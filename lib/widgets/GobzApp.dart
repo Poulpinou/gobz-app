@@ -1,0 +1,74 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gobz_app/blocs/AuthBloc.dart';
+import 'package:gobz_app/configurations/AppConfig.dart';
+import 'package:gobz_app/models/enums/AuthStatus.dart';
+import 'package:gobz_app/repositories/AuthRepository.dart';
+import 'package:gobz_app/repositories/UserRepository.dart';
+import 'package:gobz_app/widgets/pages/HomePage.dart';
+import 'package:gobz_app/widgets/pages/LoginPage.dart';
+import 'package:gobz_app/widgets/pages/SplashPage.dart';
+import 'package:gobz_app/widgets/themes/AppThemes.dart';
+
+class GobzApp extends StatelessWidget {
+  final AuthRepository authRepository = AuthRepository();
+  final UserRepository userRepository = UserRepository();
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => authRepository),
+        RepositoryProvider(create: (_) => userRepository)
+      ],
+      child: BlocProvider(
+        create: (_) => AuthBloc(
+            authRepository: authRepository, userRepository: userRepository),
+        child: GobzAppView(),
+      ),
+    );
+  }
+}
+
+class GobzAppView extends StatefulWidget {
+  _GobzAppViewState createState() => _GobzAppViewState();
+}
+
+class _GobzAppViewState extends State<GobzAppView> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
+  NavigatorState get _navigator => _navigatorKey.currentState!;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      navigatorKey: _navigatorKey,
+      title: AppConfig.instance.title,
+      theme: AppThemes.main,
+      builder: (context, child) {
+        return BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            switch (state.status) {
+              case AuthStatus.AUTHENTICATED:
+                _navigator.pushAndRemoveUntil<void>(
+                  HomePage.route(),
+                  (route) => false,
+                );
+                break;
+              case AuthStatus.UNAUTHENTICATED:
+                _navigator.pushAndRemoveUntil<void>(
+                  LoginPage.route(),
+                  (route) => false,
+                );
+                break;
+              default:
+                break;
+            }
+          },
+          child: child,
+        );
+      },
+      onGenerateRoute: (_) => SplashPage.route(),
+    );
+  }
+}
