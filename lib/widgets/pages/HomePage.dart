@@ -4,7 +4,7 @@ import 'package:gobz_app/blocs/AuthBloc.dart';
 import 'package:gobz_app/models/User.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/widgets/misc/Avatar.dart';
-import 'package:gobz_app/widgets/screens/ProjectsScreen.dart';
+import 'package:gobz_app/widgets/pages/ProjectsPage.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.pending_actions), label: "Run")),
     _HomePageScreenInfo(
         title: 'Projets',
-        screen: ProjectScreen(),
+        screen: ProjectsPage(),
         navigationBarItem: BottomNavigationBarItem(
             icon: Icon(Icons.list_alt), label: "Projets")),
   ];

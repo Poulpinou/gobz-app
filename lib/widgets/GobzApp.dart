@@ -46,7 +46,7 @@ class _GobzAppViewState extends State<GobzAppView> {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       title: AppConfig.instance.title,
-      theme: AppThemes.main,
+      theme: AppThemes.dark,
       builder: (context, child) {
         return BlocListener<AuthBloc, AuthState>(
           listener: (context, state) async {

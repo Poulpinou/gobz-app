@@ -17,10 +17,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
     if (event is FetchProjectsRequested) {
       yield* _onFetchProjects(event, state);
     } else if (event is SearchTextChanged) {
-      // There is maybe a better way...
-      yield state.copyWith(fetchStatus: ProjectStateStatus.SORTING);
       yield state.copyWith(
-          fetchStatus: ProjectStateStatus.SORTED,
           searchText: ProjectSearchInput.dirty(event.searchText));
     }
   }
@@ -96,11 +93,4 @@ class ProjectsState with FormzMixin {
   }
 }
 
-enum ProjectStateStatus {
-  UNFETCHED,
-  FETCHING,
-  FETCHED,
-  ERRORED,
-  SORTING,
-  SORTED
-}
+enum ProjectStateStatus { UNFETCHED, FETCHING, FETCHED, ERRORED }
