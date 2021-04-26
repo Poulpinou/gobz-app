@@ -71,7 +71,7 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: Theme.of(context).secondaryHeaderColor,
+      color: Theme.of(context).accentColor,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(

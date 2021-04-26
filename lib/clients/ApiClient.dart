@@ -4,33 +4,34 @@ import 'dart:io';
 import 'package:gobz_app/exceptions/BadRequestException.dart';
 import 'package:gobz_app/exceptions/FetchDataException.dart';
 import 'package:gobz_app/exceptions/UnauthorisedException.dart';
-import 'package:gobz_app/utils/LocalStorageUtils.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-class ApiClient {
-  final String host;
-  final String? basePath;
+abstract class ApiClient {
+  final String baseUrl;
+
   final bool logRequests;
-  final bool withBearerToken;
-  final String accessTokenStorageKey;
-  final Map<String, String> headers;
 
   static const Map<String, String> defaultHeaders = {
     HttpHeaders.contentTypeHeader: 'application/json',
     HttpHeaders.acceptHeader: 'application/json',
   };
 
-  ApiClient(this.host,
-      {this.basePath,
-      this.logRequests = false,
-      this.withBearerToken = false,
-      this.accessTokenStorageKey = "accessToken",
-      this.headers = defaultHeaders});
+  ApiClient(this.baseUrl, {this.logRequests = false});
 
-  dynamic _returnResponse(Response response) {
-    Log.info("Responded with status ${response.statusCode}");
+  /// Override this method to provide custom Uri
+  Uri buildUri(String? path) => Uri.http(baseUrl, path ?? "");
+
+  /// Override this method to provide custom Headers
+  Future<Map<String, String>> buildHeaders() async => defaultHeaders;
+
+  /// Override this method to provide a custom way to handle responses
+  dynamic buildResponse(Response response) {
+    if (logRequests) {
+      Log.info("Responded with status ${response.statusCode}");
+    }
+
     switch (response.statusCode) {
       case 200:
       case 201:
@@ -47,40 +48,15 @@ class ApiClient {
     }
   }
 
-  Future<Map<String, String>> _buildHeaders() async {
-    final Map<String, String> finalHeaders = Map.from(headers);
-
-    if (withBearerToken) {
-      await LocalStorageUtils.getString(accessTokenStorageKey)
-          .then((token) =>
-              finalHeaders[HttpHeaders.authorizationHeader] = "Bearer $token")
-          .onError((error, stackTrace) {
-        Log.warning("Failed to retrieve token in local storage: $error");
-        return "none";
-      });
-    }
-
-    return finalHeaders;
-  }
-
-  String _buildPath(String path) {
-    String finalPath = path;
-    if (basePath != null) {
-      finalPath = basePath! + finalPath;
-    }
-
-    return finalPath;
-  }
-
-  Future<dynamic> get(String path) async {
-    final Uri uri = Uri.http(host, _buildPath(path));
+  Future<dynamic> get(String? path) async {
+    final Uri uri = buildUri(path);
     if (logRequests) Log.info("GET ${uri.path}");
 
     var responseJson;
     try {
       final Response response =
-          await http.get(uri, headers: await _buildHeaders());
-      responseJson = _returnResponse(response);
+          await http.get(uri, headers: await buildHeaders());
+      responseJson = buildResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }
@@ -89,14 +65,14 @@ class ApiClient {
   }
 
   Future<dynamic> post(String path, {dynamic? body}) async {
-    final Uri uri = Uri.http(host, _buildPath(path));
+    final Uri uri = buildUri(path);
     if (logRequests) Log.info("POST ${uri.path} with body: $body");
 
     var responseJson;
     try {
       final Response response = await http.post(uri,
-          headers: await _buildHeaders(), body: json.encode(body));
-      responseJson = _returnResponse(response);
+          headers: await buildHeaders(), body: json.encode(body));
+      responseJson = buildResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }
@@ -104,14 +80,14 @@ class ApiClient {
   }
 
   Future<dynamic> put(String path, {dynamic? body}) async {
-    final Uri uri = Uri.http(host, _buildPath(path));
+    final Uri uri = buildUri(path);
     if (logRequests) Log.info("PUT ${uri.path}");
 
     var responseJson;
     try {
       final Response response = await http.put(uri,
-          headers: await _buildHeaders(), body: json.encode(body));
-      responseJson = _returnResponse(response);
+          headers: await buildHeaders(), body: json.encode(body));
+      responseJson = buildResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }
@@ -119,14 +95,14 @@ class ApiClient {
   }
 
   Future<dynamic> patch(String path, {dynamic? body}) async {
-    final Uri uri = Uri.http(host, _buildPath(path));
+    final Uri uri = buildUri(path);
     if (logRequests) Log.info("PATCH ${uri.path}");
 
     var responseJson;
     try {
       final Response response = await http.patch(uri,
-          headers: await _buildHeaders(), body: json.encode(body));
-      responseJson = _returnResponse(response);
+          headers: await buildHeaders(), body: json.encode(body));
+      responseJson = buildResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }
@@ -134,14 +110,14 @@ class ApiClient {
   }
 
   Future<dynamic> delete(String path) async {
-    final Uri uri = Uri.http(host, _buildPath(path));
+    final Uri uri = buildUri(path);
     if (logRequests) Log.info("DELETE ${uri.path}");
 
     var responseJson;
     try {
       final Response response =
-          await http.delete(uri, headers: await _buildHeaders());
-      responseJson = _returnResponse(response);
+          await http.delete(uri, headers: await buildHeaders());
+      responseJson = buildResponse(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }

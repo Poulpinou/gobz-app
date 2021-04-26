@@ -17,31 +17,53 @@ class LoginForm extends StatelessWidget {
             );
         }
       },
-      child: Align(
-        alignment: const Alignment(0, -1 / 3),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _EmailInput(),
-            const Padding(padding: EdgeInsets.all(12)),
-            _PasswordInput(),
-            const Padding(padding: EdgeInsets.all(12)),
-            _LoginButton(),
-          ],
-        ),
+      child: BlocBuilder<LoginBloc, LoginState>(
+        builder: (context, state) {
+          if (!state.localValuesLoaded) {
+            context.read<LoginBloc>().add(LoadLocalValues());
+          }
+
+          return Align(
+            alignment: const Alignment(0, -1 / 3),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _EmailInput(),
+                const Padding(padding: EdgeInsets.all(12)),
+                _PasswordInput(),
+                const Padding(padding: EdgeInsets.all(12)),
+                _StayConnectedInput(),
+                const Padding(padding: EdgeInsets.all(12)),
+                _LoginButton(),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-class _EmailInput extends StatelessWidget {
+class _EmailInput extends StatefulWidget {
+  @override
+  _EmailInputState createState() => _EmailInputState();
+}
+
+class _EmailInputState extends State<_EmailInput> {
+  final _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
-      buildWhen: (previous, current) => previous.email != current.email,
+      buildWhen: (previous, current) =>
+          previous.email != current.email ||
+          previous.localValuesLoaded != current.localValuesLoaded,
       builder: (context, state) {
+        if (_controller.text != state.email.value)
+          _controller.text = state.email.value;
+
         return TextField(
+          controller: _controller,
           key: const Key('loginForm_emailInput_textField'),
           onChanged: (email) =>
               context.read<LoginBloc>().add(LoginEmailChanged(email)),
@@ -56,13 +78,26 @@ class _EmailInput extends StatelessWidget {
   }
 }
 
-class _PasswordInput extends StatelessWidget {
+class _PasswordInput extends StatefulWidget {
+  @override
+  _PasswordInputState createState() => _PasswordInputState();
+}
+
+class _PasswordInputState extends State<_PasswordInput> {
+  final _controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
-      buildWhen: (previous, current) => previous.password != current.password,
+      buildWhen: (previous, current) =>
+          previous.password != current.password ||
+          previous.localValuesLoaded != current.localValuesLoaded,
       builder: (context, state) {
+        if (_controller.text != state.password.value)
+          _controller.text = state.password.value;
+
         return TextField(
+          controller: _controller,
           key: const Key('loginForm_passwordInput_textField'),
           onChanged: (password) =>
               context.read<LoginBloc>().add(LoginPasswordChanged(password)),
@@ -77,11 +112,36 @@ class _PasswordInput extends StatelessWidget {
   }
 }
 
+class _StayConnectedInput extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<LoginBloc, LoginState>(
+      buildWhen: (previous, current) =>
+          previous.stayConnected != current.stayConnected ||
+          previous.localValuesLoaded != current.localValuesLoaded,
+      builder: (context, state) => Row(
+        children: [
+          Checkbox(
+            key: const Key('loginForm_stayConnected_checkbox'),
+            value: state.stayConnected,
+            onChanged: (value) => context
+                .read<LoginBloc>()
+                .add(StayConnectedChanged(value ?? false)),
+          ),
+          const Text('Rester connecté?')
+        ],
+      ),
+    );
+  }
+}
+
 class _LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
-      buildWhen: (previous, current) => previous.status != current.status,
+      buildWhen: (previous, current) =>
+          previous.status != current.status ||
+          previous.localValuesLoaded != current.localValuesLoaded,
       builder: (context, state) {
         return state.formStatus.isSubmissionInProgress
             ? const CircularProgressIndicator()

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/AuthBloc.dart';
 import 'package:gobz_app/configurations/AppConfig.dart';
+import 'package:gobz_app/configurations/StorageKeysConfig.dart';
 import 'package:gobz_app/models/enums/AuthStatus.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/repositories/UserRepository.dart';
+import 'package:gobz_app/utils/LocalStorageUtils.dart';
 import 'package:gobz_app/widgets/pages/HomePage.dart';
 import 'package:gobz_app/widgets/pages/LoginPage.dart';
 import 'package:gobz_app/widgets/pages/SplashPage.dart';
@@ -47,7 +49,7 @@ class _GobzAppViewState extends State<GobzAppView> {
       theme: AppThemes.main,
       builder: (context, child) {
         return BlocListener<AuthBloc, AuthState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             switch (state.status) {
               case AuthStatus.AUTHENTICATED:
                 _navigator.pushAndRemoveUntil<void>(
@@ -56,10 +58,23 @@ class _GobzAppViewState extends State<GobzAppView> {
                 );
                 break;
               case AuthStatus.UNAUTHENTICATED:
-                _navigator.pushAndRemoveUntil<void>(
-                  LoginPage.route(),
-                  (route) => false,
-                );
+                final bool wasConnected = await LocalStorageUtils.getBool(
+                        StorageKeysConfig.instance.wasConnectedKey) ??
+                    false;
+                final bool stayConnected = await LocalStorageUtils.getBool(
+                        StorageKeysConfig.instance.stayConnectedKey) ??
+                    false;
+
+                if (wasConnected && stayConnected) {
+                  BlocProvider.of<AuthBloc>(context)
+                      .add(AuthAutoReconnectRequested());
+                } else {
+                  _navigator.pushAndRemoveUntil<void>(
+                    LoginPage.route(),
+                    (route) => false,
+                  );
+                }
+
                 break;
               default:
                 break;

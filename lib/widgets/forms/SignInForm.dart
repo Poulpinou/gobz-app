@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:gobz_app/blocs/SignInBloc.dart';
+import 'package:gobz_app/widgets/forms/inputs/PasswordValidationInput.dart';
 
 import 'inputs/EmailInput.dart';
 
@@ -28,6 +29,8 @@ class SignInForm extends StatelessWidget {
             _EmailInput(),
             const Padding(padding: EdgeInsets.all(12)),
             _PasswordInput(),
+            const Padding(padding: EdgeInsets.all(12)),
+            _PasswordRepeatInput(),
             const Padding(padding: EdgeInsets.all(12)),
             _SignInButton(),
           ],
@@ -96,6 +99,40 @@ class _PasswordInput extends StatelessWidget {
       },
     );
   }
+}
+
+class _PasswordRepeatInput extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SignInBloc, SignInState>(
+      buildWhen: (previous, current) => previous.repeatPassword != current.repeatPassword,
+      builder: (context, state) {
+        return TextField(
+          key: const Key('signInForm_passwordValidationInput_textField'),
+          onChanged: (password) => context
+              .read<SignInBloc>()
+              .add(SignInPasswordRepeatChanged(password)),
+          obscureText: true,
+          decoration: InputDecoration(
+            labelText: 'Confirmation du mot de passe',
+            errorText: state.repeatPassword.invalid
+                ? PasswordRepeatInput.getMessageFromError(
+                    state.repeatPassword.error!)
+                : null,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _StayConnectedInput extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+  
 }
 
 class _SignInButton extends StatelessWidget {

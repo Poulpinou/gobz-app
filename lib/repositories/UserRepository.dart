@@ -1,13 +1,9 @@
 import 'package:gobz_app/clients/ApiClient.dart';
-import 'package:gobz_app/configurations/GobzClientConfig.dart';
+import 'package:gobz_app/clients/GobzApiClient.dart';
 import 'package:gobz_app/models/User.dart';
 
 class UserRepository {
-  final ApiClient _client = ApiClient(GobzClientConfig.instance.host,
-      basePath: "/users",
-      logRequests: GobzClientConfig.instance.logRequests,
-      withBearerToken: true,
-      accessTokenStorageKey: GobzClientConfig.instance.accessTokenStorageKey);
+  final ApiClient _client = GobzApiClient(basePath: "/users");
 
   User? _user;
 

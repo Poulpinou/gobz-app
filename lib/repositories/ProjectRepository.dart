@@ -1,13 +1,10 @@
 import 'package:gobz_app/clients/ApiClient.dart';
-import 'package:gobz_app/configurations/GobzClientConfig.dart';
+import 'package:gobz_app/clients/GobzApiClient.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class ProjectRepository {
-  final ApiClient _client = ApiClient(GobzClientConfig.instance.host,
-      basePath: "/projects",
-      withBearerToken: true,
-      accessTokenStorageKey: GobzClientConfig.instance.accessTokenStorageKey);
+  final ApiClient _client = GobzApiClient(basePath: "/projects");
 
   Future<List<Project>> getAllProjects() async {
     final List<dynamic> responseData = await _client.get("");
