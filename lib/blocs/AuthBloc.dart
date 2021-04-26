@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gobz_app/configurations/StorageKeysConfig.dart';
 import 'package:gobz_app/models/User.dart';
 import 'package:gobz_app/models/enums/AuthStatus.dart';
+import 'package:gobz_app/models/requests/LoginRequest.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/repositories/UserRepository.dart';
+import 'package:gobz_app/utils/LocalStorageUtils.dart';
+import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
@@ -29,6 +33,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       yield await _mapAuthStatusChangedToState(event);
     } else if (event is AuthLogoutRequested) {
       _authRepository.logout();
+    } else if (event is AuthAutoReconnectRequested) {
+      yield await _attemptAutoReconnect();
     }
   }
 
@@ -44,6 +50,35 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             : const AuthState.unauthenticated();
       default:
         return const AuthState.unknown();
+    }
+  }
+
+  Future<AuthState> _attemptAutoReconnect() async {
+    Log.info("Auto connection requested");
+
+    final String? email = await LocalStorageUtils.getString(
+        StorageKeysConfig.instance.currentUserEmailKey);
+
+    final String? password = await LocalStorageUtils.getString(
+        StorageKeysConfig.instance.currentUserPasswordKey);
+
+    if (email == null || password == null) {
+      await LocalStorageUtils.setBool(
+          StorageKeysConfig.instance.wasConnectedKey, false);
+      return const AuthState.unauthenticated();
+    }
+
+    try {
+      await _authRepository.login(LoginRequest(email, password));
+      final user = await _userRepository.getCurrentUser();
+      return user != null
+          ? AuthState.authenticated(user)
+          : const AuthState.unauthenticated();
+    } on Exception catch (e) {
+      Log.error("Auto reconnection failed", e);
+      await LocalStorageUtils.setBool(
+          StorageKeysConfig.instance.wasConnectedKey, false);
+      return const AuthState.unauthenticated();
     }
   }
 
@@ -66,6 +101,8 @@ class AuthStatusChanged extends AuthEvent {
   final AuthStatus status;
 }
 
+class AuthAutoReconnectRequested extends AuthEvent {}
+
 class AuthLogoutRequested extends AuthEvent {}
 
 // States
@@ -73,10 +110,7 @@ class AuthState {
   final AuthStatus status;
   final User user;
 
-  const AuthState._({
-    this.status = AuthStatus.UNKNOWN,
-    this.user = User.empty,
-  });
+  const AuthState._({this.status = AuthStatus.UNKNOWN, this.user = User.empty});
 
   const AuthState.unknown() : this._();
 

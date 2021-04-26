@@ -5,7 +5,7 @@ class GobzClientConfig {
   final bool logRequests;
   final String accessTokenStorageKey;
 
-  GobzClientConfig(
+  const GobzClientConfig(
       {this.host = "10.0.2.2:8080",
       this.logRequests = false,
       this.accessTokenStorageKey = "gobzApiAccessToken"});

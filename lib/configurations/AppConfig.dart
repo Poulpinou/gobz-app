@@ -1,13 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:gobz_app/configurations/GobzClientConfig.dart';
+import 'package:gobz_app/configurations/StorageKeysConfig.dart';
 
 class AppConfig {
   final String title;
   final GobzClientConfig gobzClientConfig;
+  final StorageKeysConfig storageKeysConfig;
 
-  AppConfig({gobzClientConfig, title})
-      : this.title = title ?? "Gobz",
-        this.gobzClientConfig = gobzClientConfig ?? GobzClientConfig();
+  const AppConfig(
+      {this.title = "Gobz",
+      this.gobzClientConfig = const GobzClientConfig(),
+      this.storageKeysConfig = const StorageKeysConfig()});
 
   factory AppConfig.base() => AppConfig();
 
