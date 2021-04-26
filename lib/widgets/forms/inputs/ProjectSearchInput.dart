@@ -1,17 +1,16 @@
 import 'package:formz/formz.dart';
-
-enum ProjectSearchValidationError { empty }
+import 'package:gobz_app/widgets/forms/inputs/InputError.dart';
 
 class ProjectSearchInput
-    extends FormzInput<String, ProjectSearchValidationError> {
+    extends FormzInput<String, InputError> {
   const ProjectSearchInput.pure(): super.pure('');
 
   const ProjectSearchInput.dirty([String value = '']) : super.dirty(value);
 
   @override
-  ProjectSearchValidationError? validator(String? value) {
+  InputError? validator(String? value) {
     if (value?.isEmpty == true) {
-      return ProjectSearchValidationError.empty;
+      return InputError.empty();
     }
 
     return null;

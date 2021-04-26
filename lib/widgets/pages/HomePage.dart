@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/AuthBloc.dart';
 import 'package:gobz_app/models/User.dart';
-import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/widgets/misc/Avatar.dart';
 import 'package:gobz_app/widgets/pages/ProjectsPage.dart';
 import 'package:provider/provider.dart';
@@ -98,22 +97,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [RepositoryProvider(create: (_) => ProjectRepository())],
-      child: Scaffold(
-        appBar: _buildAppBar(context),
-        body: SafeArea(
-          child: _screenInfos.elementAt(_selectedIndex).screen,
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          items: _screenInfos.map((info) => info.navigationBarItem).toList(),
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-        ),
+    return Scaffold(
+      appBar: _buildAppBar(context),
+      body: SafeArea(
+        child: _screenInfos.elementAt(_selectedIndex).screen,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        items: _screenInfos.map((info) => info.navigationBarItem).toList(),
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }

@@ -8,7 +8,7 @@ class Project {
   final String name;
   final String description;
 
-  Project(this.id, this.name, this.description);
+  const Project(this.id, this.name, this.description);
 
   factory Project.fromJson(Map<String, dynamic> json) =>
       _$ProjectFromJson(json);

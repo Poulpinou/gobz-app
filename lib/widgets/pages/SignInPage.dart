@@ -17,17 +17,17 @@ class SignInPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Création de compte"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: BlocProvider(
-          create: (context) => SignInBloc(
-            RepositoryProvider.of<AuthRepository>(context),
-          ),
+      body: BlocProvider<SignInBloc>(
+        create: (context) => SignInBloc(
+          RepositoryProvider.of<AuthRepository>(context),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
             child: Column(
               children: [
                 SignInForm(),
-                const Padding(padding: EdgeInsets.all(12)),
+                Container(height: 12),
                 TextButton(
                     onPressed: () => Navigator.of(context).pushAndRemoveUntil(
                         LoginPage.route(), (route) => false),

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ProjectsBloc.dart';
-import 'package:gobz_app/models/Project.dart';
+import 'package:gobz_app/widgets/lists/ProjectList.dart';
 import 'package:gobz_app/widgets/pages/NewProjectPage.dart';
-
-import 'ProjectPage.dart';
 
 class ProjectsPage extends StatelessWidget {
   Widget _fetching() {
@@ -15,7 +13,7 @@ class ProjectsPage extends StatelessWidget {
           children: [
             CircularProgressIndicator(),
             Container(width: 10),
-            const Text(" Récupération des projets...")
+            const Text("Récupération des projets...")
           ],
         ),
       ),
@@ -60,7 +58,7 @@ class ProjectsPage extends StatelessWidget {
                     }
 
                     return Expanded(
-                        child: _ProjectList(projects: state.filteredProjects));
+                        child: ProjectList(projects: state.filteredProjects));
                   case ProjectStateStatus.ERRORED:
                     return Center(
                       child: Row(
@@ -99,6 +97,7 @@ class _SearchBar extends StatelessWidget {
                 decoration: InputDecoration(
                   icon: Icon(
                     Icons.search,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                   hintText: "Chercher un projet",
                 ),
@@ -107,65 +106,6 @@ class _SearchBar extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _ProjectList extends StatelessWidget {
-  final List<Project> projects;
-
-  const _ProjectList({Key? key, required this.projects}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) =>
-          _ProjectListItem(project: projects[index]),
-      itemCount: projects.length,
-      separatorBuilder: (BuildContext context, int index) => const Divider(
-        color: Colors.white,
-      ),
-    );
-  }
-}
-
-class _ProjectListItem extends StatelessWidget {
-  final Project project;
-
-  const _ProjectListItem({Key? key, required this.project}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      child: Container(
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 5.0),
-                child: Icon(
-                  Icons.image,
-                  size: 50,
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      project.name,
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    Text(project.description),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      onTap: () => Navigator.of(context).push(ProjectPage.route(project)),
     );
   }
 }

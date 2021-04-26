@@ -8,14 +8,15 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Container(
-          child: Row(
-            children: [
-              CircularProgressIndicator(),
-              Text("Chargement de Gobz...")
-            ],
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Chargement de Gobz..."),
+            Container(height: 10),
+            LinearProgressIndicator(),
+          ],
         ),
       ),
     );

@@ -15,12 +15,12 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Connexion')),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: BlocProvider(
-          create: (context) => LoginBloc(
-            RepositoryProvider.of<AuthRepository>(context),
-          ),
+      body: BlocProvider<LoginBloc>(
+        create: (context) => LoginBloc(
+          RepositoryProvider.of<AuthRepository>(context),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
             child: Column(
               children: [

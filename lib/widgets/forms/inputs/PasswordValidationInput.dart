@@ -1,9 +1,9 @@
 import 'package:formz/formz.dart';
 import 'package:gobz_app/widgets/forms/inputs/PasswordInput.dart';
 
-enum PasswordRepeatInputError { empty, notMatching, passwordInvalid }
+import 'InputError.dart';
 
-class PasswordRepeatInput extends FormzInput<String, PasswordRepeatInputError> {
+class PasswordRepeatInput extends FormzInput<String, InputError> {
   final PasswordInput? passwordInput;
 
   const PasswordRepeatInput.pure()
@@ -14,28 +14,17 @@ class PasswordRepeatInput extends FormzInput<String, PasswordRepeatInputError> {
       : super.dirty(value);
 
   @override
-  PasswordRepeatInputError? validator(String? value) {
+  InputError? validator(String? value) {
     if (passwordInput != null && passwordInput!.invalid) {
-      return PasswordRepeatInputError.passwordInvalid;
+      return InputError("Mot de passe invalide");
     }
 
     if (passwordInput == null || value == null || value.isEmpty == true) {
-      return PasswordRepeatInputError.empty;
+      return InputError("Vous devez confirmer le mot de passe");
     }
 
     return passwordInput!.value == value
         ? null
-        : PasswordRepeatInputError.notMatching;
-  }
-
-  static String getMessageFromError(PasswordRepeatInputError error) {
-    switch (error) {
-      case PasswordRepeatInputError.empty:
-        return "Vous devez confirmer le mot de passe";
-      case PasswordRepeatInputError.notMatching:
-        return "Les mots de passe ne correspondent pas";
-      case PasswordRepeatInputError.passwordInvalid:
-        return "Mot de passe invalide";
-    }
+        : InputError("Les mots de passe ne correspondent pas");
   }
 }
