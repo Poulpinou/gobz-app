@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ProjectsBloc.dart';
+import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/widgets/lists/ProjectList.dart';
 import 'package:gobz_app/widgets/pages/NewProjectPage.dart';
+import 'package:gobz_app/widgets/pages/ProjectPage.dart';
 
 class ProjectsPage extends StatelessWidget {
   Widget _fetching() {
@@ -18,6 +20,17 @@ class ProjectsPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _createProject(BuildContext context) async {
+    final Project? project =
+        await Navigator.push(context, NewProjectPage.route());
+
+    if (project != null) {
+      context.read<ProjectsBloc>().add(FetchProjectsRequested());
+
+      Navigator.push(context, ProjectPage.route(project));
+    }
   }
 
   @override
@@ -72,9 +85,11 @@ class ProjectsPage extends StatelessWidget {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => Navigator.of(context).push(NewProjectPage.route()),
-          child: const Icon(Icons.add),
+        floatingActionButton: BlocBuilder<ProjectsBloc, ProjectsState>(
+          builder: (context, state) => FloatingActionButton(
+            onPressed: () => _createProject(context),
+            child: const Icon(Icons.add),
+          ),
         ),
       ),
     );

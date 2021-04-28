@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:gobz_app/blocs/ProjectEditionBloc.dart';
-import 'package:gobz_app/widgets/pages/NewProjectPage.dart';
-import 'package:gobz_app/widgets/pages/ProjectPage.dart';
+import 'package:gobz_app/models/Project.dart';
 
 class CreateProjectForm extends StatelessWidget {
+  final Function(Project?)? onCreated;
+
+  const CreateProjectForm({Key? key, this.onCreated}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<ProjectEditionBloc, ProjectEditionState>(
@@ -16,10 +19,13 @@ class CreateProjectForm extends StatelessWidget {
             ..showSnackBar(
               const SnackBar(content: Text("La création du projet a échoué")),
             );
-        }/*
-        if(state.formStatus.isSubmissionSuccess){
-          Navigator.of(context).replace(oldRoute: NewProjectPage.route(), newRoute: ProjectPage.route(state.project!));
-        }*/
+        }
+        else if(state.formStatus.isSubmissionSuccess){
+          onCreated?.call(state.project);
+          //Navigator.of(context).replace(oldRoute: NewProjectPage.route(), newRoute: ProjectPage.route(state.project!));
+          //context.read<ProjectsBloc>().add(FetchProjectsRequested());
+          //Navigator.of(context).pop();
+        }
       },
       child: BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
         buildWhen: (previous, current) =>
