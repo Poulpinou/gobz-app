@@ -23,15 +23,19 @@ class ProjectRepository {
     return projects;
   }
 
-  Future<Project?> createProject(ProjectCreationRequest request) async {
+  Future<Project> getProject(int projectId) async {
+    final Map<String, dynamic> responseData = await _client.get("/$projectId");
+    return Project.fromJson(responseData);
+  }
+
+  Future<Project> createProject(ProjectCreationRequest request) async {
     final Map<String, dynamic> responseData =
         await _client.post("", body: request.toJson());
 
-    try {
-      return Project.fromJson(responseData);
-    } on Exception catch (e) {
-      Log.error("Failed to create project", e);
-      return null;
-    }
+    return Project.fromJson(responseData);
+  }
+
+  Future<void> deleteProject(int projectId) async {
+    return await _client.delete("/$projectId");
   }
 }

@@ -8,5 +8,6 @@ class Chapter {
 
   Chapter(this.name);
 
-  factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
+  factory Chapter.fromJson(Map<String, dynamic> json) =>
+      _$ChapterFromJson(json);
 }

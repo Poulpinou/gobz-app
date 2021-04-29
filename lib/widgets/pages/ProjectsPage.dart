@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ProjectsBloc.dart';
+import 'package:gobz_app/mixins/DisplayableMessage.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/widgets/lists/ProjectList.dart';
 import 'package:gobz_app/widgets/pages/NewProjectPage.dart';
@@ -22,6 +23,27 @@ class ProjectsPage extends StatelessWidget {
     );
   }
 
+  Widget _buildHandler({required Widget child}) {
+    return BlocListener<ProjectsBloc, ProjectsState>(
+      listener: (context, state) {
+        if (state.isErrored) {
+          final String message;
+          if (state.error is DisplayableMessage) {
+            message = (state.error as DisplayableMessage).displayableMessage;
+          } else {
+            message = "Une erreur s'est produite";
+          }
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+              content: Text(message),
+            ));
+        }
+      },
+      child: child,
+    );
+  }
+
   void _createProject(BuildContext context) async {
     final Project? project =
         await Navigator.push(context, NewProjectPage.route());
@@ -36,54 +58,67 @@ class ProjectsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          ProjectsBloc(projectRepository: RepositoryProvider.of(context)),
+      create: (context) {
+        final ProjectsBloc bloc =
+            ProjectsBloc(projectRepository: RepositoryProvider.of(context));
+
+        bloc.add(FetchProjectsRequested());
+
+        return bloc;
+      },
       child: Scaffold(
-        body: Column(
-          children: [
+        body: _buildHandler(
+          child: Column(children: [
             _SearchBar(),
             BlocBuilder<ProjectsBloc, ProjectsState>(
               buildWhen: (previous, current) =>
-                  previous.fetchStatus != current.fetchStatus ||
-                  previous.searchText.value != current.searchText.value,
+                  previous.searchText.value != current.searchText.value ||
+                  previous.isLoading != current.isLoading,
               builder: (context, state) {
-                switch (state.fetchStatus) {
-                  case ProjectStateStatus.UNFETCHED:
-                    context.read<ProjectsBloc>().add(FetchProjectsRequested());
-                    return _fetching();
-                  case ProjectStateStatus.FETCHING:
-                    return _fetching();
-                  case ProjectStateStatus.FETCHED:
-                    if (state.projects.length == 0) {
-                      return Expanded(
-                        child: Center(
-                          child: const Text("Vous n'avez encore aucun projet."),
-                        ),
-                      );
-                    }
+                if (state.isLoading) {
+                  return _fetching();
+                }
 
-                    if (state.filteredProjects.length == 0) {
-                      return Padding(
-                        padding: EdgeInsets.all(10),
-                        child: const Text(
-                            "Aucun projet ne correspond à cette recherche"),
-                      );
-                    }
-
-                    return Expanded(
-                        child: ProjectList(projects: state.filteredProjects));
-                  case ProjectStateStatus.ERRORED:
-                    return Center(
-                      child: Row(
+                if (state.isErrored) {
+                  return Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text("Impossible de récupérer les projets")
+                          const Text("Impossible de récupérer les projets"),
+                          ElevatedButton(
+                              onPressed: () => context
+                                  .read<ProjectsBloc>()
+                                  .add(FetchProjectsRequested()),
+                              child: const Text("Réessayer"))
                         ],
                       ),
-                    );
+                    ),
+                  );
                 }
+
+                if (state.projects.length == 0) {
+                  return Expanded(
+                    child: Center(
+                      child: const Text("Vous n'avez encore aucun projet."),
+                    ),
+                  );
+                }
+
+                if (state.filteredProjects.length == 0) {
+                  return Padding(
+                    padding: EdgeInsets.all(10),
+                    child: const Text(
+                        "Aucun projet ne correspond à cette recherche"),
+                  );
+                }
+
+                return Expanded(
+                    child: ProjectList(projects: state.filteredProjects));
               },
             ),
-          ],
+          ]),
         ),
         floatingActionButton: BlocBuilder<ProjectsBloc, ProjectsState>(
           builder: (context, state) => FloatingActionButton(

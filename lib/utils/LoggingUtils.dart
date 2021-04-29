@@ -14,7 +14,9 @@ class Log {
   }
 
   static void _sendLog(
-      {required String message, LogLevel level = LogLevel.INFO, Exception? exception}) {
+      {required String message,
+      LogLevel level = LogLevel.INFO,
+      Exception? exception}) {
     final DateTime time = DateTime.now();
 
     logger.log("[${time.toIso8601String()}][${level.stringValue}] $message",

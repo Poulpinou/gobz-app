@@ -1,5 +1,5 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/LoginBloc.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/widgets/forms/LoginForm.dart';
@@ -27,9 +27,9 @@ class LoginPage extends StatelessWidget {
                 LoginForm(),
                 const Padding(padding: EdgeInsets.all(12)),
                 TextButton(
-                    onPressed: () => Navigator.of(context).pushAndRemoveUntil(SignInPage.route(), (route) => false),
-                    child: const Text("Créer un compte")
-                ),
+                    onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+                        SignInPage.route(), (route) => false),
+                    child: const Text("Créer un compte")),
               ],
             ),
           ),

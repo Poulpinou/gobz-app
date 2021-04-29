@@ -11,7 +11,8 @@ class ProjectEditionBloc
     extends Bloc<ProjectEditionEvent, ProjectEditionState> {
   final ProjectRepository _projectRepository;
 
-  ProjectEditionBloc(this._projectRepository) : super(const ProjectEditionState());
+  ProjectEditionBloc(this._projectRepository)
+      : super(const ProjectEditionState());
 
   @override
   Stream<ProjectEditionState> mapEventToState(
@@ -37,7 +38,7 @@ class ProjectEditionBloc
       try {
         final Project project = (await _projectRepository.createProject(
             ProjectCreationRequest(
-                state.name.value, state.description.value, state.isShared)))!;
+                state.name.value, state.description.value, state.isShared)));
 
         yield state.copyWith(
             project: project, formStatus: FormzStatus.submissionSuccess);
@@ -48,7 +49,7 @@ class ProjectEditionBloc
     }
   }
 
- Stream<ProjectEditionState> _onUpdateProjectFormSubmitted(
+  Stream<ProjectEditionState> _onUpdateProjectFormSubmitted(
       UpdateProjectFormSubmitted event, ProjectEditionState state) async* {
     // TODO: implement method
     throw UnimplementedError();

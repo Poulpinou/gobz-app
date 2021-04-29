@@ -19,8 +19,7 @@ class CreateProjectForm extends StatelessWidget {
             ..showSnackBar(
               const SnackBar(content: Text("La création du projet a échoué")),
             );
-        }
-        else if(state.formStatus.isSubmissionSuccess){
+        } else if (state.formStatus.isSubmissionSuccess) {
           onCreated?.call(state.project);
           //Navigator.of(context).replace(oldRoute: NewProjectPage.route(), newRoute: ProjectPage.route(state.project!));
           //context.read<ProjectsBloc>().add(FetchProjectsRequested());

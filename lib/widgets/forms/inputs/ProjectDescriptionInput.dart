@@ -9,6 +9,6 @@ class ProjectDescriptionInput extends FormzInput<String, InputError> {
 
   @override
   InputError? validator(String? value) {
-    return value?.isNotEmpty == true ? null : InputError.empty();
+    return null;
   }
 }

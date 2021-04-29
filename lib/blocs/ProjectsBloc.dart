@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:gobz_app/exceptions/DisplayableException.dart';
+import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
@@ -24,14 +26,16 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 
   Stream<ProjectsState> _onFetchProjects(
       ProjectsEvent event, ProjectsState state) async* {
-    yield state.copyWith(fetchStatus: ProjectStateStatus.FETCHING);
+    yield state.copyWith(isLoading: true);
     try {
       final List<Project> projects = await _projectRepository.getAllProjects();
-      yield state.copyWith(
-          fetchStatus: ProjectStateStatus.FETCHED, projects: projects);
+      yield state.copyWith(projects: projects);
     } on Exception catch (e) {
       Log.error("Failed to retrieve projects", e);
-      yield state.copyWith(fetchStatus: ProjectStateStatus.ERRORED);
+      yield state.copyWith(
+          error: DisplayableException(
+              internMessage: e.toString(),
+              messageToDisplay: "La récupération des projets a échoué"));
     }
   }
 }
@@ -48,23 +52,25 @@ class SearchTextChanged extends ProjectsEvent {
 }
 
 // State
-class ProjectsState with FormzMixin {
-  final ProjectStateStatus fetchStatus;
+class ProjectsState extends BlocState with FormzMixin {
   final ProjectSearchInput searchText;
   final List<Project> projects;
   final List<Project> filteredProjects;
 
   ProjectsState(
-      {this.fetchStatus = ProjectStateStatus.UNFETCHED,
+      {bool? isLoading,
+      Exception? error,
       this.searchText = const ProjectSearchInput.pure(),
       this.projects = const [],
-      this.filteredProjects = const []});
+      this.filteredProjects = const []})
+      : super(isLoading: isLoading, error: error);
 
   @override
   List<FormzInput> get inputs => [searchText];
 
   ProjectsState copyWith(
-      {ProjectStateStatus? fetchStatus,
+      {bool? isLoading,
+      Exception? error,
       ProjectSearchInput? searchText,
       List<Project>? projects}) {
     final List<Project> _projects = projects ?? this.projects;
@@ -86,11 +92,10 @@ class ProjectsState with FormzMixin {
     }
 
     return ProjectsState(
-        fetchStatus: fetchStatus ?? this.fetchStatus,
+        isLoading: isLoading ?? false,
+        error: error,
         searchText: _searchText,
         projects: _projects,
         filteredProjects: _filteredProjects);
   }
 }
-
-enum ProjectStateStatus { UNFETCHED, FETCHING, FETCHED, ERRORED }

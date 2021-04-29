@@ -1,9 +1,8 @@
 import 'package:formz/formz.dart';
 import 'package:gobz_app/widgets/forms/inputs/InputError.dart';
 
-class ProjectSearchInput
-    extends FormzInput<String, InputError> {
-  const ProjectSearchInput.pure(): super.pure('');
+class ProjectSearchInput extends FormzInput<String, InputError> {
+  const ProjectSearchInput.pure() : super.pure('');
 
   const ProjectSearchInput.dirty([String value = '']) : super.dirty(value);
 

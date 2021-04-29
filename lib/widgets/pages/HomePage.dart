@@ -73,13 +73,13 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              PopupMenuDivider(),
+              /*PopupMenuDivider(),
               PopupMenuItem(
                 child: TextButton(
                   child: const Text("Profil"),
                   onPressed: () {},
                 ),
-              ),
+              ),*/
               PopupMenuDivider(),
               PopupMenuItem(
                 child: TextButton(
