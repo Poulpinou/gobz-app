@@ -8,23 +8,18 @@ import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/projects/inputs/ProjectDescriptionInput.dart';
 import 'package:gobz_app/widgets/forms/projects/inputs/ProjectNameInput.dart';
 
-class ProjectEditionBloc
-    extends Bloc<ProjectEditionEvent, ProjectEditionState> {
+class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> {
   final ProjectRepository _projectRepository;
 
   ProjectEditionBloc(this._projectRepository, {Project? project})
-      : super(project != null
-            ? ProjectEditionState.fromProject(project)
-            : ProjectEditionState.pure());
+      : super(project != null ? ProjectEditionState.fromProject(project) : ProjectEditionState.pure());
 
   @override
-  Stream<ProjectEditionState> mapEventToState(
-      ProjectEditionEvent event) async* {
+  Stream<ProjectEditionState> mapEventToState(ProjectEditionEvent event) async* {
     if (event is ProjectNameChanged) {
       yield state.copyWith(name: ProjectNameInput.dirty(event.name));
     } else if (event is ProjectDescriptionChanged) {
-      yield state.copyWith(
-          description: ProjectDescriptionInput.dirty(event.description));
+      yield state.copyWith(description: ProjectDescriptionInput.dirty(event.description));
     } else if (event is ProjectIsSharedChanged) {
       yield state.copyWith(isShared: event.isShared);
     } else if (event is CreateProjectFormSubmitted) {
@@ -39,12 +34,10 @@ class ProjectEditionBloc
     if (state.status.isValidated) {
       yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
       try {
-        final Project project = (await _projectRepository.createProject(
-            ProjectCreationRequest(
-                state.name.value, state.description.value, state.isShared)));
+        final Project project = (await _projectRepository
+            .createProject(ProjectCreationRequest(state.name.value, state.description.value, state.isShared)));
 
-        yield state.copyWith(
-            project: project, formStatus: FormzStatus.submissionSuccess);
+        yield state.copyWith(project: project, formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         Log.error('Project creation failed', e);
         yield state.copyWith(formStatus: FormzStatus.submissionFailure);
@@ -58,12 +51,9 @@ class ProjectEditionBloc
       yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
       try {
         final Project project = (await _projectRepository.updateProject(
-            state.project!.id,
-            ProjectUpdateRequest(
-                state.name.value, state.description.value, state.isShared)));
+            state.project!.id, ProjectUpdateRequest(state.name.value, state.description.value, state.isShared)));
 
-        yield state.copyWith(
-            project: project, formStatus: FormzStatus.submissionSuccess);
+        yield state.copyWith(project: project, formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         Log.error('Project update failure', e);
         yield state.copyWith(formStatus: FormzStatus.submissionFailure);
@@ -120,14 +110,11 @@ class ProjectEditionState with FormzMixin {
 
   factory ProjectEditionState.pure() => ProjectEditionState._();
 
-  factory ProjectEditionState.fromProject(
-          Project project) =>
-      ProjectEditionState._(
-          project: project,
-          name: ProjectNameInput.pure(projectName: project.name),
-          description: ProjectDescriptionInput.pure(
-              projectDescription: project.description),
-          isShared: project.isShared);
+  factory ProjectEditionState.fromProject(Project project) => ProjectEditionState._(
+      project: project,
+      name: ProjectNameInput.pure(projectName: project.name),
+      description: ProjectDescriptionInput.pure(projectDescription: project.description),
+      isShared: project.isShared);
 
   @override
   List<FormzInput> get inputs => [name, description];

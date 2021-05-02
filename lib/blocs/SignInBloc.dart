@@ -22,21 +22,17 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
     } else if (event is SignInPasswordChanged) {
       yield state.copyWith(password: PasswordInput.dirty(event.password));
     } else if (event is SignInPasswordRepeatChanged) {
-      yield state.copyWith(
-          repeatPassword:
-              PasswordRepeatInput.dirty(event.passwordRepeat, state.password));
+      yield state.copyWith(repeatPassword: PasswordRepeatInput.dirty(event.passwordRepeat, state.password));
     } else if (event is SignInSubmitted) {
       yield* _onFormSubmitted(event, state);
     }
   }
 
-  Stream<SignInState> _onFormSubmitted(
-      SignInSubmitted event, SignInState state) async* {
+  Stream<SignInState> _onFormSubmitted(SignInSubmitted event, SignInState state) async* {
     if (state.status.isValidated) {
       yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
       try {
-        await _authRepository.signIn(SignInRequest(
-            state.username.value, state.email.value, state.password.value));
+        await _authRepository.signIn(SignInRequest(state.username.value, state.email.value, state.password.value));
 
         yield state.copyWith(formStatus: FormzStatus.submissionSuccess);
       } catch (e) {

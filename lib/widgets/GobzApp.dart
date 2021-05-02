@@ -26,8 +26,7 @@ class GobzApp extends StatelessWidget {
         RepositoryProvider(create: (_) => ProjectRepository())
       ],
       child: BlocProvider(
-        create: (_) => AuthBloc(
-            authRepository: authRepository, userRepository: userRepository),
+        create: (_) => AuthBloc(authRepository: authRepository, userRepository: userRepository),
         child: GobzAppView(),
       ),
     );
@@ -60,16 +59,13 @@ class _GobzAppViewState extends State<GobzAppView> {
                 );
                 break;
               case AuthStatus.UNAUTHENTICATED:
-                final bool wasConnected = await LocalStorageUtils.getBool(
-                        StorageKeysConfig.instance.wasConnectedKey) ??
-                    false;
-                final bool stayConnected = await LocalStorageUtils.getBool(
-                        StorageKeysConfig.instance.stayConnectedKey) ??
-                    false;
+                final bool wasConnected =
+                    await LocalStorageUtils.getBool(StorageKeysConfig.instance.wasConnectedKey) ?? false;
+                final bool stayConnected =
+                    await LocalStorageUtils.getBool(StorageKeysConfig.instance.stayConnectedKey) ?? false;
 
                 if (wasConnected && stayConnected) {
-                  BlocProvider.of<AuthBloc>(context)
-                      .add(AuthAutoReconnectRequested());
+                  BlocProvider.of<AuthBloc>(context).add(AuthAutoReconnectRequested());
                 } else {
                   _navigator.pushAndRemoveUntil<void>(
                     LoginPage.route(),

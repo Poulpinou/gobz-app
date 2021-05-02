@@ -13,8 +13,7 @@ class NewProjectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ProjectEditionBloc>(
-      create: (context) =>
-          ProjectEditionBloc(context.read<ProjectRepository>()),
+      create: (context) => ProjectEditionBloc(context.read<ProjectRepository>()),
       lazy: false,
       child: Scaffold(
         appBar: AppBar(
@@ -22,8 +21,7 @@ class NewProjectPage extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.all(12),
-          child: SingleChildScrollView(
-              child: CreateProjectForm(onCreated: (project) {
+          child: SingleChildScrollView(child: CreateProjectForm(onCreated: (project) {
             Navigator.pop(context, project);
           })),
         ),

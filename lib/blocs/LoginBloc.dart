@@ -30,14 +30,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  Future<LoginState> _loadLocalValues(
-      LoadLocalValues event, LoginState state) async {
-    final bool? stayConnected = await LocalStorageUtils.getBool(
-        StorageKeysConfig.instance.stayConnectedKey);
-    final String? email = await LocalStorageUtils.getString(
-        StorageKeysConfig.instance.currentUserEmailKey);
-    final String? password = await LocalStorageUtils.getString(
-        StorageKeysConfig.instance.currentUserPasswordKey);
+  Future<LoginState> _loadLocalValues(LoadLocalValues event, LoginState state) async {
+    final bool? stayConnected = await LocalStorageUtils.getBool(StorageKeysConfig.instance.stayConnectedKey);
+    final String? email = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserEmailKey);
+    final String? password = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserPasswordKey);
 
     return state.copyWith(
         stayConnected: stayConnected,
@@ -46,22 +42,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         localValuesLoaded: true);
   }
 
-  Stream<LoginState> _onFormSubmitted(
-      LoginSubmitted event, LoginState state) async* {
+  Stream<LoginState> _onFormSubmitted(LoginSubmitted event, LoginState state) async* {
     if (state.status.isValidated) {
       yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
       try {
-        await _authRepository
-            .login(LoginRequest(state.email.value, state.password.value));
+        await _authRepository.login(LoginRequest(state.email.value, state.password.value));
 
         // Store current user infos
-        await LocalStorageUtils.setBool(
-            StorageKeysConfig.instance.stayConnectedKey, state.stayConnected);
-        await LocalStorageUtils.setString(
-            StorageKeysConfig.instance.currentUserEmailKey, state.email.value);
-        await LocalStorageUtils.setString(
-            StorageKeysConfig.instance.currentUserPasswordKey,
-            state.password.value);
+        await LocalStorageUtils.setBool(StorageKeysConfig.instance.stayConnectedKey, state.stayConnected);
+        await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserEmailKey, state.email.value);
+        await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserPasswordKey, state.password.value);
 
         yield state.copyWith(formStatus: FormzStatus.submissionSuccess);
       } catch (e) {

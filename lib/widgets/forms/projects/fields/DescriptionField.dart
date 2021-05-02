@@ -19,21 +19,15 @@ class _DescriptionFieldState extends State<_DescriptionField> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
-      buildWhen: (previous, current) =>
-          previous.description != current.description,
+      buildWhen: (previous, current) => previous.description != current.description,
       builder: (context, state) => TextField(
         controller: _controller,
-        key: Key(
-            '${_isEdition ? 'edit' : 'create'}_projectForm_descriptionField'),
-        onChanged: (description) => context
-            .read<ProjectEditionBloc>()
-            .add(ProjectDescriptionChanged(description)),
+        key: Key('${_isEdition ? 'edit' : 'create'}_projectForm_descriptionField'),
+        onChanged: (description) => context.read<ProjectEditionBloc>().add(ProjectDescriptionChanged(description)),
         decoration: InputDecoration(
           labelText: 'Description',
           floatingLabelBehavior: FloatingLabelBehavior.always,
-          errorText: state.description.invalid
-              ? state.description.error?.message
-              : null,
+          errorText: state.description.invalid ? state.description.error?.message : null,
           fillColor: Theme.of(context).colorScheme.surface,
           filled: true,
         ),

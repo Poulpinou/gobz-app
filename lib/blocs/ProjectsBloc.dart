@@ -19,13 +19,11 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
     if (event is FetchProjects) {
       yield* _onFetchProjects(event, state);
     } else if (event is SearchTextChanged) {
-      yield state.copyWith(
-          searchText: ProjectSearchInput.dirty(event.searchText));
+      yield state.copyWith(searchText: ProjectSearchInput.dirty(event.searchText));
     }
   }
 
-  Stream<ProjectsState> _onFetchProjects(
-      ProjectsEvent event, ProjectsState state) async* {
+  Stream<ProjectsState> _onFetchProjects(ProjectsEvent event, ProjectsState state) async* {
     yield state.copyWith(isLoading: true);
     try {
       final List<Project> projects = await _projectRepository.getAllProjects();
@@ -34,8 +32,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
       Log.error("Failed to retrieve projects", e);
       yield state.copyWith(
           error: DisplayableException(
-              internMessage: e.toString(),
-              messageToDisplay: "La récupération des projets a échoué"));
+              internMessage: e.toString(), messageToDisplay: "La récupération des projets a échoué"));
     }
   }
 }
@@ -68,22 +65,15 @@ class ProjectsState extends BlocState with FormzMixin {
   @override
   List<FormzInput> get inputs => [searchText];
 
-  ProjectsState copyWith(
-      {bool? isLoading,
-      Exception? error,
-      ProjectSearchInput? searchText,
-      List<Project>? projects}) {
+  ProjectsState copyWith({bool? isLoading, Exception? error, ProjectSearchInput? searchText, List<Project>? projects}) {
     final List<Project> _projects = projects ?? this.projects;
     final ProjectSearchInput _searchText = searchText ?? this.searchText;
     final List<Project> _filteredProjects;
     // If search text or project list changed, recompute
     if (searchText != null || projects != null) {
       if (_searchText.valid) {
-        _filteredProjects = _projects
-            .where((project) => project.name
-                .toUpperCase()
-                .contains(_searchText.value.toUpperCase()))
-            .toList();
+        _filteredProjects =
+            _projects.where((project) => project.name.toUpperCase().contains(_searchText.value.toUpperCase())).toList();
       } else {
         _filteredProjects = _projects;
       }

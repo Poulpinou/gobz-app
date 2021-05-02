@@ -5,8 +5,7 @@ class ProjectList extends StatelessWidget {
   final List<Project> projects;
   final Function(Project)? onProjectClicked;
 
-  const ProjectList({Key? key, required this.projects, this.onProjectClicked})
-      : super(key: key);
+  const ProjectList({Key? key, required this.projects, this.onProjectClicked}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +26,7 @@ class ProjectListItem extends StatelessWidget {
   final Project project;
   final Function(Project)? onProjectClicked;
 
-  const ProjectListItem(
-      {Key? key, required this.project, this.onProjectClicked})
-      : super(key: key);
+  const ProjectListItem({Key? key, required this.project, this.onProjectClicked}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +49,10 @@ class ProjectListItem extends StatelessWidget {
                   children: [
                     Text(
                       project.name,
-                      style: Theme.of(context).textTheme.headline6?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline6
+                          ?.copyWith(color: Theme.of(context).colorScheme.secondary),
                     ),
                     Text(project.description),
                   ],

@@ -27,8 +27,7 @@ class LoginPage extends StatelessWidget {
                 LoginForm(),
                 const Padding(padding: EdgeInsets.all(12)),
                 TextButton(
-                    onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                        SignInPage.route(), (route) => false),
+                    onPressed: () => Navigator.of(context).pushAndRemoveUntil(SignInPage.route(), (route) => false),
                     child: const Text("Créer un compte")),
               ],
             ),

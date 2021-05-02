@@ -9,8 +9,7 @@ class PasswordRepeatInput extends FormzInput<String, InputError> {
       : this.passwordInput = null,
         super.pure('');
 
-  const PasswordRepeatInput.dirty(String value, this.passwordInput)
-      : super.dirty(value);
+  const PasswordRepeatInput.dirty(String value, this.passwordInput) : super.dirty(value);
 
   @override
   InputError? validator(String? value) {
@@ -22,8 +21,6 @@ class PasswordRepeatInput extends FormzInput<String, InputError> {
       return InputError("Vous devez confirmer le mot de passe");
     }
 
-    return passwordInput!.value == value
-        ? null
-        : InputError("Les mots de passe ne correspondent pas");
+    return passwordInput!.value == value ? null : InputError("Les mots de passe ne correspondent pas");
   }
 }

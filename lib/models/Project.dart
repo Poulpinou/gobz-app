@@ -11,6 +11,5 @@ class Project {
 
   const Project(this.id, this.name, this.description, this.isShared);
 
-  factory Project.fromJson(Map<String, dynamic> json) =>
-      _$ProjectFromJson(json);
+  factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);
 }

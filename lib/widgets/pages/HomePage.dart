@@ -22,18 +22,15 @@ class _HomePageState extends State<HomePage> {
     _HomePageScreenInfo(
         title: 'Accueil',
         screen: const Text('Accueil'),
-        navigationBarItem:
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil")),
+        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil")),
     _HomePageScreenInfo(
         title: 'Run',
         screen: const Text('Run'),
-        navigationBarItem: BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions), label: "Run")),
+        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.pending_actions), label: "Run")),
     _HomePageScreenInfo(
         title: 'Projets',
         screen: ProjectsPage(),
-        navigationBarItem: BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt), label: "Projets")),
+        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: "Projets")),
   ];
 
   AppBar _buildAppBar(BuildContext context) {
@@ -76,8 +73,7 @@ class _HomePageState extends State<HomePage> {
               PopupMenuDivider(),
               PopupMenuItem(
                 child: const Text("Déconnexion"),
-                value: () =>
-                    context.read<AuthBloc>().add(AuthLogoutRequested()),
+                value: () => context.read<AuthBloc>().add(AuthLogoutRequested()),
               ),
             ];
           },
@@ -111,8 +107,5 @@ class _HomePageScreenInfo {
   final Widget screen;
   final BottomNavigationBarItem navigationBarItem;
 
-  const _HomePageScreenInfo(
-      {required this.title,
-      required this.screen,
-      required this.navigationBarItem});
+  const _HomePageScreenInfo({required this.title, required this.screen, required this.navigationBarItem});
 }

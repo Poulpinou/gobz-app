@@ -29,8 +29,7 @@ class SignInPage extends StatelessWidget {
                 SignInForm(),
                 Container(height: 12),
                 TextButton(
-                    onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                        LoginPage.route(), (route) => false),
+                    onPressed: () => Navigator.of(context).pushAndRemoveUntil(LoginPage.route(), (route) => false),
                     child: const Text("J'ai déjà un compte")),
               ],
             ),

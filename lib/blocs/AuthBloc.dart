@@ -16,9 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   late StreamSubscription<AuthStatus> _authStatusSubscription;
 
-  AuthBloc(
-      {required AuthRepository authRepository,
-      required UserRepository userRepository})
+  AuthBloc({required AuthRepository authRepository, required UserRepository userRepository})
       : _authRepository = authRepository,
         _userRepository = userRepository,
         super(const AuthState.unknown()) {
@@ -38,16 +36,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<AuthState> _mapAuthStatusChangedToState(
-      AuthStatusChanged event) async {
+  Future<AuthState> _mapAuthStatusChangedToState(AuthStatusChanged event) async {
     switch (event.status) {
       case AuthStatus.UNAUTHENTICATED:
         return const AuthState.unauthenticated();
       case AuthStatus.AUTHENTICATED:
         final user = await _userRepository.getCurrentUser();
-        return user != null
-            ? AuthState.authenticated(user)
-            : const AuthState.unauthenticated();
+        return user != null ? AuthState.authenticated(user) : const AuthState.unauthenticated();
       default:
         return const AuthState.unknown();
     }
@@ -58,27 +53,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     yield AuthState.authenticating();
 
-    final String? email = await LocalStorageUtils.getString(
-        StorageKeysConfig.instance.currentUserEmailKey);
+    final String? email = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserEmailKey);
 
-    final String? password = await LocalStorageUtils.getString(
-        StorageKeysConfig.instance.currentUserPasswordKey);
+    final String? password = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserPasswordKey);
 
     if (email == null || password == null) {
-      await LocalStorageUtils.setBool(
-          StorageKeysConfig.instance.wasConnectedKey, false);
+      await LocalStorageUtils.setBool(StorageKeysConfig.instance.wasConnectedKey, false);
       yield AuthState.unauthenticated();
     } else {
       try {
         await _authRepository.login(LoginRequest(email, password));
         final user = await _userRepository.getCurrentUser();
-        yield user != null
-            ? AuthState.authenticated(user)
-            : const AuthState.unauthenticated();
+        yield user != null ? AuthState.authenticated(user) : const AuthState.unauthenticated();
       } catch (e) {
         Log.error("Auto reconnection failed", e);
-        await LocalStorageUtils.setBool(
-            StorageKeysConfig.instance.wasConnectedKey, false);
+        await LocalStorageUtils.setBool(StorageKeysConfig.instance.wasConnectedKey, false);
         yield const AuthState.unauthenticated();
       }
     }
@@ -116,11 +105,9 @@ class AuthState {
 
   const AuthState.unknown() : this._();
 
-  const AuthState.authenticated(User user)
-      : this._(status: AuthStatus.AUTHENTICATED, user: user);
+  const AuthState.authenticated(User user) : this._(status: AuthStatus.AUTHENTICATED, user: user);
 
-  const AuthState.unauthenticated()
-      : this._(status: AuthStatus.UNAUTHENTICATED);
+  const AuthState.unauthenticated() : this._(status: AuthStatus.UNAUTHENTICATED);
 
   const AuthState.authenticating() : this._(status: AuthStatus.AUTHENTICATING);
 }

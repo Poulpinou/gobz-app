@@ -31,15 +31,13 @@ class ProjectRepository {
   }
 
   Future<Project> createProject(ProjectCreationRequest request) async {
-    final Map<String, dynamic> responseData =
-        await _client.post("", body: request.toJson());
+    final Map<String, dynamic> responseData = await _client.post("", body: request.toJson());
 
     return Project.fromJson(responseData);
   }
 
   Future<Project> updateProject(int projectId, ProjectUpdateRequest request) async {
-    final Map<String, dynamic> responseData =
-        await _client.put("/$projectId", body: request.toJson());
+    final Map<String, dynamic> responseData = await _client.put("/$projectId", body: request.toJson());
 
     return Project.fromJson(responseData);
   }

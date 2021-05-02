@@ -13,11 +13,7 @@ class ProjectsPage extends StatelessWidget {
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            Container(width: 10),
-            const Text("Récupération des projets...")
-          ],
+          children: [CircularProgressIndicator(), Container(width: 10), const Text("Récupération des projets...")],
         ),
       ),
     );
@@ -45,8 +41,7 @@ class ProjectsPage extends StatelessWidget {
   }
 
   void _createProject(BuildContext context) async {
-    final Project? project =
-        await Navigator.push(context, NewProjectPage.route());
+    final Project? project = await Navigator.push(context, NewProjectPage.route());
 
     if (project != null) {
       context.read<ProjectsBloc>().add(FetchProjects());
@@ -65,8 +60,7 @@ class ProjectsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) {
-        final ProjectsBloc bloc =
-            ProjectsBloc(projectRepository: RepositoryProvider.of(context));
+        final ProjectsBloc bloc = ProjectsBloc(projectRepository: RepositoryProvider.of(context));
 
         bloc.add(FetchProjects());
 
@@ -78,8 +72,7 @@ class ProjectsPage extends StatelessWidget {
             _SearchBar(),
             BlocBuilder<ProjectsBloc, ProjectsState>(
               buildWhen: (previous, current) =>
-                  previous.searchText.value != current.searchText.value ||
-                  previous.isLoading != current.isLoading,
+                  previous.searchText.value != current.searchText.value || previous.isLoading != current.isLoading,
               builder: (context, state) {
                 if (state.isLoading) {
                   return _buildFetching();
@@ -94,9 +87,7 @@ class ProjectsPage extends StatelessWidget {
                         children: [
                           const Text("Impossible de récupérer les projets"),
                           ElevatedButton(
-                              onPressed: () => context
-                                  .read<ProjectsBloc>()
-                                  .add(FetchProjects()),
+                              onPressed: () => context.read<ProjectsBloc>().add(FetchProjects()),
                               child: const Text("Réessayer"))
                         ],
                       ),
@@ -115,16 +106,14 @@ class ProjectsPage extends StatelessWidget {
                 if (state.filteredProjects.length == 0) {
                   return Padding(
                     padding: EdgeInsets.all(10),
-                    child: const Text(
-                        "Aucun projet ne correspond à cette recherche"),
+                    child: const Text("Aucun projet ne correspond à cette recherche"),
                   );
                 }
 
                 return Expanded(
                     child: ProjectList(
                         projects: state.filteredProjects,
-                        onProjectClicked: (project) =>
-                            _clickProject(context, project)));
+                        onProjectClicked: (project) => _clickProject(context, project)));
               },
             ),
           ]),
@@ -151,8 +140,7 @@ class _SearchBar extends StatelessWidget {
           children: [
             Expanded(
               child: TextField(
-                onChanged: (value) =>
-                    context.read<ProjectsBloc>().add(SearchTextChanged(value)),
+                onChanged: (value) => context.read<ProjectsBloc>().add(SearchTextChanged(value)),
                 decoration: InputDecoration(
                   icon: Icon(
                     Icons.search,

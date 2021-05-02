@@ -23,11 +23,8 @@ class _NameFieldState extends State<_NameField> {
       builder: (context, state) => TextField(
         controller: _controller,
         key: Key('${_isEdition ? 'edit' : 'create'}_projectForm_nameField'),
-        onChanged: (name) =>
-            context.read<ProjectEditionBloc>().add(ProjectNameChanged(name)),
-        decoration: InputDecoration(
-            labelText: 'Nom',
-            errorText: state.name.invalid ? state.name.error?.message : null),
+        onChanged: (name) => context.read<ProjectEditionBloc>().add(ProjectNameChanged(name)),
+        decoration: InputDecoration(labelText: 'Nom', errorText: state.name.invalid ? state.name.error?.message : null),
       ),
     );
   }

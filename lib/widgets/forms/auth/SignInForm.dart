@@ -42,13 +42,9 @@ class _UsernameInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('signInForm_usernameInput'),
-          onChanged: (username) =>
-              context.read<SignInBloc>().add(SignInUsernameChanged(username)),
+          onChanged: (username) => context.read<SignInBloc>().add(SignInUsernameChanged(username)),
           decoration: InputDecoration(
-              labelText: 'Pseudo',
-              errorText: state.username.invalid
-                  ? state.username.error?.message
-                  : null),
+              labelText: 'Pseudo', errorText: state.username.invalid ? state.username.error?.message : null),
         );
       },
     );
@@ -63,12 +59,9 @@ class _EmailInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('signInForm_emailInput'),
-          onChanged: (email) =>
-              context.read<SignInBloc>().add(SignInEmailChanged(email)),
-          decoration: InputDecoration(
-              labelText: 'Email',
-              errorText:
-                  state.email.invalid ? state.email.error?.message : null),
+          onChanged: (email) => context.read<SignInBloc>().add(SignInEmailChanged(email)),
+          decoration:
+              InputDecoration(labelText: 'Email', errorText: state.email.invalid ? state.email.error?.message : null),
         );
       },
     );
@@ -83,13 +76,11 @@ class _PasswordInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('signInForm_passwordInput'),
-          onChanged: (password) =>
-              context.read<SignInBloc>().add(SignInPasswordChanged(password)),
+          onChanged: (password) => context.read<SignInBloc>().add(SignInPasswordChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Mot de passe',
-            errorText:
-                state.password.invalid ? state.password.error?.message : null,
+            errorText: state.password.invalid ? state.password.error?.message : null,
           ),
         );
       },
@@ -101,20 +92,15 @@ class _PasswordRepeatInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SignInBloc, SignInState>(
-      buildWhen: (previous, current) =>
-          previous.repeatPassword != current.repeatPassword,
+      buildWhen: (previous, current) => previous.repeatPassword != current.repeatPassword,
       builder: (context, state) {
         return TextField(
           key: const Key('signInForm_passwordValidationInput'),
-          onChanged: (password) => context
-              .read<SignInBloc>()
-              .add(SignInPasswordRepeatChanged(password)),
+          onChanged: (password) => context.read<SignInBloc>().add(SignInPasswordRepeatChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Confirmation du mot de passe',
-            errorText: state.repeatPassword.invalid
-                ? state.repeatPassword.error?.message
-                : null,
+            errorText: state.repeatPassword.invalid ? state.repeatPassword.error?.message : null,
           ),
         );
       },
@@ -133,10 +119,8 @@ class _SignInButton extends StatelessWidget {
             : ElevatedButton(
                 key: const Key('signInForm_submit'),
                 child: const Text('Connexion'),
-                onPressed: state.status.isValidated
-                    ? () =>
-                        context.read<SignInBloc>().add(const SignInSubmitted())
-                    : null,
+                onPressed:
+                    state.status.isValidated ? () => context.read<SignInBloc>().add(const SignInSubmitted()) : null,
               );
       },
     );

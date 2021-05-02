@@ -52,21 +52,16 @@ class _EmailInputState extends State<_EmailInput> {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       buildWhen: (previous, current) =>
-          previous.email != current.email ||
-          previous.localValuesLoaded != current.localValuesLoaded,
+          previous.email != current.email || previous.localValuesLoaded != current.localValuesLoaded,
       builder: (context, state) {
-        if (_controller.text != state.email.value)
-          _controller.text = state.email.value;
+        if (_controller.text != state.email.value) _controller.text = state.email.value;
 
         return TextField(
           controller: _controller,
           key: const Key('loginForm_emailInput'),
-          onChanged: (email) =>
-              context.read<LoginBloc>().add(LoginEmailChanged(email)),
-          decoration: InputDecoration(
-              labelText: 'Email',
-              errorText:
-                  state.email.invalid ? state.email.error?.message : null),
+          onChanged: (email) => context.read<LoginBloc>().add(LoginEmailChanged(email)),
+          decoration:
+              InputDecoration(labelText: 'Email', errorText: state.email.invalid ? state.email.error?.message : null),
         );
       },
     );
@@ -85,22 +80,18 @@ class _PasswordInputState extends State<_PasswordInput> {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       buildWhen: (previous, current) =>
-          previous.password != current.password ||
-          previous.localValuesLoaded != current.localValuesLoaded,
+          previous.password != current.password || previous.localValuesLoaded != current.localValuesLoaded,
       builder: (context, state) {
-        if (_controller.text != state.password.value)
-          _controller.text = state.password.value;
+        if (_controller.text != state.password.value) _controller.text = state.password.value;
 
         return TextField(
           controller: _controller,
           key: const Key('loginForm_passwordInput'),
-          onChanged: (password) =>
-              context.read<LoginBloc>().add(LoginPasswordChanged(password)),
+          onChanged: (password) => context.read<LoginBloc>().add(LoginPasswordChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Mot de passe',
-            errorText:
-                state.password.invalid ? state.password.error?.message : null,
+            errorText: state.password.invalid ? state.password.error?.message : null,
           ),
         );
       },
@@ -113,16 +104,13 @@ class _StayConnectedInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       buildWhen: (previous, current) =>
-          previous.stayConnected != current.stayConnected ||
-          previous.localValuesLoaded != current.localValuesLoaded,
+          previous.stayConnected != current.stayConnected || previous.localValuesLoaded != current.localValuesLoaded,
       builder: (context, state) => Row(
         children: [
           Checkbox(
             key: const Key('loginForm_stayConnected'),
             value: state.stayConnected,
-            onChanged: (value) => context
-                .read<LoginBloc>()
-                .add(StayConnectedChanged(value ?? false)),
+            onChanged: (value) => context.read<LoginBloc>().add(StayConnectedChanged(value ?? false)),
           ),
           const Text('Rester connecté?')
         ],
@@ -136,18 +124,15 @@ class _LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       buildWhen: (previous, current) =>
-          previous.status != current.status ||
-          previous.localValuesLoaded != current.localValuesLoaded,
+          previous.status != current.status || previous.localValuesLoaded != current.localValuesLoaded,
       builder: (context, state) {
         return state.formStatus.isSubmissionInProgress
             ? const CircularProgressIndicator()
             : ElevatedButton(
                 key: const Key('loginForm_submit'),
                 child: const Text('Connexion'),
-                onPressed: state.status.isValidated
-                    ? () =>
-                        context.read<LoginBloc>().add(const LoginSubmitted())
-                    : null,
+                onPressed:
+                    state.status.isValidated ? () => context.read<LoginBloc>().add(const LoginSubmitted()) : null,
               );
       },
     );

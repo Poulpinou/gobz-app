@@ -4,11 +4,9 @@ import 'package:formz/formz.dart';
 import 'package:gobz_app/blocs/ProjectEditionBloc.dart';
 import 'package:gobz_app/models/Project.dart';
 
-part 'fields/NameField.dart';
-
 part 'fields/DescriptionField.dart';
-
 part 'fields/IsSharedField.dart';
+part 'fields/NameField.dart';
 
 class CreateProjectForm extends StatelessWidget {
   final Function(Project?)? onCreated;
@@ -30,8 +28,7 @@ class CreateProjectForm extends StatelessWidget {
         }
       },
       child: BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
-        buildWhen: (previous, current) =>
-            previous.formStatus != current.formStatus,
+        buildWhen: (previous, current) => previous.formStatus != current.formStatus,
         builder: (context, state) => state.formStatus.isSubmissionInProgress
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -50,15 +47,12 @@ class CreateProjectForm extends StatelessWidget {
                   _IsSharedField(),
                   const Padding(padding: EdgeInsets.all(12)),
                   BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
-                      buildWhen: (previous, current) =>
-                          previous.status != current.status,
+                      buildWhen: (previous, current) => previous.status != current.status,
                       builder: (context, state) {
                         return ElevatedButton(
                             key: const Key("projectForm_submit"),
                             onPressed: state.status.isValidated
-                                ? () => context
-                                    .read<ProjectEditionBloc>()
-                                    .add(CreateProjectFormSubmitted())
+                                ? () => context.read<ProjectEditionBloc>().add(CreateProjectFormSubmitted())
                                 : null,
                             child: const Text("Créer"));
                       }),
@@ -73,8 +67,7 @@ class UpdateProjectForm extends StatelessWidget {
   final Project project;
   final Function(Project)? onValidate;
 
-  const UpdateProjectForm({Key? key, required this.project, this.onValidate})
-      : super(key: key);
+  const UpdateProjectForm({Key? key, required this.project, this.onValidate}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +84,7 @@ class UpdateProjectForm extends StatelessWidget {
         }
       },
       child: BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
-        buildWhen: (previous, current) =>
-            previous.formStatus != current.formStatus,
+        buildWhen: (previous, current) => previous.formStatus != current.formStatus,
         builder: (context, state) => state.formStatus.isSubmissionInProgress
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -111,15 +103,12 @@ class UpdateProjectForm extends StatelessWidget {
                   _IsSharedField(initialValue: state.isShared),
                   const Padding(padding: EdgeInsets.all(12)),
                   BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
-                      buildWhen: (previous, current) =>
-                          previous.status != current.status,
+                      buildWhen: (previous, current) => previous.status != current.status,
                       builder: (context, state) {
                         return ElevatedButton(
                             key: const Key("projectForm_submit"),
                             onPressed: state.status.isValidated
-                                ? () => context
-                                    .read<ProjectEditionBloc>()
-                                    .add(UpdateProjectFormSubmitted())
+                                ? () => context.read<ProjectEditionBloc>().add(UpdateProjectFormSubmitted())
                                 : null,
                             child: const Text("Sauvegarder"));
                       })

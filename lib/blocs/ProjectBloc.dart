@@ -10,8 +10,7 @@ import 'package:gobz_app/utils/LoggingUtils.dart';
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   final ProjectRepository _projectRepository;
 
-  ProjectBloc(this._projectRepository, Project project)
-      : super(ProjectState(project: project));
+  ProjectBloc(this._projectRepository, Project project) : super(ProjectState(project: project));
 
   @override
   Stream<ProjectState> mapEventToState(ProjectEvent event) async* {
@@ -26,15 +25,13 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Stream<ProjectState> _fetchProject() async* {
     yield state.copyWith(isLoading: true);
     try {
-      final Project project =
-          await _projectRepository.getProject(state.project.id);
+      final Project project = await _projectRepository.getProject(state.project.id);
       yield state.copyWith(project: project);
     } catch (e) {
       Log.error("Failed to retrieve project", e);
       yield state.copyWith(
           error: DisplayableException(
-              internMessage: e.toString(),
-              messageToDisplay: "La récupération du projet a échoué"));
+              internMessage: e.toString(), messageToDisplay: "La récupération du projet a échoué"));
     }
   }
 
@@ -46,9 +43,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     } catch (e) {
       Log.error("Failed to delete project", e);
       yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(),
-              messageToDisplay: "La suppression du projet a échoué"));
+          error:
+              DisplayableException(internMessage: e.toString(), messageToDisplay: "La suppression du projet a échoué"));
     }
   }
 }
@@ -75,11 +71,7 @@ class ProjectState extends BlocState {
       : super(isLoading: isLoading, error: error);
 
   ProjectState copyWith(
-          {bool? isLoading,
-          Exception? error,
-          Project? project,
-          bool? projectDeleted,
-          bool? projectUpToDate}) =>
+          {bool? isLoading, Exception? error, Project? project, bool? projectDeleted, bool? projectUpToDate}) =>
       ProjectState(
         project: project ?? this.project,
         isLoading: isLoading ?? false,

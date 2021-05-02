@@ -20,8 +20,7 @@ class EditProjectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ProjectEditionBloc>(
-      create: (context) =>
-          ProjectEditionBloc(context.read<ProjectRepository>(), project: project),
+      create: (context) => ProjectEditionBloc(context.read<ProjectRepository>(), project: project),
       lazy: false,
       child: Scaffold(
         appBar: AppBar(

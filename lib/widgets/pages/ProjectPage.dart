@@ -13,14 +13,12 @@ class ProjectPage extends StatelessWidget {
   const ProjectPage({Key? key, required this.project}) : super(key: key);
 
   static Route route(Project project) {
-    return MaterialPageRoute<void>(
-        builder: (_) => ProjectPage(project: project));
+    return MaterialPageRoute<void>(builder: (_) => ProjectPage(project: project));
   }
 
   // Actions
   void _editProject(BuildContext context) async {
-    final Project? project = await Navigator.push(
-        context, EditProjectPage.route(project: this.project));
+    final Project? project = await Navigator.push(context, EditProjectPage.route(project: this.project));
 
     if (project != null) {
       context.read<ProjectBloc>().add(FetchProject());
@@ -49,7 +47,7 @@ class ProjectPage extends StatelessWidget {
               ],
             ));
 
-    if(isConfirmed != null && isConfirmed == true){
+    if (isConfirmed != null && isConfirmed == true) {
       context.read<ProjectBloc>().add(DeleteProject());
     }
   }
@@ -58,8 +56,7 @@ class ProjectPage extends StatelessWidget {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: BlocBuilder<ProjectBloc, ProjectState>(
-          buildWhen: (previous, current) =>
-              previous.project.name != current.project.name,
+          buildWhen: (previous, current) => previous.project.name != current.project.name,
           builder: (context, state) => Text(state.project.name)),
       actions: [
         PopupMenuButton<Function>(
@@ -151,8 +148,7 @@ class ProjectPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<ProjectBloc>(
       create: (context) {
-        final ProjectBloc bloc =
-            ProjectBloc(context.read<ProjectRepository>(), project);
+        final ProjectBloc bloc = ProjectBloc(context.read<ProjectRepository>(), project);
 
         bloc.add(FetchProject());
 
@@ -162,8 +158,7 @@ class ProjectPage extends StatelessWidget {
         appBar: _buildAppBar(context),
         body: _buildHandler(
           child: BlocBuilder<ProjectBloc, ProjectState>(
-            buildWhen: (previous, current) =>
-                previous.isLoading != current.isLoading,
+            buildWhen: (previous, current) => previous.isLoading != current.isLoading,
             builder: (context, state) => Column(
               children: [
                 _buildInfos(),

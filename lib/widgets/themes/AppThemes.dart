@@ -14,9 +14,7 @@ class AppThemes {
     scaffoldBackgroundColor: backgroundColor,
     primaryTextTheme: GoogleFonts.latoTextTheme(),
     appBarTheme: AppBarTheme(
-        centerTitle: true,
-        elevation: 4,
-        titleTextStyle: TextStyle(color: white, fontWeight: FontWeight.bold)),
+        centerTitle: true, elevation: 4, titleTextStyle: TextStyle(color: white, fontWeight: FontWeight.bold)),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: mainColor,
     ),
