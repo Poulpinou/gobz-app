@@ -3,9 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ProjectBloc.dart';
 import 'package:gobz_app/mixins/DisplayableMessage.dart';
 import 'package:gobz_app/models/Project.dart';
+import 'package:gobz_app/models/ProjectInfos.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
+import 'package:intl/intl.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import 'EditProjectPage.dart';
+
+part 'parts/components/ProgressInfos.dart';
+part 'parts/components/ProjectInfos.dart';
+part 'parts/components/ProjectSectionDisplay.dart';
 
 class ProjectPage extends StatelessWidget {
   final Project project;
@@ -116,30 +123,27 @@ class ProjectPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfos() {
-    return BlocBuilder<ProjectBloc, ProjectState>(
-      buildWhen: (previous, current) => previous.isLoading != current.isLoading,
-      builder: (context, state) => Row(
-        children: [
-          Expanded(
-            child: Card(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.image,
-                    size: 100,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(state.project.description),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+  Widget _buildResourcesInfos(BuildContext context) {
+    return _ProjectSectionDisplay(
+      title: 'Ressources',
+      icon: Icons.storage,
+      child: const Text("Arrive bientôt!"),
+    );
+  }
+
+  Widget _buildMembersInfos(BuildContext context) {
+    return _ProjectSectionDisplay(
+      title: 'Membres',
+      icon: Icons.group,
+      child: const Text("Arrive bientôt!"),
+    );
+  }
+
+  Widget _buildStatistics(BuildContext context) {
+    return _ProjectSectionDisplay(
+      title: 'Statistiques',
+      icon: Icons.bar_chart,
+      child: const Text("Arrive bientôt!"),
     );
   }
 
@@ -159,10 +163,20 @@ class ProjectPage extends StatelessWidget {
         body: _buildHandler(
           child: BlocBuilder<ProjectBloc, ProjectState>(
             buildWhen: (previous, current) => previous.isLoading != current.isLoading,
-            builder: (context, state) => Column(
-              children: [
-                _buildInfos(),
-              ],
+            builder: (context, state) => SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _ProjectInfos(),
+                    _ProgressInfos(),
+                    _buildMembersInfos(context),
+                    _buildResourcesInfos(context),
+                    _buildStatistics(context),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

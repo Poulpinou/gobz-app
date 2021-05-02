@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/exceptions/DisplayableException.dart';
 import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Project.dart';
+import 'package:gobz_app/models/ProjectInfos.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 
@@ -25,8 +26,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Stream<ProjectState> _fetchProject() async* {
     yield state.copyWith(isLoading: true);
     try {
-      final Project project = await _projectRepository.getProject(state.project.id);
-      yield state.copyWith(project: project);
+      final ProjectInfos projectInfos = await _projectRepository.getProjectInfos(state.project.id);
+      yield state.copyWith(project: projectInfos.project, projectInfos: projectInfos);
     } catch (e) {
       Log.error("Failed to retrieve project", e);
       yield state.copyWith(
@@ -59,6 +60,7 @@ class DeleteProject extends ProjectEvent {}
 // State
 class ProjectState extends BlocState {
   final Project project;
+  final ProjectInfos? projectInfos;
   final bool projectDeleted;
   final bool projectUpToDate;
 
@@ -66,16 +68,25 @@ class ProjectState extends BlocState {
       {bool? isLoading,
       Exception? error,
       required this.project,
+      this.projectInfos,
       this.projectDeleted = false,
       this.projectUpToDate = false})
       : super(isLoading: isLoading, error: error);
 
+  bool get shouldBeFetched => !projectUpToDate || projectInfos == null;
+
   ProjectState copyWith(
-          {bool? isLoading, Exception? error, Project? project, bool? projectDeleted, bool? projectUpToDate}) =>
+          {bool? isLoading,
+          Exception? error,
+          Project? project,
+          ProjectInfos? projectInfos,
+          bool? projectDeleted,
+          bool? projectUpToDate}) =>
       ProjectState(
         project: project ?? this.project,
         isLoading: isLoading ?? false,
         error: error,
+        projectInfos: projectInfos ?? this.projectInfos,
         projectDeleted: projectDeleted ?? this.projectDeleted,
         projectUpToDate: projectUpToDate ?? this.projectDeleted,
       );

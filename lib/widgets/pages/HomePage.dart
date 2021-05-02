@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/AuthBloc.dart';
 import 'package:gobz_app/models/User.dart';
 import 'package:gobz_app/widgets/misc/Avatar.dart';
-import 'package:gobz_app/widgets/pages/ProjectsPage.dart';
+import 'package:gobz_app/widgets/pages/projects/ProjectsPage.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {

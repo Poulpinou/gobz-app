@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ProjectsBloc.dart';
 import 'package:gobz_app/mixins/DisplayableMessage.dart';
 import 'package:gobz_app/models/Project.dart';
-import 'package:gobz_app/widgets/lists/ProjectList.dart';
-import 'package:gobz_app/widgets/pages/NewProjectPage.dart';
-import 'package:gobz_app/widgets/pages/ProjectPage.dart';
+import 'package:gobz_app/widgets/pages/projects/NewProjectPage.dart';
+import 'package:gobz_app/widgets/pages/projects/ProjectPage.dart';
+import 'package:gobz_app/widgets/pages/projects/parts/lists/ProjectList.dart';
+
+part 'parts/components/SearchBar.dart';
 
 class ProjectsPage extends StatelessWidget {
   Widget _buildFetching() {
@@ -123,34 +125,6 @@ class ProjectsPage extends StatelessWidget {
             onPressed: () => _createProject(context),
             child: const Icon(Icons.add),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SearchBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: Theme.of(context).secondaryHeaderColor,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                onChanged: (value) => context.read<ProjectsBloc>().add(SearchTextChanged(value)),
-                decoration: InputDecoration(
-                  icon: Icon(
-                    Icons.search,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                  hintText: "Chercher un projet",
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );

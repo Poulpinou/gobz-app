@@ -1,6 +1,7 @@
 import 'package:gobz_app/clients/ApiClient.dart';
 import 'package:gobz_app/clients/GobzApiClient.dart';
 import 'package:gobz_app/models/Project.dart';
+import 'package:gobz_app/models/ProjectInfos.dart';
 import 'package:gobz_app/models/requests/ProjectCreationRequest.dart';
 import 'package:gobz_app/models/requests/ProjectUpdateRequest.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
@@ -28,6 +29,11 @@ class ProjectRepository {
   Future<Project> getProject(int projectId) async {
     final Map<String, dynamic> responseData = await _client.get("/$projectId");
     return Project.fromJson(responseData);
+  }
+
+  Future<ProjectInfos> getProjectInfos(int projectId) async {
+    final Map<String, dynamic> responseData = await _client.get("/$projectId/infos");
+    return ProjectInfos.fromJson(responseData);
   }
 
   Future<Project> createProject(ProjectCreationRequest request) async {

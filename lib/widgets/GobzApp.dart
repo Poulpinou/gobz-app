@@ -9,8 +9,8 @@ import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/repositories/UserRepository.dart';
 import 'package:gobz_app/utils/LocalStorageUtils.dart';
 import 'package:gobz_app/widgets/pages/HomePage.dart';
-import 'package:gobz_app/widgets/pages/LoginPage.dart';
 import 'package:gobz_app/widgets/pages/SplashPage.dart';
+import 'package:gobz_app/widgets/pages/auth/LoginPage.dart';
 import 'package:gobz_app/widgets/themes/AppThemes.dart';
 
 class GobzApp extends StatelessWidget {
