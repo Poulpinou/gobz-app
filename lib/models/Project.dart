@@ -4,9 +4,13 @@ part 'Project.g.dart';
 
 @JsonSerializable()
 class Project {
+  final int id;
   final String name;
+  final String description;
+  final bool isShared;
 
-  Project(this.name);
+  const Project(this.id, this.name, this.description, this.isShared);
 
-  factory Project.fromJson(Map<String, dynamic> json) => _$ProjectFromJson(json);
+  factory Project.fromJson(Map<String, dynamic> json) =>
+      _$ProjectFromJson(json);
 }

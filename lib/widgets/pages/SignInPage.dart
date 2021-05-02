@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/SignInBloc.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
-import 'package:gobz_app/widgets/forms/SignInForm.dart';
+import 'package:gobz_app/widgets/forms/auth/SignInForm.dart';
 
 import 'LoginPage.dart';
 
@@ -17,17 +17,17 @@ class SignInPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Création de compte"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: BlocProvider(
-          create: (context) => SignInBloc(
-            RepositoryProvider.of<AuthRepository>(context),
-          ),
+      body: BlocProvider<SignInBloc>(
+        create: (context) => SignInBloc(
+          RepositoryProvider.of<AuthRepository>(context),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
             child: Column(
               children: [
                 SignInForm(),
-                const Padding(padding: EdgeInsets.all(12)),
+                Container(height: 12),
                 TextButton(
                     onPressed: () => Navigator.of(context).pushAndRemoveUntil(
                         LoginPage.route(), (route) => false),

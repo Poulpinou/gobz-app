@@ -1,3 +1,4 @@
+
 import 'AppException.dart';
 
 class FetchDataException extends AppException {

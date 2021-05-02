@@ -1,8 +1,7 @@
-import 'package:formz/formz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:gobz_app/blocs/LoginBloc.dart';
-import 'package:gobz_app/widgets/forms/inputs/EmailInput.dart';
 
 class LoginForm extends StatelessWidget {
   @override
@@ -23,20 +22,17 @@ class LoginForm extends StatelessWidget {
             context.read<LoginBloc>().add(LoadLocalValues());
           }
 
-          return Align(
-            alignment: const Alignment(0, -1 / 3),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _EmailInput(),
-                const Padding(padding: EdgeInsets.all(12)),
-                _PasswordInput(),
-                const Padding(padding: EdgeInsets.all(12)),
-                _StayConnectedInput(),
-                const Padding(padding: EdgeInsets.all(12)),
-                _LoginButton(),
-              ],
-            ),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _EmailInput(),
+              const Padding(padding: EdgeInsets.all(8)),
+              _PasswordInput(),
+              const Padding(padding: EdgeInsets.all(8)),
+              _StayConnectedInput(),
+              const Padding(padding: EdgeInsets.all(12)),
+              _LoginButton(),
+            ],
           );
         },
       ),
@@ -64,14 +60,13 @@ class _EmailInputState extends State<_EmailInput> {
 
         return TextField(
           controller: _controller,
-          key: const Key('loginForm_emailInput_textField'),
+          key: const Key('loginForm_emailInput'),
           onChanged: (email) =>
               context.read<LoginBloc>().add(LoginEmailChanged(email)),
           decoration: InputDecoration(
               labelText: 'Email',
-              errorText: state.email.invalid
-                  ? EmailInput.getMessageFromError(state.email.error!)
-                  : null),
+              errorText:
+                  state.email.invalid ? state.email.error?.message : null),
         );
       },
     );
@@ -98,13 +93,14 @@ class _PasswordInputState extends State<_PasswordInput> {
 
         return TextField(
           controller: _controller,
-          key: const Key('loginForm_passwordInput_textField'),
+          key: const Key('loginForm_passwordInput'),
           onChanged: (password) =>
               context.read<LoginBloc>().add(LoginPasswordChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Mot de passe',
-            errorText: state.password.invalid ? "Mot de passe invalide" : null,
+            errorText:
+                state.password.invalid ? state.password.error?.message : null,
           ),
         );
       },
@@ -122,7 +118,7 @@ class _StayConnectedInput extends StatelessWidget {
       builder: (context, state) => Row(
         children: [
           Checkbox(
-            key: const Key('loginForm_stayConnected_checkbox'),
+            key: const Key('loginForm_stayConnected'),
             value: state.stayConnected,
             onChanged: (value) => context
                 .read<LoginBloc>()
@@ -146,7 +142,7 @@ class _LoginButton extends StatelessWidget {
         return state.formStatus.isSubmissionInProgress
             ? const CircularProgressIndicator()
             : ElevatedButton(
-                key: const Key('loginForm_continue_raisedButton'),
+                key: const Key('loginForm_submit'),
                 child: const Text('Connexion'),
                 onPressed: state.status.isValidated
                     ? () =>

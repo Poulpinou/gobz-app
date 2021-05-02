@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/AuthBloc.dart';
 import 'package:gobz_app/models/User.dart';
-import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/widgets/misc/Avatar.dart';
-import 'package:gobz_app/widgets/screens/ProjectsScreen.dart';
+import 'package:gobz_app/widgets/pages/ProjectsPage.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,7 +31,7 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.pending_actions), label: "Run")),
     _HomePageScreenInfo(
         title: 'Projets',
-        screen: ProjectScreen(),
+        screen: ProjectsPage(),
         navigationBarItem: BottomNavigationBarItem(
             icon: Icon(Icons.list_alt), label: "Projets")),
   ];
@@ -48,7 +47,7 @@ class _HomePageState extends State<HomePage> {
         style: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       actions: [
-        PopupMenuButton(
+        PopupMenuButton<Function?>(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Avatar(
@@ -57,7 +56,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           itemBuilder: (BuildContext context) {
-            return <PopupMenuEntry>[
+            return <PopupMenuEntry<Function?>>[
               PopupMenuItem(
                 child: Row(
                   children: [
@@ -76,18 +75,9 @@ class _HomePageState extends State<HomePage> {
               ),
               PopupMenuDivider(),
               PopupMenuItem(
-                child: TextButton(
-                  child: const Text("Profil"),
-                  onPressed: () {},
-                ),
-              ),
-              PopupMenuDivider(),
-              PopupMenuItem(
-                child: TextButton(
-                  child: const Text("Déconnexion"),
-                  onPressed: () =>
-                      context.read<AuthBloc>().add(AuthLogoutRequested()),
-                ),
+                child: const Text("Déconnexion"),
+                value: () =>
+                    context.read<AuthBloc>().add(AuthLogoutRequested()),
               ),
             ];
           },
@@ -98,22 +88,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [RepositoryProvider(create: (_) => ProjectRepository())],
-      child: Scaffold(
-        appBar: _buildAppBar(context),
-        body: SafeArea(
-          child: _screenInfos.elementAt(_selectedIndex).screen,
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          items: _screenInfos.map((info) => info.navigationBarItem).toList(),
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-        ),
+    return Scaffold(
+      appBar: _buildAppBar(context),
+      body: SafeArea(
+        child: _screenInfos.elementAt(_selectedIndex).screen,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        items: _screenInfos.map((info) => info.navigationBarItem).toList(),
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }

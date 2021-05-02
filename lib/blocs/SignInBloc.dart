@@ -3,10 +3,10 @@ import 'package:formz/formz.dart';
 import 'package:gobz_app/models/requests/SignInRequest.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
-import 'package:gobz_app/widgets/forms/inputs/EmailInput.dart';
-import 'package:gobz_app/widgets/forms/inputs/PasswordInput.dart';
-import 'package:gobz_app/widgets/forms/inputs/PasswordValidationInput.dart';
-import 'package:gobz_app/widgets/forms/inputs/UsernameInput.dart';
+import 'package:gobz_app/widgets/forms/auth/inputs/EmailInput.dart';
+import 'package:gobz_app/widgets/forms/auth/inputs/PasswordInput.dart';
+import 'package:gobz_app/widgets/forms/auth/inputs/PasswordValidationInput.dart';
+import 'package:gobz_app/widgets/forms/auth/inputs/UsernameInput.dart';
 
 class SignInBloc extends Bloc<SignInEvent, SignInState> {
   final AuthRepository _authRepository;
@@ -39,7 +39,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
             state.username.value, state.email.value, state.password.value));
 
         yield state.copyWith(formStatus: FormzStatus.submissionSuccess);
-      } on Exception catch (e) {
+      } catch (e) {
         Log.error("Sign in failed", e);
         yield state.copyWith(formStatus: FormzStatus.submissionFailure);
       }

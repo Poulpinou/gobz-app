@@ -1,13 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:gobz_app/configurations/AppConfig.dart';
 import 'package:gobz_app/configurations/StorageKeysConfig.dart';
 import 'package:gobz_app/models/requests/LoginRequest.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/utils/LocalStorageUtils.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
-import 'package:gobz_app/widgets/forms/inputs/PasswordInput.dart';
-import 'package:gobz_app/widgets/forms/inputs/EmailInput.dart';
+import 'package:gobz_app/widgets/forms/auth/inputs/EmailInput.dart';
+import 'package:gobz_app/widgets/forms/auth/inputs/PasswordInput.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthRepository _authRepository;
@@ -65,7 +64,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             state.password.value);
 
         yield state.copyWith(formStatus: FormzStatus.submissionSuccess);
-      } on Exception catch (e) {
+      } catch (e) {
         Log.error("Login failed", e);
         yield state.copyWith(formStatus: FormzStatus.submissionFailure);
       }
