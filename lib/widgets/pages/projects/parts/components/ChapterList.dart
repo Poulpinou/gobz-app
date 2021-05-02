@@ -1,32 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:gobz_app/models/Project.dart';
+import 'package:gobz_app/models/Chapter.dart';
 
-class ProjectList extends StatelessWidget {
-  final List<Project> projects;
-  final Function(Project)? onProjectClicked;
+class ChapterList extends StatelessWidget {
+  final List<Chapter> chapters;
+  final Function(Chapter chapter)? onChapterClicked;
 
-  const ProjectList({Key? key, required this.projects, this.onProjectClicked}) : super(key: key);
+  const ChapterList({
+    Key? key,
+    required this.chapters,
+    this.onChapterClicked,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      itemBuilder: (context, index) => ProjectListItem(
-        project: projects[index],
-        onProjectClicked: onProjectClicked,
-      ),
-      itemCount: projects.length,
-      separatorBuilder: (BuildContext context, int index) => Divider(
-        color: Theme.of(context).colorScheme.secondary,
-      ),
-    );
+        itemBuilder: (context, index) => ChapterListItem(
+              chapter: chapters[index],
+              onChapterClicked: onChapterClicked,
+            ),
+        separatorBuilder: (BuildContext context, int index) => Divider(
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+        itemCount: chapters.length);
   }
 }
 
-class ProjectListItem extends StatelessWidget {
-  final Project project;
-  final Function(Project)? onProjectClicked;
+class ChapterListItem extends StatelessWidget {
+  final Chapter chapter;
+  final Function(Chapter chapter)? onChapterClicked;
 
-  const ProjectListItem({Key? key, required this.project, this.onProjectClicked}) : super(key: key);
+  const ChapterListItem({
+    Key? key,
+    required this.chapter,
+    this.onChapterClicked,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +55,12 @@ class ProjectListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      project.name,
+                      chapter.name,
                       style: Theme.of(context)
                           .textTheme
                           .headline6
                           ?.copyWith(color: Theme.of(context).colorScheme.secondary),
                     ),
-                    Text(project.description),
                   ],
                 ),
               ),
@@ -62,7 +68,7 @@ class ProjectListItem extends StatelessWidget {
           ),
         ),
       ),
-      onTap: () => onProjectClicked?.call(project),
+      onTap: () => onChapterClicked?.call(chapter),
     );
   }
 }

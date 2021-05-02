@@ -13,7 +13,7 @@ class GobzApiClient extends ApiClient {
       : super(GobzClientConfig.instance.host, logRequests: GobzClientConfig.instance.logRequests);
 
   @override
-  Uri buildUri(String? path) => Uri.http(baseUrl, "$basePath$path");
+  Uri buildUri(String? path) => Uri.http(baseUrl, "${basePath ?? ""}$path");
 
   @override
   Future<Map<String, String>> buildHeaders() async {

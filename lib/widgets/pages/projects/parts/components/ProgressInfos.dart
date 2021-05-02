@@ -1,6 +1,11 @@
 part of '../../ProjectPage.dart';
 
+
 class _ProgressInfos extends StatelessWidget {
+  final Function()? onClick;
+
+  const _ProgressInfos({Key? key, this.onClick}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return _ProjectSectionDisplay(
@@ -8,7 +13,7 @@ class _ProgressInfos extends StatelessWidget {
       icon: Icons.library_add_check_sharp,
       action: TextButton(
         child: const Text("Consulter"),
-        onPressed: () => print("Going to chapters..."),
+        onPressed: onClick,
       ),
       child: BlocBuilder<ProjectBloc, ProjectState>(
         buildWhen: (previous, current) => previous.isLoading != current.isLoading,
@@ -20,7 +25,9 @@ class _ProgressInfos extends StatelessWidget {
           }
 
           final ProjectInfos infos = state.projectInfos!;
-          final double donePercent = infos.progressInfos.tasksDoneAmount / infos.progressInfos.tasksAmount;
+          final double donePercent = infos.progressInfos.tasksAmount == 0
+              ? 0
+              : infos.progressInfos.tasksDoneAmount / infos.progressInfos.tasksAmount;
 
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

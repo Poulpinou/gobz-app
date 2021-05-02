@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gobz_app/blocs/ChaptersBloc.dart';
 import 'package:gobz_app/blocs/ProjectBloc.dart';
 import 'package:gobz_app/mixins/DisplayableMessage.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/models/ProjectInfos.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
+import 'package:gobz_app/widgets/misc/BlocHandler.dart';
+import 'package:gobz_app/widgets/pages/projects/ChaptersPage.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import 'EditProjectPage.dart';
 
 part 'parts/components/ProgressInfos.dart';
+
 part 'parts/components/ProjectInfos.dart';
+
 part 'parts/components/ProjectSectionDisplay.dart';
 
 class ProjectPage extends StatelessWidget {
@@ -59,6 +64,12 @@ class ProjectPage extends StatelessWidget {
     }
   }
 
+  void _goToChapters(BuildContext context) async {
+    await Navigator.push(context, ChaptersPage.route(project));
+
+    context.read<ProjectBloc>().add(FetchProject());
+  }
+
   // Build Parts
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
@@ -94,32 +105,20 @@ class ProjectPage extends StatelessWidget {
   }
 
   Widget _buildHandler({required Widget child}) {
-    return BlocListener<ProjectBloc, ProjectState>(
-      listener: (context, state) {
+    return BlocHandler<ProjectBloc, ProjectState>.custom(
+      mapErrorToNotification: (state) {
         if (state.projectDeleted) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              content: Text("${state.project.name} as été supprimé"),
-              backgroundColor: Colors.greenAccent,
-            ));
-          Navigator.pop(context, null);
-        } else if (state.isErrored) {
-          final String message;
-          if (state.error is DisplayableMessage) {
-            message = (state.error as DisplayableMessage).displayableMessage;
-          } else {
-            message = "Une erreur s'est produite";
-          }
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-              content: Text(message),
-              backgroundColor: Colors.redAccent,
-            ));
+          return BlocNotification.success("${state.project.name} as été supprimé");
         }
       },
-      child: child,
+      child: BlocListener<ProjectBloc, ProjectState>(
+        listener: (context, state) {
+          if (state.projectDeleted) {
+            Navigator.pop(context, null);
+          }
+        },
+        child: child,
+      ),
     );
   }
 
@@ -170,7 +169,7 @@ class ProjectPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _ProjectInfos(),
-                    _ProgressInfos(),
+                    _ProgressInfos(onClick: () => _goToChapters(context)),
                     _buildMembersInfos(context),
                     _buildResourcesInfos(context),
                     _buildStatistics(context),

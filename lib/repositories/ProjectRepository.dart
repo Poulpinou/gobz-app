@@ -12,18 +12,12 @@ class ProjectRepository {
   Future<List<Project>> getAllProjects() async {
     final List<dynamic> responseData = await _client.get("");
 
-    final List<Project> projects = [];
-    responseData.forEach((element) {
-      try {
-        final Project project = Project.fromJson(element);
-        projects.add(project);
-      } catch (e) {
-        Log.error("Failed to build project from data: $element", e);
-        rethrow;
-      }
-    });
-
-    return projects;
+    try {
+      return responseData.map((projectData) => Project.fromJson(projectData)).toList();
+    } catch (e) {
+      Log.error("Failed to create projects from response", e);
+      rethrow;
+    }
   }
 
   Future<Project> getProject(int projectId) async {

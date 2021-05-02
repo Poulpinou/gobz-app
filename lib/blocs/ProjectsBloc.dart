@@ -8,25 +8,24 @@ import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/projects/inputs/ProjectSearchInput.dart';
 
 class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
-  final ProjectRepository _projectRepository;
+  final ProjectRepository projectRepository;
 
-  ProjectsBloc({required ProjectRepository projectRepository})
-      : _projectRepository = projectRepository,
+  ProjectsBloc({required this.projectRepository}) :
         super(ProjectsState());
 
   @override
   Stream<ProjectsState> mapEventToState(ProjectsEvent event) async* {
     if (event is FetchProjects) {
-      yield* _onFetchProjects(event, state);
+      yield* _onFetchProjects(state);
     } else if (event is SearchTextChanged) {
       yield state.copyWith(searchText: ProjectSearchInput.dirty(event.searchText));
     }
   }
 
-  Stream<ProjectsState> _onFetchProjects(ProjectsEvent event, ProjectsState state) async* {
+  Stream<ProjectsState> _onFetchProjects(ProjectsState state) async* {
     yield state.copyWith(isLoading: true);
     try {
-      final List<Project> projects = await _projectRepository.getAllProjects();
+      final List<Project> projects = await projectRepository.getAllProjects();
       yield state.copyWith(projects: projects);
     } catch (e) {
       Log.error("Failed to retrieve projects", e);
