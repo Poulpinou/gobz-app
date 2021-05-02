@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ProjectEditionBloc.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
-import 'package:gobz_app/widgets/forms/ProjectForm.dart';
+import 'package:gobz_app/widgets/forms/projects/ProjectForm.dart';
 
 class NewProjectPage extends StatelessWidget {
   static Route<Project> route() {

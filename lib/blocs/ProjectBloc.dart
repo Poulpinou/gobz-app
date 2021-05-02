@@ -29,7 +29,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       final Project project =
           await _projectRepository.getProject(state.project.id);
       yield state.copyWith(project: project);
-    } on Exception catch (e) {
+    } catch (e) {
       Log.error("Failed to retrieve project", e);
       yield state.copyWith(
           error: DisplayableException(
@@ -43,7 +43,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     try {
       await _projectRepository.deleteProject(state.project.id);
       yield state.copyWith(projectDeleted: true);
-    } on Exception catch (e) {
+    } catch (e) {
       Log.error("Failed to delete project", e);
       yield state.copyWith(
           error: DisplayableException(

@@ -34,7 +34,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } else if (event is AuthLogoutRequested) {
       _authRepository.logout();
     } else if (event is AuthAutoReconnectRequested) {
-      yield await _attemptAutoReconnect();
+      yield* _attemptAutoReconnect();
     }
   }
 
@@ -53,8 +53,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<AuthState> _attemptAutoReconnect() async {
+  Stream<AuthState> _attemptAutoReconnect() async* {
     Log.info("Auto connection requested");
+
+    yield AuthState.authenticating();
 
     final String? email = await LocalStorageUtils.getString(
         StorageKeysConfig.instance.currentUserEmailKey);
@@ -65,20 +67,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (email == null || password == null) {
       await LocalStorageUtils.setBool(
           StorageKeysConfig.instance.wasConnectedKey, false);
-      return const AuthState.unauthenticated();
-    }
-
-    try {
-      await _authRepository.login(LoginRequest(email, password));
-      final user = await _userRepository.getCurrentUser();
-      return user != null
-          ? AuthState.authenticated(user)
-          : const AuthState.unauthenticated();
-    } on Exception catch (e) {
-      Log.error("Auto reconnection failed", e);
-      await LocalStorageUtils.setBool(
-          StorageKeysConfig.instance.wasConnectedKey, false);
-      return const AuthState.unauthenticated();
+      yield AuthState.unauthenticated();
+    } else {
+      try {
+        await _authRepository.login(LoginRequest(email, password));
+        final user = await _userRepository.getCurrentUser();
+        yield user != null
+            ? AuthState.authenticated(user)
+            : const AuthState.unauthenticated();
+      } catch (e) {
+        Log.error("Auto reconnection failed", e);
+        await LocalStorageUtils.setBool(
+            StorageKeysConfig.instance.wasConnectedKey, false);
+        yield const AuthState.unauthenticated();
+      }
     }
   }
 
@@ -119,4 +121,6 @@ class AuthState {
 
   const AuthState.unauthenticated()
       : this._(status: AuthStatus.UNAUTHENTICATED);
+
+  const AuthState.authenticating() : this._(status: AuthStatus.AUTHENTICATING);
 }

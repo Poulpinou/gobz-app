@@ -5,7 +5,7 @@ import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
-import 'package:gobz_app/widgets/forms/inputs/ProjectSearchInput.dart';
+import 'package:gobz_app/widgets/forms/projects/inputs/ProjectSearchInput.dart';
 
 class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
   final ProjectRepository _projectRepository;
@@ -30,7 +30,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
     try {
       final List<Project> projects = await _projectRepository.getAllProjects();
       yield state.copyWith(projects: projects);
-    } on Exception catch (e) {
+    } catch (e) {
       Log.error("Failed to retrieve projects", e);
       yield state.copyWith(
           error: DisplayableException(

@@ -1,5 +1,5 @@
 import 'package:formz/formz.dart';
-import 'package:gobz_app/widgets/forms/inputs/InputError.dart';
+import 'package:gobz_app/widgets/forms/generics/inputs/InputError.dart';
 
 class PasswordInput extends FormzInput<String, InputError> {
   const PasswordInput.pure() : super.pure('');

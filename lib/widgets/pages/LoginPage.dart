@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/LoginBloc.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
-import 'package:gobz_app/widgets/forms/LoginForm.dart';
+import 'package:gobz_app/widgets/forms/auth/LoginForm.dart';
 
 import 'SignInPage.dart';
 

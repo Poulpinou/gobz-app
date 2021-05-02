@@ -9,18 +9,23 @@ class Log {
     _sendLog(message: message, level: LogLevel.WARNING);
   }
 
-  static void error(String message, Exception exception) {
-    _sendLog(message: message, level: LogLevel.ERROR, exception: exception);
+  static void error(String message, Object error) {
+    if (error is Error) {
+      _sendLog(message: message, level: LogLevel.ERROR, error: error, stackTrace: error.stackTrace);
+    }else{
+      _sendLog(message: message, level: LogLevel.ERROR, error: error);
+    }
   }
 
   static void _sendLog(
       {required String message,
       LogLevel level = LogLevel.INFO,
-      Exception? exception}) {
+      Object? error,
+      StackTrace? stackTrace}) {
     final DateTime time = DateTime.now();
 
     logger.log("[${time.toIso8601String()}][${level.stringValue}] $message",
-        level: level.index, error: exception, time: time);
+        level: level.index, error: error, time: time, stackTrace: stackTrace);
   }
 }
 

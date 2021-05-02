@@ -2,6 +2,7 @@ import 'package:gobz_app/clients/ApiClient.dart';
 import 'package:gobz_app/clients/GobzApiClient.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/models/requests/ProjectCreationRequest.dart';
+import 'package:gobz_app/models/requests/ProjectUpdateRequest.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class ProjectRepository {
@@ -15,8 +16,9 @@ class ProjectRepository {
       try {
         final Project project = Project.fromJson(element);
         projects.add(project);
-      } on Exception catch (e) {
+      } catch (e) {
         Log.error("Failed to build project from data: $element", e);
+        rethrow;
       }
     });
 
@@ -31,6 +33,13 @@ class ProjectRepository {
   Future<Project> createProject(ProjectCreationRequest request) async {
     final Map<String, dynamic> responseData =
         await _client.post("", body: request.toJson());
+
+    return Project.fromJson(responseData);
+  }
+
+  Future<Project> updateProject(int projectId, ProjectUpdateRequest request) async {
+    final Map<String, dynamic> responseData =
+        await _client.put("/$projectId", body: request.toJson());
 
     return Project.fromJson(responseData);
   }

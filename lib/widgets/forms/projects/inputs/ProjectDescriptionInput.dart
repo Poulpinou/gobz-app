@@ -1,9 +1,8 @@
 import 'package:formz/formz.dart';
-
-import 'InputError.dart';
+import 'package:gobz_app/widgets/forms/generics/inputs/InputError.dart';
 
 class ProjectDescriptionInput extends FormzInput<String, InputError> {
-  const ProjectDescriptionInput.pure() : super.pure('');
+  const ProjectDescriptionInput.pure({String? projectDescription}) : super.pure(projectDescription ?? '');
 
   const ProjectDescriptionInput.dirty([String value = '']) : super.dirty(value);
 

@@ -8,7 +8,7 @@ import 'package:gobz_app/widgets/pages/NewProjectPage.dart';
 import 'package:gobz_app/widgets/pages/ProjectPage.dart';
 
 class ProjectsPage extends StatelessWidget {
-  Widget _fetching() {
+  Widget _buildFetching() {
     return Expanded(
       child: Center(
         child: Row(
@@ -55,6 +55,11 @@ class ProjectsPage extends StatelessWidget {
     }
   }
 
+  void _clickProject(BuildContext context, Project project) async {
+    await Navigator.push(context, ProjectPage.route(project));
+    context.read<ProjectsBloc>().add(FetchProjectsRequested());
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -76,7 +81,7 @@ class ProjectsPage extends StatelessWidget {
                   previous.isLoading != current.isLoading,
               builder: (context, state) {
                 if (state.isLoading) {
-                  return _fetching();
+                  return _buildFetching();
                 }
 
                 if (state.isErrored) {
@@ -115,7 +120,10 @@ class ProjectsPage extends StatelessWidget {
                 }
 
                 return Expanded(
-                    child: ProjectList(projects: state.filteredProjects));
+                    child: ProjectList(
+                        projects: state.filteredProjects,
+                        onProjectClicked: (project) =>
+                            _clickProject(context, project)));
               },
             ),
           ]),

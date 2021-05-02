@@ -1,7 +1,6 @@
 import 'package:formz/formz.dart';
-import 'package:gobz_app/widgets/forms/inputs/PasswordInput.dart';
-
-import 'InputError.dart';
+import 'package:gobz_app/widgets/forms/auth/inputs/PasswordInput.dart';
+import 'package:gobz_app/widgets/forms/generics/inputs/InputError.dart';
 
 class PasswordRepeatInput extends FormzInput<String, InputError> {
   final PasswordInput? passwordInput;

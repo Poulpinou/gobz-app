@@ -1,6 +1,5 @@
 import 'package:formz/formz.dart';
-
-import 'InputError.dart';
+import 'package:gobz_app/widgets/forms/generics/inputs/InputError.dart';
 
 class UsernameInput extends FormzInput<String, InputError> {
   const UsernameInput.pure() : super.pure('');

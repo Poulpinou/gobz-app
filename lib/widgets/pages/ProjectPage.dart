@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ProjectBloc.dart';
+import 'package:gobz_app/blocs/ProjectsBloc.dart';
 import 'package:gobz_app/mixins/DisplayableMessage.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
+
+import 'EditProjectPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final Project project;
@@ -13,6 +16,15 @@ class ProjectPage extends StatelessWidget {
   static Route route(Project project) {
     return MaterialPageRoute<void>(
         builder: (_) => ProjectPage(project: project));
+  }
+
+  void _editProject(BuildContext context) async {
+    final Project? project = await Navigator.push(
+        context, EditProjectPage.route(project: this.project));
+
+    if (project != null) {
+      context.read<ProjectBloc>().add(FetchProject());
+    }
   }
 
   AppBar _buildAppBar() {
@@ -38,9 +50,8 @@ class ProjectPage extends StatelessWidget {
               ),
               PopupMenuItem(
                 child: TextButton(
-                  child: const Text("Modifier"),
-                  onPressed: () => {},
-                ),
+                    child: const Text("Modifier"),
+                    onPressed: () => _editProject(context)),
               ),
               PopupMenuItem(
                 child: TextButton(
@@ -80,26 +91,29 @@ class ProjectPage extends StatelessWidget {
   }
 
   Widget _buildInfos() {
-    return Row(
-      children: [
-        Expanded(
-          child: Card(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.image,
-                  size: 100,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(project.description),
-                ),
-              ],
+    return BlocBuilder<ProjectBloc, ProjectState>(
+      buildWhen: (previous, current) => previous.isLoading != current.isLoading,
+      builder: (context, state) => Row(
+        children: [
+          Expanded(
+            child: Card(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.image,
+                    size: 100,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(state.project.description),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
