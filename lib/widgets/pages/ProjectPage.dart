@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ProjectBloc.dart';
-import 'package:gobz_app/blocs/ProjectsBloc.dart';
 import 'package:gobz_app/mixins/DisplayableMessage.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
@@ -18,6 +17,7 @@ class ProjectPage extends StatelessWidget {
         builder: (_) => ProjectPage(project: project));
   }
 
+  // Actions
   void _editProject(BuildContext context) async {
     final Project? project = await Navigator.push(
         context, EditProjectPage.route(project: this.project));
@@ -27,38 +27,60 @@ class ProjectPage extends StatelessWidget {
     }
   }
 
-  AppBar _buildAppBar() {
+  void _refreshProject(BuildContext context) {
+    context.read<ProjectBloc>().add(FetchProject());
+  }
+
+  void _deleteProject(BuildContext context) async {
+    final bool? isConfirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Supprimer ${project.name}?'),
+              content: Text('Attention, cette action est définitive!'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text('Oui'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text('Non'),
+                ),
+              ],
+            ));
+
+    if(isConfirmed != null && isConfirmed == true){
+      context.read<ProjectBloc>().add(DeleteProject());
+    }
+  }
+
+  // Build Parts
+  AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: BlocBuilder<ProjectBloc, ProjectState>(
           buildWhen: (previous, current) =>
               previous.project.name != current.project.name,
           builder: (context, state) => Text(state.project.name)),
       actions: [
-        PopupMenuButton(
+        PopupMenuButton<Function>(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Icon(Icons.create),
           ),
+          onSelected: (function) => function(),
           itemBuilder: (BuildContext context) {
-            return <PopupMenuEntry>[
+            return <PopupMenuEntry<Function>>[
               PopupMenuItem(
-                child: TextButton(
-                  child: const Text("Actualiser"),
-                  onPressed: () =>
-                      context.read<ProjectBloc>().add(FetchProject()),
-                ),
+                child: const Text("Actualiser"),
+                value: () => _refreshProject(context),
               ),
               PopupMenuItem(
-                child: TextButton(
-                    child: const Text("Modifier"),
-                    onPressed: () => _editProject(context)),
+                child: const Text("Modifier"),
+                value: () => _editProject(context),
               ),
               PopupMenuItem(
-                child: TextButton(
-                  child: const Text("Supprimer"),
-                  onPressed: () =>
-                      context.read<ProjectBloc>().add(DeleteProject()),
-                ),
+                child: const Text("Supprimer"),
+                value: () => _deleteProject(context),
               ),
             ];
           },
@@ -71,7 +93,13 @@ class ProjectPage extends StatelessWidget {
     return BlocListener<ProjectBloc, ProjectState>(
       listener: (context, state) {
         if (state.projectDeleted) {
-          Navigator.pop(context);
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+              content: Text("${state.project.name} as été supprimé"),
+              backgroundColor: Colors.greenAccent,
+            ));
+          Navigator.pop(context, null);
         } else if (state.isErrored) {
           final String message;
           if (state.error is DisplayableMessage) {
@@ -83,6 +111,7 @@ class ProjectPage extends StatelessWidget {
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBar(
               content: Text(message),
+              backgroundColor: Colors.redAccent,
             ));
         }
       },
@@ -117,6 +146,7 @@ class ProjectPage extends StatelessWidget {
     );
   }
 
+  // Build
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ProjectBloc>(
@@ -129,7 +159,7 @@ class ProjectPage extends StatelessWidget {
         return bloc;
       },
       child: Scaffold(
-        appBar: _buildAppBar(),
+        appBar: _buildAppBar(context),
         body: _buildHandler(
           child: BlocBuilder<ProjectBloc, ProjectState>(
             buildWhen: (previous, current) =>

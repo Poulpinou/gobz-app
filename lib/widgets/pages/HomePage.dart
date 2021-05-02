@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
         style: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       actions: [
-        PopupMenuButton(
+        PopupMenuButton<Function?>(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Avatar(
@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           itemBuilder: (BuildContext context) {
-            return <PopupMenuEntry>[
+            return <PopupMenuEntry<Function?>>[
               PopupMenuItem(
                 child: Row(
                   children: [
@@ -73,20 +73,11 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              /*PopupMenuDivider(),
-              PopupMenuItem(
-                child: TextButton(
-                  child: const Text("Profil"),
-                  onPressed: () {},
-                ),
-              ),*/
               PopupMenuDivider(),
               PopupMenuItem(
-                child: TextButton(
-                  child: const Text("Déconnexion"),
-                  onPressed: () =>
-                      context.read<AuthBloc>().add(AuthLogoutRequested()),
-                ),
+                child: const Text("Déconnexion"),
+                value: () =>
+                    context.read<AuthBloc>().add(AuthLogoutRequested()),
               ),
             ];
           },

@@ -16,7 +16,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 
   @override
   Stream<ProjectsState> mapEventToState(ProjectsEvent event) async* {
-    if (event is FetchProjectsRequested) {
+    if (event is FetchProjects) {
       yield* _onFetchProjects(event, state);
     } else if (event is SearchTextChanged) {
       yield state.copyWith(
@@ -43,7 +43,7 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 // Events
 abstract class ProjectsEvent {}
 
-class FetchProjectsRequested extends ProjectsEvent {}
+class FetchProjects extends ProjectsEvent {}
 
 class SearchTextChanged extends ProjectsEvent {
   final String searchText;

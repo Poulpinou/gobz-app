@@ -79,6 +79,7 @@ class _GobzAppViewState extends State<GobzAppView> {
 
                 break;
               case AuthStatus.UNKNOWN:
+              case AuthStatus.AUTHENTICATING:
                 break;
             }
           },
