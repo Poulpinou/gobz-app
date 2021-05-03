@@ -1,4 +1,4 @@
-part of '../ProjectForm.dart';
+part of '../ChapterForm.dart';
 
 class _NameField extends StatefulWidget {
   final String? initialValue;
@@ -15,12 +15,12 @@ class _NameFieldState extends State<_NameField> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
+    return BlocBuilder<ChapterEditionBloc, ChapterEditionState>(
       buildWhen: (previous, current) => previous.name != current.name,
       builder: (context, state) => TextField(
         controller: _controller,
-        key: Key('projectForm_nameField'),
-        onChanged: (name) => context.read<ProjectEditionBloc>().add(ProjectEditionEvents.nameChanged(name)),
+        key: Key('chapterForm_nameField'),
+        onChanged: (name) => context.read<ChapterEditionBloc>().add(ChapterEditionEvents.nameChanged(name)),
         decoration: InputDecoration(labelText: 'Nom', errorText: state.name.invalid ? state.name.error?.message : null),
       ),
     );

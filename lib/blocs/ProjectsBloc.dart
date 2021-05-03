@@ -8,25 +8,23 @@ import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/projects/inputs/ProjectSearchInput.dart';
 
 class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
-  final ProjectRepository _projectRepository;
+  final ProjectRepository projectRepository;
 
-  ProjectsBloc({required ProjectRepository projectRepository})
-      : _projectRepository = projectRepository,
-        super(ProjectsState());
+  ProjectsBloc({required this.projectRepository}) : super(ProjectsState());
 
   @override
   Stream<ProjectsState> mapEventToState(ProjectsEvent event) async* {
-    if (event is FetchProjects) {
-      yield* _onFetchProjects(event, state);
-    } else if (event is SearchTextChanged) {
+    if (event is _FetchProjects) {
+      yield* _onFetchProjects(state);
+    } else if (event is _SearchTextChanged) {
       yield state.copyWith(searchText: ProjectSearchInput.dirty(event.searchText));
     }
   }
 
-  Stream<ProjectsState> _onFetchProjects(ProjectsEvent event, ProjectsState state) async* {
+  Stream<ProjectsState> _onFetchProjects(ProjectsState state) async* {
     yield state.copyWith(isLoading: true);
     try {
-      final List<Project> projects = await _projectRepository.getAllProjects();
+      final List<Project> projects = await projectRepository.getAllProjects();
       yield state.copyWith(projects: projects);
     } catch (e) {
       Log.error("Failed to retrieve projects", e);
@@ -40,12 +38,18 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 // Events
 abstract class ProjectsEvent {}
 
-class FetchProjects extends ProjectsEvent {}
+abstract class ProjectsEvents {
+  static _FetchProjects fetch() => _FetchProjects();
 
-class SearchTextChanged extends ProjectsEvent {
+  static _SearchTextChanged searchTextChanged(String searchText) => _SearchTextChanged(searchText);
+}
+
+class _FetchProjects extends ProjectsEvent {}
+
+class _SearchTextChanged extends ProjectsEvent {
   final String searchText;
 
-  SearchTextChanged(this.searchText);
+  _SearchTextChanged(this.searchText);
 }
 
 // State

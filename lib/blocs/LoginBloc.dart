@@ -17,20 +17,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Stream<LoginState> mapEventToState(
     LoginEvent event,
   ) async* {
-    if (event is LoadLocalValues) {
-      yield await _loadLocalValues(event, state);
-    } else if (event is LoginEmailChanged) {
+    if (event is _LoadLocalValues) {
+      yield await _loadLocalValues(state);
+    } else if (event is _LoginEmailChanged) {
       yield state.copyWith(email: EmailInput.dirty(event.email));
-    } else if (event is LoginPasswordChanged) {
+    } else if (event is _LoginPasswordChanged) {
       yield state.copyWith(password: PasswordInput.dirty(event.password));
-    } else if (event is StayConnectedChanged) {
+    } else if (event is _StayConnectedChanged) {
       yield state.copyWith(stayConnected: event.stayConnected);
-    } else if (event is LoginSubmitted) {
-      yield* _onFormSubmitted(event, state);
+    } else if (event is _LoginSubmitted) {
+      yield* _onFormSubmitted(state);
     }
   }
 
-  Future<LoginState> _loadLocalValues(LoadLocalValues event, LoginState state) async {
+  Future<LoginState> _loadLocalValues(LoginState state) async {
     final bool? stayConnected = await LocalStorageUtils.getBool(StorageKeysConfig.instance.stayConnectedKey);
     final String? email = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserEmailKey);
     final String? password = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserPasswordKey);
@@ -42,7 +42,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         localValuesLoaded: true);
   }
 
-  Stream<LoginState> _onFormSubmitted(LoginSubmitted event, LoginState state) async* {
+  Stream<LoginState> _onFormSubmitted(LoginState state) async* {
     if (state.status.isValidated) {
       yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
       try {
@@ -63,35 +63,41 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 }
 
 // Events
-abstract class LoginEvent {
-  const LoginEvent();
+abstract class LoginEvent {}
+
+abstract class LoginEvents {
+  static _LoadLocalValues loadLocalValues() => _LoadLocalValues();
+
+  static _LoginEmailChanged emailChanged(String email) => _LoginEmailChanged(email);
+
+  static _LoginPasswordChanged passwordChanged(String password) => _LoginPasswordChanged(password);
+
+  static _StayConnectedChanged stayConnectedChanged(bool stayConnected) => _StayConnectedChanged(stayConnected);
+
+  static _LoginSubmitted loginSubmitted() => _LoginSubmitted();
 }
 
-class LoadLocalValues extends LoginEvent {
-  const LoadLocalValues();
-}
+class _LoadLocalValues extends LoginEvent {}
 
-class LoginEmailChanged extends LoginEvent {
-  const LoginEmailChanged(this.email);
-
+class _LoginEmailChanged extends LoginEvent {
   final String email;
+
+  _LoginEmailChanged(this.email);
 }
 
-class LoginPasswordChanged extends LoginEvent {
-  const LoginPasswordChanged(this.password);
-
+class _LoginPasswordChanged extends LoginEvent {
   final String password;
+
+  _LoginPasswordChanged(this.password);
 }
 
-class StayConnectedChanged extends LoginEvent {
-  const StayConnectedChanged(this.stayConnected);
-
+class _StayConnectedChanged extends LoginEvent {
   final bool stayConnected;
+
+  _StayConnectedChanged(this.stayConnected);
 }
 
-class LoginSubmitted extends LoginEvent {
-  const LoginSubmitted();
-}
+class _LoginSubmitted extends LoginEvent {}
 
 // States
 class LoginState with FormzMixin {

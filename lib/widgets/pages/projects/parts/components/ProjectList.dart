@@ -3,9 +3,13 @@ import 'package:gobz_app/models/Project.dart';
 
 class ProjectList extends StatelessWidget {
   final List<Project> projects;
-  final Function(Project)? onProjectClicked;
+  final Function(Project project)? onProjectClicked;
 
-  const ProjectList({Key? key, required this.projects, this.onProjectClicked}) : super(key: key);
+  const ProjectList({
+    Key? key,
+    required this.projects,
+    this.onProjectClicked,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +30,11 @@ class ProjectListItem extends StatelessWidget {
   final Project project;
   final Function(Project)? onProjectClicked;
 
-  const ProjectListItem({Key? key, required this.project, this.onProjectClicked}) : super(key: key);
+  const ProjectListItem({
+    Key? key,
+    required this.project,
+    this.onProjectClicked,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

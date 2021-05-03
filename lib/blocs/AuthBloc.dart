@@ -21,22 +21,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _userRepository = userRepository,
         super(const AuthState.unknown()) {
     _authStatusSubscription = _authRepository.statusStream.listen(
-      (status) => add(AuthStatusChanged(status)),
+      (status) => add(_AuthStatusChanged(status)),
     );
   }
 
   @override
   Stream<AuthState> mapEventToState(AuthEvent event) async* {
-    if (event is AuthStatusChanged) {
+    if (event is _AuthStatusChanged) {
       yield await _mapAuthStatusChangedToState(event);
-    } else if (event is AuthLogoutRequested) {
+    } else if (event is _AuthLogoutRequested) {
       _authRepository.logout();
-    } else if (event is AuthAutoReconnectRequested) {
+    } else if (event is _AuthAutoReconnectRequested) {
       yield* _attemptAutoReconnect();
     }
   }
 
-  Future<AuthState> _mapAuthStatusChangedToState(AuthStatusChanged event) async {
+  Future<AuthState> _mapAuthStatusChangedToState(_AuthStatusChanged event) async {
     switch (event.status) {
       case AuthStatus.UNAUTHENTICATED:
         return const AuthState.unauthenticated();
@@ -82,19 +82,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 }
 
 // Events
-abstract class AuthEvent {
-  const AuthEvent();
+abstract class AuthEvent {}
+
+abstract class AuthEvents {
+  static _AuthStatusChanged statusChanged(AuthStatus status) => _AuthStatusChanged(status);
+
+  static _AuthAutoReconnectRequested autoReconnectRequested() => _AuthAutoReconnectRequested();
+
+  static _AuthLogoutRequested logoutRequested() => _AuthLogoutRequested();
 }
 
-class AuthStatusChanged extends AuthEvent {
-  const AuthStatusChanged(this.status);
-
+class _AuthStatusChanged extends AuthEvent {
   final AuthStatus status;
+
+  _AuthStatusChanged(this.status);
 }
 
-class AuthAutoReconnectRequested extends AuthEvent {}
+class _AuthAutoReconnectRequested extends AuthEvent {}
 
-class AuthLogoutRequested extends AuthEvent {}
+class _AuthLogoutRequested extends AuthEvent {}
 
 // States
 class AuthState {

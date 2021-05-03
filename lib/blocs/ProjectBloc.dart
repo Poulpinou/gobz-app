@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/exceptions/DisplayableException.dart';
 import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Project.dart';
+import 'package:gobz_app/models/ProjectInfos.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 
@@ -14,10 +15,9 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
   @override
   Stream<ProjectState> mapEventToState(ProjectEvent event) async* {
-    if (event is FetchProject) {
+    if (event is _FetchProject) {
       yield* _fetchProject();
-    }
-    if (event is DeleteProject) {
+    } else if (event is _DeleteProject) {
       yield* _deleteProject();
     }
   }
@@ -25,8 +25,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Stream<ProjectState> _fetchProject() async* {
     yield state.copyWith(isLoading: true);
     try {
-      final Project project = await _projectRepository.getProject(state.project.id);
-      yield state.copyWith(project: project);
+      final ProjectInfos projectInfos = await _projectRepository.getProjectInfos(state.project.id);
+      yield state.copyWith(project: projectInfos.project, projectInfos: projectInfos);
     } catch (e) {
       Log.error("Failed to retrieve project", e);
       yield state.copyWith(
@@ -52,31 +52,40 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 // Events
 abstract class ProjectEvent {}
 
-class FetchProject extends ProjectEvent {}
+abstract class ProjectEvents {
+  static _FetchProject fetch() => _FetchProject();
 
-class DeleteProject extends ProjectEvent {}
+  static _DeleteProject delete() => _DeleteProject();
+}
+
+class _FetchProject extends ProjectEvent {}
+
+class _DeleteProject extends ProjectEvent {}
 
 // State
 class ProjectState extends BlocState {
   final Project project;
+  final ProjectInfos? projectInfos;
   final bool projectDeleted;
-  final bool projectUpToDate;
 
   const ProjectState(
-      {bool? isLoading,
-      Exception? error,
-      required this.project,
-      this.projectDeleted = false,
-      this.projectUpToDate = false})
+      {bool? isLoading, Exception? error, required this.project, this.projectInfos, this.projectDeleted = false})
       : super(isLoading: isLoading, error: error);
 
-  ProjectState copyWith(
-          {bool? isLoading, Exception? error, Project? project, bool? projectDeleted, bool? projectUpToDate}) =>
+  bool get shouldBeFetched => projectInfos == null;
+
+  ProjectState copyWith({
+    bool? isLoading,
+    Exception? error,
+    Project? project,
+    ProjectInfos? projectInfos,
+    bool? projectDeleted,
+  }) =>
       ProjectState(
         project: project ?? this.project,
         isLoading: isLoading ?? false,
         error: error,
+        projectInfos: projectInfos ?? this.projectInfos,
         projectDeleted: projectDeleted ?? this.projectDeleted,
-        projectUpToDate: projectUpToDate ?? this.projectDeleted,
       );
 }

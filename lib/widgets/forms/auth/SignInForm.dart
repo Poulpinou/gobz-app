@@ -42,7 +42,7 @@ class _UsernameInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('signInForm_usernameInput'),
-          onChanged: (username) => context.read<SignInBloc>().add(SignInUsernameChanged(username)),
+          onChanged: (username) => context.read<SignInBloc>().add(SignInEvents.usernameChanged(username)),
           decoration: InputDecoration(
               labelText: 'Pseudo', errorText: state.username.invalid ? state.username.error?.message : null),
         );
@@ -59,7 +59,7 @@ class _EmailInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('signInForm_emailInput'),
-          onChanged: (email) => context.read<SignInBloc>().add(SignInEmailChanged(email)),
+          onChanged: (email) => context.read<SignInBloc>().add(SignInEvents.emailChanged(email)),
           decoration:
               InputDecoration(labelText: 'Email', errorText: state.email.invalid ? state.email.error?.message : null),
         );
@@ -76,7 +76,7 @@ class _PasswordInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('signInForm_passwordInput'),
-          onChanged: (password) => context.read<SignInBloc>().add(SignInPasswordChanged(password)),
+          onChanged: (password) => context.read<SignInBloc>().add(SignInEvents.passwordChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Mot de passe',
@@ -96,7 +96,7 @@ class _PasswordRepeatInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('signInForm_passwordValidationInput'),
-          onChanged: (password) => context.read<SignInBloc>().add(SignInPasswordRepeatChanged(password)),
+          onChanged: (password) => context.read<SignInBloc>().add(SignInEvents.passwordRepeatChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Confirmation du mot de passe',
@@ -119,8 +119,9 @@ class _SignInButton extends StatelessWidget {
             : ElevatedButton(
                 key: const Key('signInForm_submit'),
                 child: const Text('Connexion'),
-                onPressed:
-                    state.status.isValidated ? () => context.read<SignInBloc>().add(const SignInSubmitted()) : null,
+                onPressed: state.status.isValidated
+                    ? () => context.read<SignInBloc>().add(SignInEvents.signInSubmitted())
+                    : null,
               );
       },
     );

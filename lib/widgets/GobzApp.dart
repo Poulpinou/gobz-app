@@ -5,12 +5,13 @@ import 'package:gobz_app/configurations/AppConfig.dart';
 import 'package:gobz_app/configurations/StorageKeysConfig.dart';
 import 'package:gobz_app/models/enums/AuthStatus.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
+import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/repositories/UserRepository.dart';
 import 'package:gobz_app/utils/LocalStorageUtils.dart';
 import 'package:gobz_app/widgets/pages/HomePage.dart';
-import 'package:gobz_app/widgets/pages/LoginPage.dart';
 import 'package:gobz_app/widgets/pages/SplashPage.dart';
+import 'package:gobz_app/widgets/pages/auth/LoginPage.dart';
 import 'package:gobz_app/widgets/themes/AppThemes.dart';
 
 class GobzApp extends StatelessWidget {
@@ -23,7 +24,8 @@ class GobzApp extends StatelessWidget {
       providers: [
         RepositoryProvider(create: (_) => authRepository),
         RepositoryProvider(create: (_) => userRepository),
-        RepositoryProvider(create: (_) => ProjectRepository())
+        RepositoryProvider(create: (_) => ProjectRepository()),
+        RepositoryProvider(create: (_) => ChapterRepository()),
       ],
       child: BlocProvider(
         create: (_) => AuthBloc(authRepository: authRepository, userRepository: userRepository),
@@ -65,7 +67,7 @@ class _GobzAppViewState extends State<GobzAppView> {
                     await LocalStorageUtils.getBool(StorageKeysConfig.instance.stayConnectedKey) ?? false;
 
                 if (wasConnected && stayConnected) {
-                  BlocProvider.of<AuthBloc>(context).add(AuthAutoReconnectRequested());
+                  BlocProvider.of<AuthBloc>(context).add(AuthEvents.autoReconnectRequested());
                 } else {
                   _navigator.pushAndRemoveUntil<void>(
                     LoginPage.route(),

@@ -19,7 +19,7 @@ class LoginForm extends StatelessWidget {
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
           if (!state.localValuesLoaded) {
-            context.read<LoginBloc>().add(LoadLocalValues());
+            context.read<LoginBloc>().add(LoginEvents.loadLocalValues());
           }
 
           return Column(
@@ -59,7 +59,7 @@ class _EmailInputState extends State<_EmailInput> {
         return TextField(
           controller: _controller,
           key: const Key('loginForm_emailInput'),
-          onChanged: (email) => context.read<LoginBloc>().add(LoginEmailChanged(email)),
+          onChanged: (email) => context.read<LoginBloc>().add(LoginEvents.emailChanged(email)),
           decoration:
               InputDecoration(labelText: 'Email', errorText: state.email.invalid ? state.email.error?.message : null),
         );
@@ -87,7 +87,7 @@ class _PasswordInputState extends State<_PasswordInput> {
         return TextField(
           controller: _controller,
           key: const Key('loginForm_passwordInput'),
-          onChanged: (password) => context.read<LoginBloc>().add(LoginPasswordChanged(password)),
+          onChanged: (password) => context.read<LoginBloc>().add(LoginEvents.passwordChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Mot de passe',
@@ -110,7 +110,7 @@ class _StayConnectedInput extends StatelessWidget {
           Checkbox(
             key: const Key('loginForm_stayConnected'),
             value: state.stayConnected,
-            onChanged: (value) => context.read<LoginBloc>().add(StayConnectedChanged(value ?? false)),
+            onChanged: (value) => context.read<LoginBloc>().add(LoginEvents.stayConnectedChanged(value ?? false)),
           ),
           const Text('Rester connecté?')
         ],
@@ -132,7 +132,7 @@ class _LoginButton extends StatelessWidget {
                 key: const Key('loginForm_submit'),
                 child: const Text('Connexion'),
                 onPressed:
-                    state.status.isValidated ? () => context.read<LoginBloc>().add(const LoginSubmitted()) : null,
+                    state.status.isValidated ? () => context.read<LoginBloc>().add(LoginEvents.loginSubmitted()) : null,
               );
       },
     );

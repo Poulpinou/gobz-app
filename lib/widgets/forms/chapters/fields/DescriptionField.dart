@@ -1,4 +1,4 @@
-part of '../ProjectForm.dart';
+part of '../ChapterForm.dart';
 
 class _DescriptionField extends StatefulWidget {
   final String? initialValue;
@@ -15,13 +15,13 @@ class _DescriptionFieldState extends State<_DescriptionField> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
+    return BlocBuilder<ChapterEditionBloc, ChapterEditionState>(
       buildWhen: (previous, current) => previous.description != current.description,
       builder: (context, state) => TextField(
         controller: _controller,
-        key: Key('projectForm_descriptionField'),
+        key: Key('chapterForm_descriptionField'),
         onChanged: (description) =>
-            context.read<ProjectEditionBloc>().add(ProjectEditionEvents.descriptionChanged(description)),
+            context.read<ChapterEditionBloc>().add(ChapterEditionEvents.descriptionChanged(description)),
         decoration: InputDecoration(
           labelText: 'Description',
           floatingLabelBehavior: FloatingLabelBehavior.always,

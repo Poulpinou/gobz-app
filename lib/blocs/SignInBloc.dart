@@ -15,20 +15,20 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
   @override
   Stream<SignInState> mapEventToState(SignInEvent event) async* {
-    if (event is SignInUsernameChanged) {
+    if (event is _SignInUsernameChanged) {
       yield state.copyWith(username: UsernameInput.dirty(event.username));
-    } else if (event is SignInEmailChanged) {
+    } else if (event is _SignInEmailChanged) {
       yield state.copyWith(email: EmailInput.dirty(event.email));
-    } else if (event is SignInPasswordChanged) {
+    } else if (event is _SignInPasswordChanged) {
       yield state.copyWith(password: PasswordInput.dirty(event.password));
-    } else if (event is SignInPasswordRepeatChanged) {
+    } else if (event is _SignInPasswordRepeatChanged) {
       yield state.copyWith(repeatPassword: PasswordRepeatInput.dirty(event.passwordRepeat, state.password));
-    } else if (event is SignInSubmitted) {
-      yield* _onFormSubmitted(event, state);
+    } else if (event is _SignInSubmitted) {
+      yield* _onFormSubmitted(state);
     }
   }
 
-  Stream<SignInState> _onFormSubmitted(SignInSubmitted event, SignInState state) async* {
+  Stream<SignInState> _onFormSubmitted(SignInState state) async* {
     if (state.status.isValidated) {
       yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
       try {
@@ -44,37 +44,46 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 }
 
 // Events
-abstract class SignInEvent {
-  const SignInEvent();
+abstract class SignInEvent {}
+
+abstract class SignInEvents {
+  static _SignInUsernameChanged usernameChanged(String username) => _SignInUsernameChanged(username);
+
+  static _SignInEmailChanged emailChanged(String email) => _SignInEmailChanged(email);
+
+  static _SignInPasswordChanged passwordChanged(String password) => _SignInPasswordChanged(password);
+
+  static _SignInPasswordRepeatChanged passwordRepeatChanged(String passwordRepeat) =>
+      _SignInPasswordRepeatChanged(passwordRepeat);
+
+  static _SignInSubmitted signInSubmitted() => _SignInSubmitted();
 }
 
-class SignInUsernameChanged extends SignInEvent {
-  const SignInUsernameChanged(this.username);
-
+class _SignInUsernameChanged extends SignInEvent {
   final String username;
+
+  _SignInUsernameChanged(this.username);
 }
 
-class SignInEmailChanged extends SignInEvent {
-  const SignInEmailChanged(this.email);
-
+class _SignInEmailChanged extends SignInEvent {
   final String email;
+
+  _SignInEmailChanged(this.email);
 }
 
-class SignInPasswordChanged extends SignInEvent {
-  const SignInPasswordChanged(this.password);
-
+class _SignInPasswordChanged extends SignInEvent {
   final String password;
+
+  _SignInPasswordChanged(this.password);
 }
 
-class SignInPasswordRepeatChanged extends SignInEvent {
-  const SignInPasswordRepeatChanged(this.passwordRepeat);
-
+class _SignInPasswordRepeatChanged extends SignInEvent {
   final String passwordRepeat;
+
+  _SignInPasswordRepeatChanged(this.passwordRepeat);
 }
 
-class SignInSubmitted extends SignInEvent {
-  const SignInSubmitted();
-}
+class _SignInSubmitted extends SignInEvent {}
 
 // State
 class SignInState with FormzMixin {

@@ -14,16 +14,17 @@ class NewProjectPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<ProjectEditionBloc>(
       create: (context) => ProjectEditionBloc(context.read<ProjectRepository>()),
-      lazy: false,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Nouveau projet"),
+          title: const Text("Nouveau projet"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(12),
-          child: SingleChildScrollView(child: CreateProjectForm(onCreated: (project) {
-            Navigator.pop(context, project);
-          })),
+          child: SingleChildScrollView(
+            child: ProjectForm(
+              onValidate: (project) => Navigator.pop(context, project),
+            ),
+          ),
         ),
       ),
     );
