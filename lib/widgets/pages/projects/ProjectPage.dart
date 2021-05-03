@@ -33,12 +33,12 @@ class ProjectPage extends StatelessWidget {
     final Project? project = await Navigator.push(context, EditProjectPage.route(project: this.project));
 
     if (project != null) {
-      context.read<ProjectBloc>().add(FetchProject());
+      context.read<ProjectBloc>().add(ProjectEvents.fetch());
     }
   }
 
   void _refreshProject(BuildContext context) {
-    context.read<ProjectBloc>().add(FetchProject());
+    context.read<ProjectBloc>().add(ProjectEvents.fetch());
   }
 
   void _deleteProject(BuildContext context) async {
@@ -60,14 +60,14 @@ class ProjectPage extends StatelessWidget {
             ));
 
     if (isConfirmed != null && isConfirmed == true) {
-      context.read<ProjectBloc>().add(DeleteProject());
+      context.read<ProjectBloc>().add(ProjectEvents.delete());
     }
   }
 
   void _goToChapters(BuildContext context) async {
     await Navigator.push(context, ChaptersPage.route(project));
 
-    context.read<ProjectBloc>().add(FetchProject());
+    context.read<ProjectBloc>().add(ProjectEvents.fetch());
   }
 
   // Build Parts
@@ -108,17 +108,11 @@ class ProjectPage extends StatelessWidget {
     return BlocHandler<ProjectBloc, ProjectState>.custom(
       mapErrorToNotification: (state) {
         if (state.projectDeleted) {
-          return BlocNotification.success("${state.project.name} as été supprimé");
+          return BlocNotification.success("${state.project.name} as été supprimé")
+              .copyWith(postAction: (context) => Navigator.pop(context, null));
         }
       },
-      child: BlocListener<ProjectBloc, ProjectState>(
-        listener: (context, state) {
-          if (state.projectDeleted) {
-            Navigator.pop(context, null);
-          }
-        },
-        child: child,
-      ),
+      child: child,
     );
   }
 
@@ -153,7 +147,7 @@ class ProjectPage extends StatelessWidget {
       create: (context) {
         final ProjectBloc bloc = ProjectBloc(context.read<ProjectRepository>(), project);
 
-        bloc.add(FetchProject());
+        bloc.add(ProjectEvents.fetch());
 
         return bloc;
       },

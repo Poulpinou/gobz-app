@@ -14,7 +14,7 @@ class _IsSharedField extends StatelessWidget {
           Checkbox(
             key: const Key('projectForm_isShared'),
             value: state.isShared,
-            onChanged: (value) => context.read<ProjectEditionBloc>().add(ProjectIsSharedChanged(value ?? false)),
+            onChanged: (value) => context.read<ProjectEditionBloc>().add(ProjectEditionEvents.isSharedChanged(value ?? false)),
           ),
           const Text('Public')
         ],

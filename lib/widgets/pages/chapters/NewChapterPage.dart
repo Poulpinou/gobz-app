@@ -32,8 +32,8 @@ class NewChapterPage extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
-            child: CreateChapterForm(
-              onCreated: (chapter) => Navigator.pop(context, chapter),
+            child: ChapterForm(
+              onValidate: (chapter) => Navigator.pop(context, chapter),
             ),
           ),
         ),

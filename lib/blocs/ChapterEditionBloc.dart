@@ -4,6 +4,7 @@ import 'package:gobz_app/exceptions/DisplayableException.dart';
 import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Chapter.dart';
 import 'package:gobz_app/models/requests/ChapterCreationRequest.dart';
+import 'package:gobz_app/models/requests/ChapterUpdateRequest.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/chapters/inputs/ChapterDescriptionInput.dart';
@@ -23,6 +24,8 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
       yield state.copyWith(description: ChapterDescriptionInput.dirty(event.description));
     } else if (event is _CreateChapterFormSubmitted) {
       yield* _onCreateChapterSubmitted(state);
+    } else if (event is _UpdateChapterFormSubmitted) {
+      yield* _onUpdateChapterSubmitted(state);
     }
   }
 
@@ -41,10 +44,35 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
       } catch (e) {
         Log.error('Chapter creation failed', e);
         yield state.copyWith(
-            error: DisplayableException(
-          internMessage: e.toString(),
-          messageToDisplay: "Echec de la création du chapitre",
-        ));
+          error: DisplayableException(
+            internMessage: e.toString(),
+            messageToDisplay: "Echec de la création du chapitre",
+          ),
+        );
+      }
+    }
+  }
+
+  Stream<ChapterEditionState> _onUpdateChapterSubmitted(ChapterEditionState state) async* {
+    if (state.status.isValidated) {
+      yield state.copyWith(isLoading: true);
+      try {
+        final Chapter? chapter = await _chapterRepository.updateChapter(
+            state.chapter!.id,
+            ChapterUpdateRequest(
+              name: state.name.value,
+              description: state.description.value,
+            ));
+
+        yield state.copyWith(chapter: chapter);
+      } catch (e) {
+        Log.error('Chapter update failed', e);
+        yield state.copyWith(
+          error: DisplayableException(
+            internMessage: e.toString(),
+            messageToDisplay: "Echec de la sauvegarde du chapitre",
+          ),
+        );
       }
     }
   }
@@ -58,7 +86,9 @@ abstract class ChapterEditionEvents {
 
   static _ChapterDescriptionChanged descriptionChanged(String description) => _ChapterDescriptionChanged(description);
 
-  static _CreateChapterFormSubmitted create() => _CreateChapterFormSubmitted();
+  static _CreateChapterFormSubmitted createFormSubmitted() => _CreateChapterFormSubmitted();
+
+  static _UpdateChapterFormSubmitted updateFormSubmitted() => _UpdateChapterFormSubmitted();
 }
 
 class _ChapterNameChanged extends ChapterEditionEvent {
@@ -75,15 +105,19 @@ class _ChapterDescriptionChanged extends ChapterEditionEvent {
 
 class _CreateChapterFormSubmitted extends ChapterEditionEvent {}
 
+class _UpdateChapterFormSubmitted extends ChapterEditionEvent {}
+
 // State
 class ChapterEditionState extends BlocState with FormzMixin {
   final Chapter? chapter;
+  final bool hasBeenUpdated;
   final ChapterNameInput name;
   final ChapterDescriptionInput description;
 
   const ChapterEditionState._({
     bool? isLoading,
     Exception? error,
+    this.hasBeenUpdated = false,
     this.chapter,
     this.name = const ChapterNameInput.pure(),
     this.description = const ChapterDescriptionInput.pure(),
@@ -103,6 +137,7 @@ class ChapterEditionState extends BlocState with FormzMixin {
         isLoading: isLoading ?? false,
         error: error,
         chapter: chapter ?? this.chapter,
+        hasBeenUpdated: chapter != null,
         name: name ?? this.name,
         description: description ?? this.description,
       );

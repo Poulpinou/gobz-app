@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:gobz_app/exceptions/DisplayableException.dart';
+import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/models/requests/ProjectCreationRequest.dart';
 import 'package:gobz_app/models/requests/ProjectUpdateRequest.dart';
@@ -16,97 +18,114 @@ class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> 
 
   @override
   Stream<ProjectEditionState> mapEventToState(ProjectEditionEvent event) async* {
-    if (event is ProjectNameChanged) {
+    if (event is _ProjectNameChanged) {
       yield state.copyWith(name: ProjectNameInput.dirty(event.name));
-    } else if (event is ProjectDescriptionChanged) {
+    } else if (event is _ProjectDescriptionChanged) {
       yield state.copyWith(description: ProjectDescriptionInput.dirty(event.description));
-    } else if (event is ProjectIsSharedChanged) {
+    } else if (event is _ProjectIsSharedChanged) {
       yield state.copyWith(isShared: event.isShared);
-    } else if (event is CreateProjectFormSubmitted) {
-      yield* _onCreateProjectFormSubmitted(event, state);
-    } else if (event is UpdateProjectFormSubmitted) {
-      yield* _onUpdateProjectFormSubmitted(event, state);
+    } else if (event is _CreateProjectFormSubmitted) {
+      yield* _onCreateProjectFormSubmitted(state);
+    } else if (event is _UpdateProjectFormSubmitted) {
+      yield* _onUpdateProjectFormSubmitted(state);
     }
   }
 
-  Stream<ProjectEditionState> _onCreateProjectFormSubmitted(
-      CreateProjectFormSubmitted event, ProjectEditionState state) async* {
+  Stream<ProjectEditionState> _onCreateProjectFormSubmitted(ProjectEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
+      yield state.copyWith(isLoading: true);
       try {
         final Project project = (await _projectRepository
             .createProject(ProjectCreationRequest(state.name.value, state.description.value, state.isShared)));
 
-        yield state.copyWith(project: project, formStatus: FormzStatus.submissionSuccess);
+        yield state.copyWith(project: project);
       } catch (e) {
         Log.error('Project creation failed', e);
-        yield state.copyWith(formStatus: FormzStatus.submissionFailure);
+        yield state.copyWith(
+          error: DisplayableException(
+            internMessage: e.toString(),
+            messageToDisplay: "Echec de la création du projet",
+          ),
+        );
       }
     }
   }
 
-  Stream<ProjectEditionState> _onUpdateProjectFormSubmitted(
-      UpdateProjectFormSubmitted event, ProjectEditionState state) async* {
+  Stream<ProjectEditionState> _onUpdateProjectFormSubmitted(ProjectEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
+      yield state.copyWith(isLoading: true);
       try {
         final Project project = (await _projectRepository.updateProject(
             state.project!.id, ProjectUpdateRequest(state.name.value, state.description.value, state.isShared)));
 
-        yield state.copyWith(project: project, formStatus: FormzStatus.submissionSuccess);
+        yield state.copyWith(project: project);
       } catch (e) {
         Log.error('Project update failure', e);
-        yield state.copyWith(formStatus: FormzStatus.submissionFailure);
+        yield state.copyWith(
+          error: DisplayableException(
+            internMessage: e.toString(),
+            messageToDisplay: "Echec de la sauvegarde du projet",
+          ),
+        );
       }
     }
   }
 }
 
 // Events
-abstract class ProjectEditionEvent {
-  const ProjectEditionEvent();
+abstract class ProjectEditionEvent {}
+
+abstract class ProjectEditionEvents {
+  static _ProjectNameChanged nameChanged(String name) => _ProjectNameChanged(name);
+
+  static _ProjectDescriptionChanged descriptionChanged(String description) => _ProjectDescriptionChanged(description);
+
+  static _ProjectIsSharedChanged isSharedChanged(bool isShared) => _ProjectIsSharedChanged(isShared);
+
+  static _CreateProjectFormSubmitted creationFormSubmitted() => _CreateProjectFormSubmitted();
+
+  static _UpdateProjectFormSubmitted updateFormSubmitted() => _UpdateProjectFormSubmitted();
 }
 
-class ProjectNameChanged extends ProjectEditionEvent {
+class _ProjectNameChanged extends ProjectEditionEvent {
   final String name;
 
-  const ProjectNameChanged(this.name);
+  _ProjectNameChanged(this.name);
 }
 
-class ProjectDescriptionChanged extends ProjectEditionEvent {
+class _ProjectDescriptionChanged extends ProjectEditionEvent {
   final String description;
 
-  const ProjectDescriptionChanged(this.description);
+  _ProjectDescriptionChanged(this.description);
 }
 
-class ProjectIsSharedChanged extends ProjectEditionEvent {
+class _ProjectIsSharedChanged extends ProjectEditionEvent {
   final bool isShared;
 
-  const ProjectIsSharedChanged(this.isShared);
+  _ProjectIsSharedChanged(this.isShared);
 }
 
-class CreateProjectFormSubmitted extends ProjectEditionEvent {
-  const CreateProjectFormSubmitted();
-}
+class _CreateProjectFormSubmitted extends ProjectEditionEvent {}
 
-class UpdateProjectFormSubmitted extends ProjectEditionEvent {
-  const UpdateProjectFormSubmitted();
-}
+class _UpdateProjectFormSubmitted extends ProjectEditionEvent {}
 
 // State
-class ProjectEditionState with FormzMixin {
+class ProjectEditionState extends BlocState with FormzMixin {
   final Project? project;
-  final FormzStatus formStatus;
+  final bool hasBeenUpdated;
   final ProjectNameInput name;
   final ProjectDescriptionInput description;
   final bool isShared;
 
-  const ProjectEditionState._(
-      {this.project,
-      this.formStatus = FormzStatus.pure,
-      this.name = const ProjectNameInput.pure(),
-      this.description = const ProjectDescriptionInput.pure(),
-      this.isShared = true});
+  const ProjectEditionState._({
+    bool? isLoading,
+    Exception? error,
+    this.project,
+    this.hasBeenUpdated = false,
+    this.name = const ProjectNameInput.pure(),
+    this.description = const ProjectDescriptionInput.pure(),
+    this.isShared = true,
+  }) : super(isLoading: isLoading, error: error);
 
   factory ProjectEditionState.pure() => ProjectEditionState._();
 
@@ -120,15 +139,19 @@ class ProjectEditionState with FormzMixin {
   List<FormzInput> get inputs => [name, description];
 
   ProjectEditionState copyWith(
-          {Project? project,
-          FormzStatus? formStatus,
+          {bool? isLoading,
+          Exception? error,
+          Project? project,
           ProjectNameInput? name,
           ProjectDescriptionInput? description,
           bool? isShared}) =>
       ProjectEditionState._(
-          project: project ?? this.project,
-          formStatus: formStatus ?? this.status,
-          name: name ?? this.name,
-          description: description ?? this.description,
-          isShared: isShared ?? this.isShared);
+        isLoading: isLoading ?? false,
+        error: error,
+        project: project ?? this.project,
+        hasBeenUpdated: project != null,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        isShared: isShared ?? this.isShared,
+      );
 }

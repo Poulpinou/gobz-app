@@ -9,12 +9,9 @@ class _DescriptionField extends StatefulWidget {
 }
 
 class _DescriptionFieldState extends State<_DescriptionField> {
-  final bool _isEdition;
   final TextEditingController _controller;
 
-  _DescriptionFieldState(String? initialValue)
-      : _isEdition = initialValue != null,
-        _controller = TextEditingController(text: initialValue);
+  _DescriptionFieldState(String? initialValue) : _controller = TextEditingController(text: initialValue);
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +19,9 @@ class _DescriptionFieldState extends State<_DescriptionField> {
       buildWhen: (previous, current) => previous.description != current.description,
       builder: (context, state) => TextField(
         controller: _controller,
-        key: Key('${_isEdition ? 'edit' : 'create'}_chapterForm_descriptionField'),
-        onChanged: (description) => context.read<ChapterEditionBloc>().add(ChapterEditionEvents.descriptionChanged(description)),
+        key: Key('chapterForm_descriptionField'),
+        onChanged: (description) =>
+            context.read<ChapterEditionBloc>().add(ChapterEditionEvents.descriptionChanged(description)),
         decoration: InputDecoration(
           labelText: 'Description',
           floatingLabelBehavior: FloatingLabelBehavior.always,

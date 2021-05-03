@@ -29,11 +29,13 @@ class EditProjectPage extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
-              child: UpdateProjectForm(
-                  project: project,
-                  onValidate: (project) {
-                    Navigator.pop(context, project);
-                  })),
+            child: ProjectForm(
+              project: project,
+              onValidate: (project) {
+                Navigator.pop(context, project);
+              },
+            ),
+          ),
         ),
       ),
     );

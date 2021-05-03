@@ -36,7 +36,7 @@ class ChaptersBloc extends Bloc<ChaptersEvent, ChaptersState> {
 abstract class ChaptersEvent {
 }
 
-class ChaptersEvents {
+abstract class ChaptersEvents {
   static _FetchChapters fetch() => _FetchChapters();
 }
 

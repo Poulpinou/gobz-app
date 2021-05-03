@@ -28,7 +28,7 @@ class _ProjectInfos extends StatelessWidget {
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       Text(
-                          "Créé le ${DateFormat.yMd().format(state.project.createdAt)} à ${DateFormat.jm().format(state.project.createdAt)}"),
+                          "Créé le ${DateFormat("dd/MM/yyyy à hh:mm").format(state.project.createdAt)}"),
                     ],
                   ),
                 ),

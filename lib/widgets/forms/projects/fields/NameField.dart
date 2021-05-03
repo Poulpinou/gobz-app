@@ -9,12 +9,9 @@ class _NameField extends StatefulWidget {
 }
 
 class _NameFieldState extends State<_NameField> {
-  final bool _isEdition;
   final TextEditingController _controller;
 
-  _NameFieldState(String? initialValue)
-      : _isEdition = initialValue != null,
-        _controller = TextEditingController(text: initialValue ?? "");
+  _NameFieldState(String? initialValue) : _controller = TextEditingController(text: initialValue ?? "");
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +19,8 @@ class _NameFieldState extends State<_NameField> {
       buildWhen: (previous, current) => previous.name != current.name,
       builder: (context, state) => TextField(
         controller: _controller,
-        key: Key('${_isEdition ? 'edit' : 'create'}_projectForm_nameField'),
-        onChanged: (name) => context.read<ProjectEditionBloc>().add(ProjectNameChanged(name)),
+        key: Key('projectForm_nameField'),
+        onChanged: (name) => context.read<ProjectEditionBloc>().add(ProjectEditionEvents.nameChanged(name)),
         decoration: InputDecoration(labelText: 'Nom', errorText: state.name.invalid ? state.name.error?.message : null),
       ),
     );

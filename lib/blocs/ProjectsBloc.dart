@@ -10,14 +10,13 @@ import 'package:gobz_app/widgets/forms/projects/inputs/ProjectSearchInput.dart';
 class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
   final ProjectRepository projectRepository;
 
-  ProjectsBloc({required this.projectRepository}) :
-        super(ProjectsState());
+  ProjectsBloc({required this.projectRepository}) : super(ProjectsState());
 
   @override
   Stream<ProjectsState> mapEventToState(ProjectsEvent event) async* {
-    if (event is FetchProjects) {
+    if (event is _FetchProjects) {
       yield* _onFetchProjects(state);
-    } else if (event is SearchTextChanged) {
+    } else if (event is _SearchTextChanged) {
       yield state.copyWith(searchText: ProjectSearchInput.dirty(event.searchText));
     }
   }
@@ -39,12 +38,18 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
 // Events
 abstract class ProjectsEvent {}
 
-class FetchProjects extends ProjectsEvent {}
+abstract class ProjectsEvents {
+  static _FetchProjects fetch() => _FetchProjects();
 
-class SearchTextChanged extends ProjectsEvent {
+  static _SearchTextChanged searchTextChanged(String searchText) => _SearchTextChanged(searchText);
+}
+
+class _FetchProjects extends ProjectsEvent {}
+
+class _SearchTextChanged extends ProjectsEvent {
   final String searchText;
 
-  SearchTextChanged(this.searchText);
+  _SearchTextChanged(this.searchText);
 }
 
 // State

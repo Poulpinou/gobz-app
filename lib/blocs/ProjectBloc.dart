@@ -15,10 +15,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
   @override
   Stream<ProjectState> mapEventToState(ProjectEvent event) async* {
-    if (event is FetchProject) {
+    if (event is _FetchProject) {
       yield* _fetchProject();
     }
-    if (event is DeleteProject) {
+    if (event is _DeleteProject) {
       yield* _deleteProject();
     }
   }
@@ -53,9 +53,15 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 // Events
 abstract class ProjectEvent {}
 
-class FetchProject extends ProjectEvent {}
+abstract class ProjectEvents {
+  static _FetchProject fetch() => _FetchProject();
 
-class DeleteProject extends ProjectEvent {}
+  static _DeleteProject delete() => _DeleteProject();
+}
+
+class _FetchProject extends ProjectEvent {}
+
+class _DeleteProject extends ProjectEvent {}
 
 // State
 class ProjectState extends BlocState {

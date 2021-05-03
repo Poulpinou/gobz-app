@@ -59,6 +59,8 @@ class BlocHandler<B extends BlocBase<S>, S extends BlocState> extends StatelessW
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(snackBar);
+
+          notification.postAction?.call(context);
         }
       },
       child: child,
@@ -70,8 +72,9 @@ class BlocNotification {
   final String message;
   final Color? backgroundColor;
   final Color? textColor;
+  final Function(BuildContext context)? postAction;
 
-  const BlocNotification._(this.message, {this.backgroundColor, this.textColor = Colors.white});
+  const BlocNotification._(this.message, {this.backgroundColor, this.textColor = Colors.white, this.postAction});
 
   factory BlocNotification.error(String message) => BlocNotification._(message, backgroundColor: Colors.redAccent);
 
@@ -79,9 +82,16 @@ class BlocNotification {
 
   factory BlocNotification.warning(String message) => BlocNotification._(message, backgroundColor: Colors.orangeAccent);
 
-  factory BlocNotification.custom(String message, Color backgroundColor, Color textColor) => BlocNotification._(
-        message,
-        backgroundColor: backgroundColor,
-        textColor: textColor,
+  BlocNotification copyWith({
+    String? message,
+    Color? backgroundColor,
+    Color? textColor,
+    Function(BuildContext context)? postAction,
+  }) =>
+      BlocNotification._(
+        message ?? this.message,
+        backgroundColor: backgroundColor ?? this.backgroundColor,
+        textColor: textColor ?? this.textColor,
+        postAction: postAction ?? this.postAction,
       );
 }

@@ -11,7 +11,7 @@ class _SearchBar extends StatelessWidget {
           children: [
             Expanded(
               child: TextField(
-                onChanged: (value) => context.read<ProjectsBloc>().add(SearchTextChanged(value)),
+                onChanged: (value) => context.read<ProjectsBloc>().add(ProjectsEvents.searchTextChanged(value)),
                 decoration: InputDecoration(
                   icon: Icon(
                     Icons.search,

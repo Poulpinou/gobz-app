@@ -17,7 +17,7 @@ class ProjectsPage extends StatelessWidget {
     final Project? project = await Navigator.push(context, NewProjectPage.route());
 
     if (project != null) {
-      context.read<ProjectsBloc>().add(FetchProjects());
+      context.read<ProjectsBloc>().add(ProjectsEvents.fetch());
 
       Navigator.push(context, ProjectPage.route(project));
     }
@@ -26,7 +26,7 @@ class ProjectsPage extends StatelessWidget {
   void _clickProject(BuildContext context, Project project) async {
     await Navigator.push(context, ProjectPage.route(project));
 
-    context.read<ProjectsBloc>().add(FetchProjects());
+    context.read<ProjectsBloc>().add(ProjectsEvents.fetch());
   }
 
   @override
@@ -35,7 +35,7 @@ class ProjectsPage extends StatelessWidget {
       create: (context) {
         final ProjectsBloc bloc = ProjectsBloc(projectRepository: RepositoryProvider.of<ProjectRepository>(context));
 
-        bloc.add(FetchProjects());
+        bloc.add(ProjectsEvents.fetch());
 
         return bloc;
       },
@@ -60,7 +60,7 @@ class ProjectsPage extends StatelessWidget {
                         children: [
                           const Text("Impossible de récupérer les projets"),
                           ElevatedButton(
-                              onPressed: () => context.read<ProjectsBloc>().add(FetchProjects()),
+                              onPressed: () => context.read<ProjectsBloc>().add(ProjectsEvents.fetch()),
                               child: const Text("Réessayer"))
                         ],
                       ),

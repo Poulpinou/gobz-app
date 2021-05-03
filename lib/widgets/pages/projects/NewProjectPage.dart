@@ -21,8 +21,8 @@ class NewProjectPage extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
-            child: CreateProjectForm(
-              onCreated: (project) => Navigator.pop(context, project),
+            child: ProjectForm(
+              onValidate: (project) => Navigator.pop(context, project),
             ),
           ),
         ),

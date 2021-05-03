@@ -67,7 +67,7 @@ class _GobzAppViewState extends State<GobzAppView> {
                     await LocalStorageUtils.getBool(StorageKeysConfig.instance.stayConnectedKey) ?? false;
 
                 if (wasConnected && stayConnected) {
-                  BlocProvider.of<AuthBloc>(context).add(AuthAutoReconnectRequested());
+                  BlocProvider.of<AuthBloc>(context).add(AuthEvents.autoReconnectRequested());
                 } else {
                   _navigator.pushAndRemoveUntil<void>(
                     LoginPage.route(),

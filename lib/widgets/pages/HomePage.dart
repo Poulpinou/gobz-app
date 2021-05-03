@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
               PopupMenuDivider(),
               PopupMenuItem(
                 child: const Text("Déconnexion"),
-                value: () => context.read<AuthBloc>().add(AuthLogoutRequested()),
+                value: () => context.read<AuthBloc>().add(AuthEvents.logoutRequested()),
               ),
             ];
           },
