@@ -35,6 +35,8 @@ class _ProgressInfos extends StatelessWidget {
               Flexible(
                 flex: 1,
                 child: CircularPercentIndicator(
+                  animation: true,
+                  animationDuration: 600,
                   radius: 80.0,
                   lineWidth: 8.0,
                   percent: donePercent,

@@ -47,9 +47,9 @@ class ChapterForm extends StatelessWidget {
 
           return Column(
             children: [
-              _NameField(),
+              _NameField(initialValue: state.name.value),
               const Padding(padding: EdgeInsets.all(8)),
-              _DescriptionField(),
+              _DescriptionField(initialValue: state.description.value),
               const Padding(padding: EdgeInsets.all(12)),
               BlocBuilder<ChapterEditionBloc, ChapterEditionState>(
                 buildWhen: (previous, current) => previous.status != current.status,

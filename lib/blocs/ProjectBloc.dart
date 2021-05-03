@@ -17,8 +17,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Stream<ProjectState> mapEventToState(ProjectEvent event) async* {
     if (event is _FetchProject) {
       yield* _fetchProject();
-    }
-    if (event is _DeleteProject) {
+    } else if (event is _DeleteProject) {
       yield* _deleteProject();
     }
   }
@@ -68,32 +67,25 @@ class ProjectState extends BlocState {
   final Project project;
   final ProjectInfos? projectInfos;
   final bool projectDeleted;
-  final bool projectUpToDate;
 
   const ProjectState(
-      {bool? isLoading,
-      Exception? error,
-      required this.project,
-      this.projectInfos,
-      this.projectDeleted = false,
-      this.projectUpToDate = false})
+      {bool? isLoading, Exception? error, required this.project, this.projectInfos, this.projectDeleted = false})
       : super(isLoading: isLoading, error: error);
 
-  bool get shouldBeFetched => !projectUpToDate || projectInfos == null;
+  bool get shouldBeFetched => projectInfos == null;
 
-  ProjectState copyWith(
-          {bool? isLoading,
-          Exception? error,
-          Project? project,
-          ProjectInfos? projectInfos,
-          bool? projectDeleted,
-          bool? projectUpToDate}) =>
+  ProjectState copyWith({
+    bool? isLoading,
+    Exception? error,
+    Project? project,
+    ProjectInfos? projectInfos,
+    bool? projectDeleted,
+  }) =>
       ProjectState(
         project: project ?? this.project,
         isLoading: isLoading ?? false,
         error: error,
         projectInfos: projectInfos ?? this.projectInfos,
         projectDeleted: projectDeleted ?? this.projectDeleted,
-        projectUpToDate: projectUpToDate ?? this.projectDeleted,
       );
 }

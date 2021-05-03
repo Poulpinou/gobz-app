@@ -19,8 +19,20 @@ class ChapterRepository {
     }
   }
 
+  Future<Chapter> getChapter(int chapterId) async {
+    final Map<String, dynamic> responseData = await _client.get("/chapters/$chapterId");
+
+    try {
+      return Chapter.fromJson(responseData);
+    } catch (e) {
+      Log.error("Failed to create chapter from response", e);
+      rethrow;
+    }
+  }
+
   Future<Chapter> createChapter(int projectId, ChapterCreationRequest request) async {
-    final Map<String, dynamic> responseData = await _client.post("/projects/$projectId/chapters", body: request.toJson());
+    final Map<String, dynamic> responseData =
+        await _client.post("/projects/$projectId/chapters", body: request.toJson());
 
     try {
       return Chapter.fromJson(responseData);
@@ -31,7 +43,7 @@ class ChapterRepository {
   }
 
   Future<Chapter> updateChapter(int chapterId, ChapterUpdateRequest request) async {
-    final Map<String, dynamic> responseData = await _client.post("/chapters/$chapterId", body: request.toJson());
+    final Map<String, dynamic> responseData = await _client.put("/chapters/$chapterId", body: request.toJson());
 
     try {
       return Chapter.fromJson(responseData);
@@ -39,5 +51,9 @@ class ChapterRepository {
       Log.error("Failed to create chapter from response", e);
       rethrow;
     }
+  }
+
+  Future<void> deleteChapter(int chapterId) async {
+    return await _client.delete("/chapters/$chapterId");
   }
 }

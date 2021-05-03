@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/blocs/ChaptersBloc.dart';
 import 'package:gobz_app/blocs/ProjectBloc.dart';
-import 'package:gobz_app/mixins/DisplayableMessage.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/models/ProjectInfos.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
@@ -14,9 +12,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'EditProjectPage.dart';
 
 part 'parts/components/ProgressInfos.dart';
-
 part 'parts/components/ProjectInfos.dart';
-
 part 'parts/components/ProjectSectionDisplay.dart';
 
 class ProjectPage extends StatelessWidget {
@@ -67,7 +63,7 @@ class ProjectPage extends StatelessWidget {
   void _goToChapters(BuildContext context) async {
     await Navigator.push(context, ChaptersPage.route(project));
 
-    context.read<ProjectBloc>().add(ProjectEvents.fetch());
+    _refreshProject(context);
   }
 
   // Build Parts
@@ -80,25 +76,23 @@ class ProjectPage extends StatelessWidget {
         PopupMenuButton<Function>(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Icon(Icons.create),
+            child: Icon(Icons.more_vert),
           ),
           onSelected: (function) => function(),
-          itemBuilder: (BuildContext context) {
-            return <PopupMenuEntry<Function>>[
-              PopupMenuItem(
-                child: const Text("Actualiser"),
-                value: () => _refreshProject(context),
-              ),
-              PopupMenuItem(
-                child: const Text("Modifier"),
-                value: () => _editProject(context),
-              ),
-              PopupMenuItem(
-                child: const Text("Supprimer"),
-                value: () => _deleteProject(context),
-              ),
-            ];
-          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<Function>>[
+            PopupMenuItem(
+              child: const Text("Actualiser"),
+              value: () => _refreshProject(context),
+            ),
+            PopupMenuItem(
+              child: const Text("Modifier"),
+              value: () => _editProject(context),
+            ),
+            PopupMenuItem(
+              child: const Text("Supprimer"),
+              value: () => _deleteProject(context),
+            ),
+          ],
         ),
       ],
     );
@@ -108,7 +102,7 @@ class ProjectPage extends StatelessWidget {
     return BlocHandler<ProjectBloc, ProjectState>.custom(
       mapErrorToNotification: (state) {
         if (state.projectDeleted) {
-          return BlocNotification.success("${state.project.name} as été supprimé")
+          return BlocNotification.success("${state.project.name} a été supprimé")
               .copyWith(postAction: (context) => Navigator.pop(context, null));
         }
       },

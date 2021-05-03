@@ -48,6 +48,8 @@ class ChapterListItem extends StatelessWidget {
               Flexible(
                 flex: 1,
                 child: CircularPercentIndicator(
+                  animation: true,
+                  animationDuration: 600,
                   radius: 60,
                   lineWidth: 8.0,
                   percent: chapter.completion,

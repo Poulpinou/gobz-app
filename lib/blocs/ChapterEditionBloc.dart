@@ -11,10 +11,12 @@ import 'package:gobz_app/widgets/forms/chapters/inputs/ChapterDescriptionInput.d
 import 'package:gobz_app/widgets/forms/chapters/inputs/ChapterNameInput.dart';
 
 class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> {
-  final int _projectId;
+  final int? _projectId;
   final ChapterRepository _chapterRepository;
 
-  ChapterEditionBloc(this._chapterRepository, this._projectId) : super(ChapterEditionState.pure());
+  ChapterEditionBloc(this._chapterRepository, {int? projectId, Chapter? chapter})
+      : _projectId = projectId,
+        super(chapter != null ? ChapterEditionState.fromChapter(chapter) : ChapterEditionState.pure());
 
   @override
   Stream<ChapterEditionState> mapEventToState(ChapterEditionEvent event) async* {
@@ -34,7 +36,7 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
       yield state.copyWith(isLoading: true);
       try {
         final Chapter? chapter = await _chapterRepository.createChapter(
-            _projectId,
+            _projectId!,
             ChapterCreationRequest(
               name: state.name.value,
               description: state.description.value,
@@ -124,6 +126,12 @@ class ChapterEditionState extends BlocState with FormzMixin {
   }) : super(isLoading: isLoading, error: error);
 
   factory ChapterEditionState.pure() => ChapterEditionState._();
+
+  factory ChapterEditionState.fromChapter(Chapter chapter) => ChapterEditionState._(
+        chapter: chapter,
+        name: ChapterNameInput.pure(chapterName: chapter.name),
+        description: ChapterDescriptionInput.pure(chapterDescription: chapter.description),
+      );
 
   @override
   ChapterEditionState copyWith({

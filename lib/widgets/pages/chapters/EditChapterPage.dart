@@ -6,16 +6,16 @@ import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/widgets/forms/chapters/ChapterForm.dart';
 
-class NewChapterPage extends StatelessWidget {
-  final Project project;
+class EditChapterPage extends StatelessWidget {
+  final Chapter chapter;
 
-  const NewChapterPage({Key? key, required this.project}) : super(key: key);
+  const EditChapterPage({Key? key, required this.chapter}) : super(key: key);
 
-  static Route<Chapter> route(Project project) {
+  static Route<Chapter> route(Chapter chapter) {
     return MaterialPageRoute<Chapter>(
-        builder: (_) => NewChapterPage(
-              project: project,
-            ));
+        builder: (_) => EditChapterPage(
+          chapter: chapter,
+        ));
   }
 
   @override
@@ -23,16 +23,17 @@ class NewChapterPage extends StatelessWidget {
     return BlocProvider<ChapterEditionBloc>(
       create: (context) => ChapterEditionBloc(
         context.read<ChapterRepository>(),
-        projectId: project.id,
+        chapter: chapter,
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Nouveau chapitre"),
+          title: Text("Edition de ${chapter.name}"),
         ),
         body: Padding(
           padding: const EdgeInsets.all(12),
           child: SingleChildScrollView(
             child: ChapterForm(
+              chapter: chapter,
               onValidate: (chapter) => Navigator.pop(context, chapter),
             ),
           ),

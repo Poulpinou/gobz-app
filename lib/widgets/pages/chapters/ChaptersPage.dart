@@ -9,6 +9,8 @@ import 'package:gobz_app/widgets/misc/CircularLoader.dart';
 import 'package:gobz_app/widgets/pages/chapters/NewChapterPage.dart';
 import 'package:gobz_app/widgets/pages/chapters/components/ChapterList.dart';
 
+import 'ChapterPage.dart';
+
 class ChaptersPage extends StatelessWidget {
   final Project project;
 
@@ -21,11 +23,17 @@ class ChaptersPage extends StatelessWidget {
   void _createChapter(BuildContext context) async {
     final Chapter? chapter = await Navigator.push(context, NewChapterPage.route(project));
 
-    if(chapter != null){
+    if (chapter != null) {
       context.read<ChaptersBloc>().add(ChaptersEvents.fetch());
 
-      //Navigator.push(context, ChapterPage.route(chapter));
+      Navigator.push(context, ChapterPage.route(chapter));
     }
+  }
+
+  void _clickChapter(BuildContext context, Chapter chapter) async {
+    await Navigator.push(context, ChapterPage.route(chapter));
+
+    context.read<ChaptersBloc>().add(ChaptersEvents.fetch());
   }
 
   @override
@@ -44,6 +52,21 @@ class ChaptersPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Chapitres"),
+          actions: [
+            PopupMenuButton<Function>(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(Icons.more_vert),
+              ),
+              onSelected: (function) => function(),
+              itemBuilder: (context) => <PopupMenuEntry<Function>>[
+                PopupMenuItem(
+                  child: const Text("Actualiser"),
+                  value: () => context.read<ChaptersBloc>().add(ChaptersEvents.fetch()),
+                ),
+              ],
+            ),
+          ],
         ),
         body: BlocHandler<ChaptersBloc, ChaptersState>.simple(
           child: Column(
@@ -83,7 +106,7 @@ class ChaptersPage extends StatelessWidget {
                   return Expanded(
                     child: ChapterList(
                       chapters: state.chapters,
-                      onChapterClicked: (chapter) => print(chapter.name),
+                      onChapterClicked: (chapter) => _clickChapter(context, chapter),
                     ),
                   );
                 },
