@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gobz_app/models/Chapter.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class ChapterList extends StatelessWidget {
   final List<Chapter> chapters;
@@ -40,17 +41,22 @@ class ChapterListItem extends StatelessWidget {
     return InkWell(
       child: Container(
         child: Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(8.0),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 5.0),
-                child: Icon(
-                  Icons.image,
-                  size: 50,
+              Flexible(
+                flex: 1,
+                child: CircularPercentIndicator(
+                  radius: 60,
+                  lineWidth: 8.0,
+                  percent: chapter.completion,
+                  center: new Text(chapter.completion < 1 ? "${(chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
+                  progressColor: Theme.of(context).colorScheme.secondary,
                 ),
               ),
               Expanded(
+                flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -61,6 +67,7 @@ class ChapterListItem extends StatelessWidget {
                           .headline6
                           ?.copyWith(color: Theme.of(context).colorScheme.secondary),
                     ),
+                    Text(chapter.description),
                   ],
                 ),
               ),

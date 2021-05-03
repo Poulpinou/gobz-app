@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ChaptersBloc.dart';
+import 'package:gobz_app/models/Chapter.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
 import 'package:gobz_app/widgets/misc/CircularLoader.dart';
-import 'package:gobz_app/widgets/pages/projects/parts/components/ChapterList.dart';
+import 'package:gobz_app/widgets/pages/chapters/NewChapterPage.dart';
+import 'package:gobz_app/widgets/pages/chapters/components/ChapterList.dart';
 
 class ChaptersPage extends StatelessWidget {
   final Project project;
@@ -14,6 +16,16 @@ class ChaptersPage extends StatelessWidget {
 
   static Route route(Project project) {
     return MaterialPageRoute(builder: (_) => ChaptersPage(project: project));
+  }
+
+  void _createChapter(BuildContext context) async {
+    final Chapter? chapter = await Navigator.push(context, NewChapterPage.route(project));
+
+    if(chapter != null){
+      context.read<ChaptersBloc>().add(ChaptersEvents.fetch());
+
+      //Navigator.push(context, ChapterPage.route(chapter));
+    }
   }
 
   @override
@@ -77,6 +89,12 @@ class ChaptersPage extends StatelessWidget {
                 },
               ),
             ],
+          ),
+        ),
+        floatingActionButton: BlocBuilder<ChaptersBloc, ChaptersState>(
+          builder: (context, state) => FloatingActionButton(
+            onPressed: () => _createChapter(context),
+            child: const Icon(Icons.add),
           ),
         ),
       ),

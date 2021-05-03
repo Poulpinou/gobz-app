@@ -5,11 +5,13 @@ import 'package:gobz_app/blocs/ProjectEditionBloc.dart';
 import 'package:gobz_app/models/Project.dart';
 
 part 'fields/DescriptionField.dart';
+
 part 'fields/IsSharedField.dart';
+
 part 'fields/NameField.dart';
 
 class CreateProjectForm extends StatelessWidget {
-  final Function(Project?)? onCreated;
+  final Function(Project? project)? onCreated;
 
   const CreateProjectForm({Key? key, this.onCreated}) : super(key: key);
 
@@ -29,35 +31,36 @@ class CreateProjectForm extends StatelessWidget {
       },
       child: BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
         buildWhen: (previous, current) => previous.formStatus != current.formStatus,
-        builder: (context, state) => state.formStatus.isSubmissionInProgress
+        builder: (context, state) =>
+        state.formStatus.isSubmissionInProgress
             ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Création du projet..."),
-                  Container(height: 10),
-                  LinearProgressIndicator(),
-                ],
-              )
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Création du projet..."),
+            Container(height: 10),
+            LinearProgressIndicator(),
+          ],
+        )
             : Column(
-                children: [
-                  _NameField(),
-                  const Padding(padding: EdgeInsets.all(8)),
-                  _DescriptionField(),
-                  const Padding(padding: EdgeInsets.all(12)),
-                  _IsSharedField(),
-                  const Padding(padding: EdgeInsets.all(12)),
-                  BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
-                      buildWhen: (previous, current) => previous.status != current.status,
-                      builder: (context, state) {
-                        return ElevatedButton(
-                            key: const Key("projectForm_submit"),
-                            onPressed: state.status.isValidated
-                                ? () => context.read<ProjectEditionBloc>().add(CreateProjectFormSubmitted())
-                                : null,
-                            child: const Text("Créer"));
-                      }),
-                ],
-              ),
+          children: [
+            _NameField(),
+            const Padding(padding: EdgeInsets.all(8)),
+            _DescriptionField(),
+            const Padding(padding: EdgeInsets.all(8)),
+            _IsSharedField(),
+            const Padding(padding: EdgeInsets.all(12)),
+            BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
+                buildWhen: (previous, current) => previous.status != current.status,
+                builder: (context, state) =>
+                    ElevatedButton(
+                        key: const Key("projectForm_submit"),
+                        onPressed: state.status.isValidated
+                            ? () => context.read<ProjectEditionBloc>().add(CreateProjectFormSubmitted())
+                            : null,
+                        child: const Text("Créer"))
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -85,35 +88,36 @@ class UpdateProjectForm extends StatelessWidget {
       },
       child: BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
         buildWhen: (previous, current) => previous.formStatus != current.formStatus,
-        builder: (context, state) => state.formStatus.isSubmissionInProgress
+        builder: (context, state) =>
+        state.formStatus.isSubmissionInProgress
             ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Sauvegarde du projet..."),
-                  Container(height: 10),
-                  LinearProgressIndicator(),
-                ],
-              )
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Sauvegarde du projet..."),
+            Container(height: 10),
+            LinearProgressIndicator(),
+          ],
+        )
             : Column(
-                children: [
-                  _NameField(initialValue: state.name.value),
-                  const Padding(padding: EdgeInsets.all(8)),
-                  _DescriptionField(initialValue: state.description.value),
-                  const Padding(padding: EdgeInsets.all(12)),
-                  _IsSharedField(initialValue: state.isShared),
-                  const Padding(padding: EdgeInsets.all(12)),
-                  BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
-                      buildWhen: (previous, current) => previous.status != current.status,
-                      builder: (context, state) {
-                        return ElevatedButton(
-                            key: const Key("projectForm_submit"),
-                            onPressed: state.status.isValidated
-                                ? () => context.read<ProjectEditionBloc>().add(UpdateProjectFormSubmitted())
-                                : null,
-                            child: const Text("Sauvegarder"));
-                      })
-                ],
-              ),
+          children: [
+            _NameField(initialValue: state.name.value),
+            const Padding(padding: EdgeInsets.all(8)),
+            _DescriptionField(initialValue: state.description.value),
+            const Padding(padding: EdgeInsets.all(12)),
+            _IsSharedField(initialValue: state.isShared),
+            const Padding(padding: EdgeInsets.all(12)),
+            BlocBuilder<ProjectEditionBloc, ProjectEditionState>(
+                buildWhen: (previous, current) => previous.status != current.status,
+                builder: (context, state) {
+                  return ElevatedButton(
+                      key: const Key("projectForm_submit"),
+                      onPressed: state.status.isValidated
+                          ? () => context.read<ProjectEditionBloc>().add(UpdateProjectFormSubmitted())
+                          : null,
+                      child: const Text("Sauvegarder"));
+                })
+          ],
+        ),
       ),
     );
   }
