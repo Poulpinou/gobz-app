@@ -19,28 +19,36 @@ class _ProjectInfos extends StatelessWidget {
                   size: 80,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "General",
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.subtitle1?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      Text(
-                          "Créé le ${DateFormat("dd/MM/yyyy à hh:mm").format(state.project.createdAt)}"),
+                      Text("Créé le ${DateFormat("dd/MM/yyyy à hh:mm").format(state.project.createdAt)}"),
+                      Text("Public: ${state.project.isShared ? 'oui' : 'non'}"),
                     ],
                   ),
                 ),
               ],
             ),
-            Text(
-              "Description",
-              style: Theme.of(context).textTheme.subtitle1,
-            ),
-            Text(
-              state.project.description,
-              style: Theme.of(context).textTheme.bodyText2?.copyWith(fontStyle: FontStyle.italic),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Description",
+                    style: Theme.of(context).textTheme.subtitle1?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    state.project.description,
+                    style: Theme.of(context).textTheme.bodyText2?.copyWith(fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

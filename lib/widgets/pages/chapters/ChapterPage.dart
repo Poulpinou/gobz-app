@@ -103,7 +103,6 @@ class ChapterPage extends StatelessWidget {
         color: Theme.of(context).secondaryHeaderColor,
         child: Column(
           children: [
-
             LinearPercentIndicator(
               padding: EdgeInsets.zero,
               lineHeight: 20.0,

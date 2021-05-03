@@ -6,7 +6,6 @@ import 'package:gobz_app/models/Chapter.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
 
 part 'fields/DescriptionField.dart';
-
 part 'fields/NameField.dart';
 
 class ChapterForm extends StatelessWidget {

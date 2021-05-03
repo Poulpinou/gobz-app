@@ -10,8 +10,7 @@ class ChaptersBloc extends Bloc<ChaptersEvent, ChaptersState> {
   final Project project;
   final ChapterRepository chapterRepository;
 
-  ChaptersBloc({required this.project, required this.chapterRepository}):
-        super(ChaptersState());
+  ChaptersBloc({required this.project, required this.chapterRepository}) : super(ChaptersState());
 
   @override
   Stream<ChaptersState> mapEventToState(ChaptersEvent event) async* {
@@ -25,23 +24,23 @@ class ChaptersBloc extends Bloc<ChaptersEvent, ChaptersState> {
     try {
       final List<Chapter> chapters = await chapterRepository.getChapters(project.id);
       yield state.copyWith(chapters: chapters);
-    }catch(e){
+    } catch (e) {
       Log.error("Failed to retrieve chapters", e);
-      yield state.copyWith(error: DisplayableException(internMessage: e.toString(), messageToDisplay: "La récupération des chapitres a échoué"));
+      yield state.copyWith(
+          error: DisplayableException(
+              internMessage: e.toString(), messageToDisplay: "La récupération des chapitres a échoué"));
     }
   }
 }
 
 // Events
-abstract class ChaptersEvent {
-}
+abstract class ChaptersEvent {}
 
 abstract class ChaptersEvents {
   static _FetchChapters fetch() => _FetchChapters();
 }
 
-class _FetchChapters extends ChaptersEvent {
-}
+class _FetchChapters extends ChaptersEvent {}
 
 // States
 class ChaptersState extends BlocState {
@@ -54,8 +53,7 @@ class ChaptersState extends BlocState {
   }) : super(isLoading: isLoading, error: error);
 
   @override
-  ChaptersState copyWith({bool? isLoading, Exception? error, List<Chapter>? chapters}) =>
-      ChaptersState(
+  ChaptersState copyWith({bool? isLoading, Exception? error, List<Chapter>? chapters}) => ChaptersState(
         isLoading: isLoading ?? false,
         error: error,
         chapters: chapters ?? this.chapters,

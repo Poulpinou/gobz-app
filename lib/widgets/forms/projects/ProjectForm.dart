@@ -6,9 +6,7 @@ import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
 
 part 'fields/DescriptionField.dart';
-
 part 'fields/IsSharedField.dart';
-
 part 'fields/NameField.dart';
 
 class ProjectForm extends StatelessWidget {

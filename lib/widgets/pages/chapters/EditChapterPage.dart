@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ChapterEditionBloc.dart';
 import 'package:gobz_app/models/Chapter.dart';
-import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/widgets/forms/chapters/ChapterForm.dart';
 
@@ -14,8 +13,8 @@ class EditChapterPage extends StatelessWidget {
   static Route<Chapter> route(Chapter chapter) {
     return MaterialPageRoute<Chapter>(
         builder: (_) => EditChapterPage(
-          chapter: chapter,
-        ));
+              chapter: chapter,
+            ));
   }
 
   @override

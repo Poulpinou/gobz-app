@@ -35,7 +35,7 @@ abstract class ApiClient {
     switch (response.statusCode) {
       case 200:
       case 201:
-        return json.decode(response.body.toString());
+        return json.decode(utf8.decode(response.body.codeUnits));
       case 400:
         throw BadRequestException(response.body.toString());
       case 401:

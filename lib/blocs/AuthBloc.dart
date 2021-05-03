@@ -82,8 +82,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 }
 
 // Events
-abstract class AuthEvent {
-}
+abstract class AuthEvent {}
 
 abstract class AuthEvents {
   static _AuthStatusChanged statusChanged(AuthStatus status) => _AuthStatusChanged(status);

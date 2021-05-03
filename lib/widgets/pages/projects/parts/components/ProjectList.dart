@@ -30,7 +30,11 @@ class ProjectListItem extends StatelessWidget {
   final Project project;
   final Function(Project)? onProjectClicked;
 
-  const ProjectListItem({Key? key, required this.project, this.onProjectClicked,}) : super(key: key);
+  const ProjectListItem({
+    Key? key,
+    required this.project,
+    this.onProjectClicked,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

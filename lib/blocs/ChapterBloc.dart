@@ -79,9 +79,8 @@ class ChapterState extends BlocState {
     bool? chapterDeleted,
   }) =>
       ChapterState(
-        isLoading: isLoading ?? false,
-        error: error,
-        chapter: chapter ?? this.chapter,
-        chapterDeleted: chapterDeleted ?? this.chapterDeleted
-      );
+          isLoading: isLoading ?? false,
+          error: error,
+          chapter: chapter ?? this.chapter,
+          chapterDeleted: chapterDeleted ?? this.chapterDeleted);
 }

@@ -12,7 +12,6 @@ import 'package:gobz_app/widgets/pages/projects/parts/components/ProjectList.dar
 part 'parts/components/SearchBar.dart';
 
 class ProjectsPage extends StatelessWidget {
-
   void _createProject(BuildContext context) async {
     final Project? project = await Navigator.push(context, NewProjectPage.route());
 

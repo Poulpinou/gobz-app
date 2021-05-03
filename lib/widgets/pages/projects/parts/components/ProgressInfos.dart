@@ -1,6 +1,5 @@
 part of '../../ProjectPage.dart';
 
-
 class _ProgressInfos extends StatelessWidget {
   final Function()? onClick;
 
