@@ -7,6 +7,8 @@ import 'package:gobz_app/models/enums/AuthStatus.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
+import 'package:gobz_app/repositories/StepRepository.dart';
+import 'package:gobz_app/repositories/TaskRepository.dart';
 import 'package:gobz_app/repositories/UserRepository.dart';
 import 'package:gobz_app/utils/LocalStorageUtils.dart';
 import 'package:gobz_app/widgets/pages/HomePage.dart';
@@ -26,6 +28,8 @@ class GobzApp extends StatelessWidget {
         RepositoryProvider(create: (_) => userRepository),
         RepositoryProvider(create: (_) => ProjectRepository()),
         RepositoryProvider(create: (_) => ChapterRepository()),
+        RepositoryProvider(create: (_) => StepRepository()),
+        RepositoryProvider(create: (_) => TaskRepository()),
       ],
       child: BlocProvider(
         create: (_) => AuthBloc(authRepository: authRepository, userRepository: userRepository),

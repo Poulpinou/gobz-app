@@ -5,7 +5,7 @@ import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/models/ProjectInfos.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
-import 'package:gobz_app/widgets/pages/chapters/ChaptersPage.dart';
+import 'package:gobz_app/widgets/pages/progress/ChaptersPage.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 

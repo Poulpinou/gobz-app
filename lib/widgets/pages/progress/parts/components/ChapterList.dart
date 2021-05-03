@@ -53,7 +53,7 @@ class ChapterListItem extends StatelessWidget {
                   radius: 60,
                   lineWidth: 8.0,
                   percent: chapter.completion,
-                  center: new Text(chapter.completion < 1 ? "${(chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
+                  center: Text(chapter.completion < 1 ? "${(chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
                   progressColor: Theme.of(context).colorScheme.secondary,
                 ),
               ),

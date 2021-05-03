@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ChapterBloc.dart';
+import 'package:gobz_app/blocs/StepsBloc.dart';
 import 'package:gobz_app/models/Chapter.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
+import 'package:gobz_app/repositories/StepRepository.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
+import 'package:gobz_app/widgets/misc/CircularLoader.dart';
+import 'package:gobz_app/widgets/pages/progress/parts/components/StepList.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-
 import 'EditChapterPage.dart';
+
+part 'parts/components/StepListWrapper.dart';
 
 class ChapterPage extends StatelessWidget {
   final Chapter chapter;
@@ -97,34 +102,35 @@ class ChapterPage extends StatelessWidget {
     );
   }
 
-  Widget _buildChapterHeader() {
-    return BlocBuilder<ChapterBloc, ChapterState>(
-      builder: (context, state) => ColoredBox(
-        color: Theme.of(context).secondaryHeaderColor,
-        child: Column(
-          children: [
-            LinearPercentIndicator(
-              padding: EdgeInsets.zero,
-              lineHeight: 20.0,
-              animation: true,
-              animationDuration: 600,
-              percent: state.chapter.completion,
-              center: Text(chapter.completion < 1 ? "${(chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
-              progressColor: Theme.of(context).colorScheme.secondary,
-              linearStrokeCap: LinearStrokeCap.butt,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(state.chapter.description),
+  Widget _buildChapterHeader(BuildContext context, ChapterState state) {
+    return ColoredBox(
+      color: Theme.of(context).secondaryHeaderColor,
+      child: Column(
+        children: [
+          LinearPercentIndicator(
+            padding: EdgeInsets.zero,
+            lineHeight: 20.0,
+            animation: true,
+            animationDuration: 600,
+            percent: state.chapter.completion,
+            center: Text(chapter.completion < 1 ? "${(chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
+            progressColor: Theme.of(context).colorScheme.secondary,
+            linearStrokeCap: LinearStrokeCap.butt,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    state.chapter.description,
+                    style: Theme.of(context).textTheme.bodyText2?.copyWith(fontStyle: FontStyle.italic),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -143,10 +149,14 @@ class ChapterPage extends StatelessWidget {
       child: Scaffold(
         appBar: _buildAppBar(context),
         body: _buildHandler(
-          child: Column(
-            children: [
-              _buildChapterHeader(),
-            ],
+          child: BlocBuilder<ChapterBloc, ChapterState>(
+            buildWhen: (previous, current) => previous.isLoading != current.isLoading,
+            builder: (context, state) => Column(
+              children: [
+                _buildChapterHeader(context, state),
+                _StepListWrapper(chapter: state.chapter),
+              ],
+            ),
           ),
         ),
       ),
