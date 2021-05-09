@@ -3,7 +3,6 @@ import 'package:gobz_app/exceptions/DisplayableException.dart';
 import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Chapter.dart';
 import 'package:gobz_app/models/Step.dart';
-import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/StepRepository.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 

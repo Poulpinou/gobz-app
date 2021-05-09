@@ -44,7 +44,7 @@ class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> 
         yield state.copyWith(
           error: DisplayableException(
             internMessage: e.toString(),
-            messageToDisplay: "Echec de la création du projet",
+            messageToDisplay: "Échec de la création du projet",
           ),
         );
       }
@@ -64,7 +64,7 @@ class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> 
         yield state.copyWith(
           error: DisplayableException(
             internMessage: e.toString(),
-            messageToDisplay: "Echec de la sauvegarde du projet",
+            messageToDisplay: "Échec de la sauvegarde du projet",
           ),
         );
       }

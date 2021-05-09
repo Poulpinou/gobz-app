@@ -26,17 +26,25 @@ class TaskListItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            task.isDone ? Icons.check_circle_rounded : Icons.circle,
-            size: 10,
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Icon(
+              task.isDone ? Icons.check_circle_rounded : Icons.circle,
+              size: 10,
+            ),
           ),
           Padding(padding: EdgeInsets.all(4)),
-          Text(
-            task.text,
-            style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                  decoration: task.isDone ? TextDecoration.lineThrough : null,
-                ),
+          Expanded(
+            child: Text(
+              task.text +
+                  "gds dtrjqer qyhsrjyj rheq hsysrtr sgqsrt hq hst qrg trh qsrg rsht syd jfhq SH T QDGQD TH SDTH RSG S THSRY J SFH SYRFH TQD H SG WDV GFN SXFN F H",
+              style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                    decoration: task.isDone ? TextDecoration.lineThrough : null,
+                  ),
+              overflow: TextOverflow.visible,
+            ),
           ),
         ],
       ),

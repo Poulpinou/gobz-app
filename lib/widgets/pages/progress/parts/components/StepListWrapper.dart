@@ -5,6 +5,15 @@ class _StepListWrapper extends StatelessWidget {
 
   const _StepListWrapper({Key? key, required this.chapter}) : super(key: key);
 
+  void _refreshStep(BuildContext context) {
+    context.read<StepsBloc>().add(StepsEvents.fetch());
+  }
+
+  void _createStep(BuildContext context) async {
+    await Navigator.push(context, NewStepPage.route(chapter));
+    _refreshStep(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<StepsBloc>(
@@ -15,17 +24,17 @@ class _StepListWrapper extends StatelessWidget {
 
         return bloc;
       },
-      child: BlocHandler<StepsBloc, StepsState>.simple(
-        child: BlocBuilder<StepsBloc, StepsState>(
-          buildWhen: (previous, current) => previous.isLoading != current.isLoading,
-          builder: (context, state) {
-            if (state.isLoading) {
-              return Expanded(child: CircularLoader("Récupération des étapes..."));
-            }
+      child: Scaffold(
+        body: BlocHandler<StepsBloc, StepsState>.simple(
+          child: BlocBuilder<StepsBloc, StepsState>(
+            buildWhen: (previous, current) => previous.isLoading != current.isLoading,
+            builder: (context, state) {
+              if (state.isLoading) {
+                return CircularLoader("Récupération des étapes...");
+              }
 
-            if (state.isErrored) {
-              return Expanded(
-                child: Center(
+              if (state.isErrored) {
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -36,24 +45,26 @@ class _StepListWrapper extends StatelessWidget {
                           child: const Text("Réessayer"))
                     ],
                   ),
-                ),
-              );
-            }
+                );
+              }
 
-            if (state.steps.length == 0) {
-              return Expanded(
-                child: Center(
+              if (state.steps.length == 0) {
+                return Center(
                   child: const Text("Il n'y a encore aucune étape dans ce chapitre"),
-                ),
-              );
-            }
+                );
+              }
 
-            return Expanded(
-              child: StepList(
+              return StepList(
                 steps: state.steps,
-              ),
-            );
-          },
+              );
+            },
+          ),
+        ),
+        floatingActionButton: BlocBuilder<StepsBloc, StepsState>(
+          builder: (context, state) => FloatingActionButton(
+            onPressed: () => _createStep(context),
+            child: const Icon(Icons.add),
+          ),
         ),
       ),
     );

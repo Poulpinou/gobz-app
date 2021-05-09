@@ -35,6 +35,7 @@ class _AccordionState extends State<Accordion> {
               ? Container(
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   child: widget.content,
+                  color: Theme.of(context).secondaryHeaderColor,
                 )
               : Container()
         ],

@@ -22,14 +22,13 @@ class StepList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) => StepListItem(
-        step: steps[index],
-      ),
-      separatorBuilder: (BuildContext context, int index) => Divider(
-        color: Theme.of(context).colorScheme.secondary,
-      ),
-      itemCount: steps.length,
+    return ListView.builder(
+      itemBuilder: (context, index) => index < steps.length
+          ? StepListItem(
+              step: steps[index],
+            )
+          : Container(height: 80),
+      itemCount: steps.length + 1,
     );
   }
 }
@@ -50,7 +49,7 @@ class StepListItem extends StatelessWidget {
             animation: true,
             animationDuration: 600,
             radius: 40,
-            lineWidth: 8.0,
+            lineWidth: 5.0,
             percent: step.completion,
             center: step.completion < 1
                 ? Text(
