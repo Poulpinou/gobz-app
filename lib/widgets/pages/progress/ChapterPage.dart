@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ChapterBloc.dart';
 import 'package:gobz_app/blocs/StepsBloc.dart';
 import 'package:gobz_app/models/Chapter.dart';
+import 'package:gobz_app/models/Step.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/repositories/StepRepository.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
 import 'package:gobz_app/widgets/misc/CircularLoader.dart';
+import 'package:gobz_app/widgets/pages/progress/EditStepPage.dart';
 import 'package:gobz_app/widgets/pages/progress/parts/components/StepList.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
@@ -75,15 +77,33 @@ class ChapterPage extends StatelessWidget {
           onSelected: (function) => function(),
           itemBuilder: (BuildContext context) => <PopupMenuEntry<Function>>[
             PopupMenuItem(
-              child: const Text("Actualiser"),
+              child: Row(
+                children: <Widget>[
+                  const Icon(Icons.refresh),
+                  Container(width: 4),
+                  const Text("Actualiser"),
+                ],
+              ),
               value: () => _refreshChapter(context),
             ),
             PopupMenuItem(
-              child: const Text("Modifier"),
+              child: Row(
+                children: <Widget>[
+                  const Icon(Icons.edit),
+                  Container(width: 4),
+                  const Text("Éditer"),
+                ],
+              ),
               value: () => _editChapter(context),
             ),
             PopupMenuItem(
-              child: const Text("Supprimer"),
+              child: Row(
+                children: <Widget>[
+                  const Icon(Icons.delete),
+                  Container(width: 4),
+                  const Text("Supprimer"),
+                ],
+              ),
               value: () => _deleteChapter(context),
             ),
           ],
@@ -105,34 +125,37 @@ class ChapterPage extends StatelessWidget {
   }
 
   Widget _buildChapterHeader(BuildContext context, ChapterState state) {
-    return ColoredBox(
-      color: Theme.of(context).secondaryHeaderColor,
-      child: Column(
-        children: [
-          LinearPercentIndicator(
-            padding: EdgeInsets.zero,
-            lineHeight: 20.0,
-            animation: true,
-            animationDuration: 600,
-            percent: state.chapter.completion,
-            center: Text(chapter.completion < 1 ? "${(chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
-            progressColor: Theme.of(context).colorScheme.secondary,
-            linearStrokeCap: LinearStrokeCap.butt,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    state.chapter.description,
-                    style: Theme.of(context).textTheme.bodyText2?.copyWith(fontStyle: FontStyle.italic),
-                  ),
-                ),
-              ],
+    return BlocBuilder<ChapterBloc, ChapterState>(
+      buildWhen: (previous, current) => previous.isLoading != current.isLoading,
+      builder: (context, state) => ColoredBox(
+        color: Theme.of(context).secondaryHeaderColor,
+        child: Column(
+          children: [
+            LinearPercentIndicator(
+              padding: EdgeInsets.zero,
+              lineHeight: 20.0,
+              animation: true,
+              animationDuration: 600,
+              percent: state.chapter.completion,
+              center: Text(state.chapter.completion < 1 ? "${(state.chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
+              progressColor: Theme.of(context).colorScheme.secondary,
+              linearStrokeCap: LinearStrokeCap.butt,
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      state.chapter.description,
+                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

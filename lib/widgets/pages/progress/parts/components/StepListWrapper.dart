@@ -5,13 +5,44 @@ class _StepListWrapper extends StatelessWidget {
 
   const _StepListWrapper({Key? key, required this.chapter}) : super(key: key);
 
-  void _refreshStep(BuildContext context) {
+  void _refreshSteps(BuildContext context) {
     context.read<StepsBloc>().add(StepsEvents.fetch());
+    context.read<ChapterBloc>().add(ChapterEvents.fetch());
   }
 
   void _createStep(BuildContext context) async {
     await Navigator.push(context, NewStepPage.route(chapter));
-    _refreshStep(context);
+    _refreshSteps(context);
+  }
+
+  void _deleteStep(BuildContext context, Step step) async {
+    final bool? isConfirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Supprimer ${step.name}?'),
+              content: Text('Attention, cette action est définitive!'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text('Oui'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text('Non'),
+                ),
+              ],
+            ));
+
+    if (isConfirmed != null && isConfirmed == true) {
+      context.read<StepsBloc>().add(StepsEvents.deleteStep(step));
+    }
+  }
+
+  void _editStep(BuildContext context, Step step) async {
+    final Step? result = await Navigator.push(context, EditStepPage.route(step));
+    if (result != null) {
+      _refreshSteps(context);
+    }
   }
 
   @override
@@ -25,7 +56,12 @@ class _StepListWrapper extends StatelessWidget {
         return bloc;
       },
       child: Scaffold(
-        body: BlocHandler<StepsBloc, StepsState>.simple(
+        body: BlocHandler<StepsBloc, StepsState>.custom(
+          mapErrorToNotification: (state) {
+            if (state.deletedStep != null) {
+              return BlocNotification.success("${state.deletedStep!.name} a été supprimé");
+            }
+          },
           child: BlocBuilder<StepsBloc, StepsState>(
             buildWhen: (previous, current) => previous.isLoading != current.isLoading,
             builder: (context, state) {
@@ -40,9 +76,7 @@ class _StepListWrapper extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Text("Impossible de récupérer les étapes"),
-                      ElevatedButton(
-                          onPressed: () => context.read<StepsBloc>().add(StepsEvents.fetch()),
-                          child: const Text("Réessayer"))
+                      ElevatedButton(onPressed: () => _refreshSteps(context), child: const Text("Réessayer"))
                     ],
                   ),
                 );
@@ -56,6 +90,38 @@ class _StepListWrapper extends StatelessWidget {
 
               return StepList(
                 steps: state.steps,
+                stepActions: <PopupMenuEntry<Function(Step)>>[
+                  PopupMenuItem<Function(Step)>(
+                    value: (step) => _refreshSteps(context),
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(Icons.refresh),
+                        Container(width: 4),
+                        const Text("Actualiser"),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<Function(Step)>(
+                    value: (step) => _editStep(context, step),
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(Icons.edit),
+                        Container(width: 4),
+                        const Text("Éditer"),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<Function(Step)>(
+                    value: (step) => _deleteStep(context, step),
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(Icons.delete),
+                        Container(width: 4),
+                        const Text("Supprimer"),
+                      ],
+                    ),
+                  ),
+                ],
               );
             },
           ),
