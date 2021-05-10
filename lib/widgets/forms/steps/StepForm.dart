@@ -1,43 +1,42 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Step;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:gobz_app/blocs/ChapterEditionBloc.dart';
-import 'package:gobz_app/models/Chapter.dart';
+import 'package:gobz_app/blocs/StepEditionBloc.dart';
+import 'package:gobz_app/models/Step.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
 
 part 'fields/DescriptionField.dart';
 part 'fields/NameField.dart';
 
-class ChapterForm extends StatelessWidget {
-  final Chapter? chapter;
-  final Function(Chapter chapter)? onValidate;
+class StepForm extends StatelessWidget {
+  final Step? step;
+  final Function(Step)? onValidate;
   final bool isCreation;
 
-  const ChapterForm({Key? key, this.chapter, this.onValidate})
-      : this.isCreation = chapter == null,
+  const StepForm({Key? key, Step? step, this.onValidate})
+      : this.step = step,
+        this.isCreation = step == null,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocHandler<ChapterEditionBloc, ChapterEditionState>.custom(
+    return BlocHandler<StepEditionBloc, StepEditionState>.custom(
       mapErrorToNotification: (state) {
-        if (state.hasBeenUpdated && state.chapter != null) {
-          return BlocNotification.success(
-                  "${isCreation ? 'Création' : 'Sauvegarde'} de ${state.chapter!.name} réussie!")
+        if (state.hasBeenUpdated && state.step != null) {
+          return BlocNotification.success("${isCreation ? 'Création' : 'Sauvegarde'} de ${state.step!.name} réussie!")
               .copyWith(
-            postAction: (context) => onValidate?.call(state.chapter!),
-            //postAction: (context) => Navigator.pop(context, state.chapter),
+            postAction: (context) => onValidate?.call(state.step!),
           );
         }
       },
-      child: BlocBuilder<ChapterEditionBloc, ChapterEditionState>(
+      child: BlocBuilder<StepEditionBloc, StepEditionState>(
         buildWhen: (previous, current) => previous.isLoading != current.isLoading,
         builder: (context, state) {
           if (state.isLoading) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("${isCreation ? 'Création' : 'Sauvegarde'} du chapitre..."),
+                Text("${isCreation ? 'Création' : 'Sauvegarde'} de l'étape..."),
                 Container(height: 10),
                 LinearProgressIndicator(),
               ],
@@ -50,14 +49,14 @@ class ChapterForm extends StatelessWidget {
               const Padding(padding: EdgeInsets.all(8)),
               _DescriptionField(initialValue: state.description.value),
               const Padding(padding: EdgeInsets.all(12)),
-              BlocBuilder<ChapterEditionBloc, ChapterEditionState>(
+              BlocBuilder<StepEditionBloc, StepEditionState>(
                 buildWhen: (previous, current) => previous.status != current.status,
                 builder: (context, state) => ElevatedButton(
-                  key: const Key("chapterForm_submit"),
+                  key: const Key("stepForm_submit"),
                   onPressed: state.status.isValidated
-                      ? () => context.read<ChapterEditionBloc>().add(isCreation
-                          ? ChapterEditionEvents.createFormSubmitted()
-                          : ChapterEditionEvents.updateFormSubmitted())
+                      ? () => context.read<StepEditionBloc>().add(isCreation
+                          ? StepEditionEvents.createFormSubmitted()
+                          : StepEditionEvents.updateFormSubmitted())
                       : null,
                   child: Text(isCreation ? 'Créer' : 'Sauvegarder'),
                 ),

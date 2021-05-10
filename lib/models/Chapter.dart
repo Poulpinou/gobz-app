@@ -9,7 +9,7 @@ class Chapter {
   final String description;
   final double completion;
 
-  Chapter(this.name, this.id, this.description, this.completion);
+  Chapter(this.id, this.name, this.description, this.completion);
 
   factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Step;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ChapterBloc.dart';
 import 'package:gobz_app/models/Chapter.dart';
@@ -7,6 +7,7 @@ import 'package:gobz_app/widgets/misc/BlocHandler.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import 'EditChapterPage.dart';
+import 'parts/wrappers/StepListWrapper.dart';
 
 class ChapterPage extends StatelessWidget {
   final Chapter chapter;
@@ -68,15 +69,33 @@ class ChapterPage extends StatelessWidget {
           onSelected: (function) => function(),
           itemBuilder: (BuildContext context) => <PopupMenuEntry<Function>>[
             PopupMenuItem(
-              child: const Text("Actualiser"),
+              child: Row(
+                children: <Widget>[
+                  const Icon(Icons.refresh),
+                  Container(width: 4),
+                  const Text("Actualiser"),
+                ],
+              ),
               value: () => _refreshChapter(context),
             ),
             PopupMenuItem(
-              child: const Text("Modifier"),
+              child: Row(
+                children: <Widget>[
+                  const Icon(Icons.edit),
+                  Container(width: 4),
+                  const Text("Éditer"),
+                ],
+              ),
               value: () => _editChapter(context),
             ),
             PopupMenuItem(
-              child: const Text("Supprimer"),
+              child: Row(
+                children: <Widget>[
+                  const Icon(Icons.delete),
+                  Container(width: 4),
+                  const Text("Supprimer"),
+                ],
+              ),
               value: () => _deleteChapter(context),
             ),
           ],
@@ -97,8 +116,9 @@ class ChapterPage extends StatelessWidget {
     );
   }
 
-  Widget _buildChapterHeader() {
+  Widget _buildChapterHeader(BuildContext context, ChapterState state) {
     return BlocBuilder<ChapterBloc, ChapterState>(
+      buildWhen: (previous, current) => previous.isLoading != current.isLoading,
       builder: (context, state) => ColoredBox(
         color: Theme.of(context).secondaryHeaderColor,
         child: Column(
@@ -109,7 +129,8 @@ class ChapterPage extends StatelessWidget {
               animation: true,
               animationDuration: 600,
               percent: state.chapter.completion,
-              center: Text(chapter.completion < 1 ? "${(chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
+              center:
+                  Text(state.chapter.completion < 1 ? "${(state.chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
               progressColor: Theme.of(context).colorScheme.secondary,
               linearStrokeCap: LinearStrokeCap.butt,
             ),
@@ -118,7 +139,10 @@ class ChapterPage extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(state.chapter.description),
+                    child: Text(
+                      state.chapter.description,
+                      style: Theme.of(context).textTheme.bodyText2?.copyWith(fontStyle: FontStyle.italic),
+                    ),
                   ),
                 ],
               ),
@@ -143,10 +167,16 @@ class ChapterPage extends StatelessWidget {
       child: Scaffold(
         appBar: _buildAppBar(context),
         body: _buildHandler(
-          child: Column(
-            children: [
-              _buildChapterHeader(),
-            ],
+          child: BlocBuilder<ChapterBloc, ChapterState>(
+            buildWhen: (previous, current) => previous.isLoading != current.isLoading,
+            builder: (context, state) => Column(
+              children: [
+                _buildChapterHeader(context, state),
+                Expanded(
+                  child: StepListWrapper(chapter: state.chapter),
+                ),
+              ],
+            ),
           ),
         ),
       ),

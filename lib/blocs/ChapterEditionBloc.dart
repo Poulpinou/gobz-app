@@ -48,7 +48,7 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
         yield state.copyWith(
           error: DisplayableException(
             internMessage: e.toString(),
-            messageToDisplay: "Echec de la création du chapitre",
+            messageToDisplay: "Échec de la création du chapitre",
           ),
         );
       }
@@ -72,7 +72,7 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
         yield state.copyWith(
           error: DisplayableException(
             internMessage: e.toString(),
-            messageToDisplay: "Echec de la sauvegarde du chapitre",
+            messageToDisplay: "Échec de la sauvegarde du chapitre",
           ),
         );
       }

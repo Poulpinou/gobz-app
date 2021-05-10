@@ -6,8 +6,8 @@ import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
 import 'package:gobz_app/widgets/misc/CircularLoader.dart';
-import 'package:gobz_app/widgets/pages/chapters/NewChapterPage.dart';
-import 'package:gobz_app/widgets/pages/chapters/components/ChapterList.dart';
+import 'package:gobz_app/widgets/pages/progress/NewChapterPage.dart';
+import 'package:gobz_app/widgets/pages/progress/parts/components/ChapterList.dart';
 
 import 'ChapterPage.dart';
 

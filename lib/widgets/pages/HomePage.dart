@@ -52,6 +52,7 @@ class _HomePageState extends State<HomePage> {
               size: 20,
             ),
           ),
+          onSelected: (function) => function?.call(),
           itemBuilder: (BuildContext context) {
             return <PopupMenuEntry<Function?>>[
               PopupMenuItem(
