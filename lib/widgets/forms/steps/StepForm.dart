@@ -25,7 +25,7 @@ class StepForm extends StatelessWidget {
         if (state.hasBeenUpdated && state.step != null) {
           return BlocNotification.success("${isCreation ? 'Création' : 'Sauvegarde'} de ${state.step!.name} réussie!")
               .copyWith(
-            postAction: (context) => Navigator.pop(context, state.step),
+            postAction: (context) => onValidate?.call(state.step!),
           );
         }
       },

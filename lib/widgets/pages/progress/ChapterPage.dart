@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart' hide Step;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/blocs/ChapterBloc.dart';
-import 'package:gobz_app/blocs/StepsBloc.dart';
 import 'package:gobz_app/models/Chapter.dart';
-import 'package:gobz_app/models/Step.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
-import 'package:gobz_app/repositories/StepRepository.dart';
 import 'package:gobz_app/widgets/misc/BlocHandler.dart';
-import 'package:gobz_app/widgets/misc/CircularLoader.dart';
-import 'package:gobz_app/widgets/pages/progress/EditStepPage.dart';
-import 'package:gobz_app/widgets/pages/progress/parts/components/StepList.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import 'EditChapterPage.dart';
-import 'NewStepPage.dart';
-
-part 'parts/components/StepListWrapper.dart';
+import 'parts/wrappers/StepListWrapper.dart';
 
 class ChapterPage extends StatelessWidget {
   final Chapter chapter;
@@ -137,7 +129,8 @@ class ChapterPage extends StatelessWidget {
               animation: true,
               animationDuration: 600,
               percent: state.chapter.completion,
-              center: Text(state.chapter.completion < 1 ? "${(state.chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
+              center:
+                  Text(state.chapter.completion < 1 ? "${(state.chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
               progressColor: Theme.of(context).colorScheme.secondary,
               linearStrokeCap: LinearStrokeCap.butt,
             ),
@@ -180,7 +173,7 @@ class ChapterPage extends StatelessWidget {
               children: [
                 _buildChapterHeader(context, state),
                 Expanded(
-                  child: _StepListWrapper(chapter: state.chapter),
+                  child: StepListWrapper(chapter: state.chapter),
                 ),
               ],
             ),

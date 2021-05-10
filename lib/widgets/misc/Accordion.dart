@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class Accordion extends StatefulWidget {
   final Widget title;
   final Widget content;
+  final EdgeInsetsGeometry? contentPadding;
 
-  Accordion({required this.title, required this.content});
+  Accordion({required this.title, required this.content, this.contentPadding});
 
   @override
   _AccordionState createState() => _AccordionState();
@@ -33,7 +34,7 @@ class _AccordionState extends State<Accordion> {
           ),
           _showContent
               ? Container(
-                  padding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+                  padding: widget.contentPadding ?? EdgeInsets.zero,
                   child: widget.content,
                   color: Theme.of(context).secondaryHeaderColor,
                 )

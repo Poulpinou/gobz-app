@@ -10,12 +10,11 @@ part 'fields/NameField.dart';
 
 class ChapterForm extends StatelessWidget {
   final Chapter? chapter;
-  final Function(Chapter)? onValidate;
+  final Function(Chapter chapter)? onValidate;
   final bool isCreation;
 
-  const ChapterForm({Key? key, Chapter? chapter, this.onValidate})
-      : this.chapter = chapter,
-        this.isCreation = chapter == null,
+  const ChapterForm({Key? key, this.chapter, this.onValidate})
+      : this.isCreation = chapter == null,
         super(key: key);
 
   @override
@@ -26,7 +25,8 @@ class ChapterForm extends StatelessWidget {
           return BlocNotification.success(
                   "${isCreation ? 'Création' : 'Sauvegarde'} de ${state.chapter!.name} réussie!")
               .copyWith(
-            postAction: (context) => Navigator.pop(context, state.chapter),
+            postAction: (context) => onValidate?.call(state.chapter!),
+            //postAction: (context) => Navigator.pop(context, state.chapter),
           );
         }
       },
