@@ -21,7 +21,10 @@ class StepListWrapper extends StatelessWidget {
 
   void _refreshSteps(BuildContext context) {
     context.read<StepsBloc>().add(StepsEvents.fetch());
-    context.read<ChapterBloc>().add(ChapterEvents.fetch());
+  }
+
+  void _refreshStep(BuildContext context) {
+    context.read<StepBloc>().add(StepEvents.fetch());
   }
 
   void _createStep(BuildContext context) async {
@@ -129,7 +132,7 @@ class StepListWrapper extends StatelessWidget {
                           onSelected: (action) => action?.call(step),
                           items: <PopupMenuEntry<Function(Step)>>[
                             PopupMenuItem<Function(Step)>(
-                              value: (step) => _refreshSteps(context),
+                              value: (step) => _refreshStep(context),
                               child: Row(
                                 children: <Widget>[
                                   const Icon(Icons.refresh),

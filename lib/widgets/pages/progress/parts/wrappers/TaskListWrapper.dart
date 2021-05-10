@@ -19,18 +19,26 @@ class TaskListWrapper extends StatefulWidget {
   _TaskListWrapperState createState() => _TaskListWrapperState();
 }
 
-class _TaskListWrapperState extends State<TaskListWrapper> {
-  bool _taskFormShown = false;
+enum _FormMode { NORMAL, CREATION, EDITION }
 
-  void _openTaskForm() {
+class _TaskListWrapperState extends State<TaskListWrapper> {
+  _FormMode _mode = _FormMode.NORMAL;
+
+  void _onCreateTask() {
     setState(() {
-      _taskFormShown = true;
+      _mode = _FormMode.CREATION;
     });
   }
 
-  void _closeTaskForm() {
+  void _onEditTask() {
     setState(() {
-      _taskFormShown = false;
+      _mode = _FormMode.EDITION;
+    });
+  }
+
+  void _exitMode() {
+    setState(() {
+      _mode = _FormMode.NORMAL;
     });
   }
 
@@ -49,48 +57,67 @@ class _TaskListWrapperState extends State<TaskListWrapper> {
   }
 
   Widget _buildBottomBar(BuildContext context) {
-    return _taskFormShown
-        ? BlocProvider<TaskEditionBloc>(
-            create: (context) => TaskEditionBloc(
-              context.read<TaskRepository>(),
-              stepId: widget.step.id,
-            ),
+    switch (_mode) {
+      case _FormMode.EDITION:
+        return BlocBuilder<TasksBloc, TasksState>(
+          builder: (context, state) => BlocProvider<TaskEditionBloc>(
+            create: (context) => TaskEditionBloc(context.read<TaskRepository>(), task: state.selected),
             child: TaskForm(
+              task: state.selected,
               onValidate: (task) {
+                _exitMode();
                 _refreshTasks(context);
-                _closeTaskForm();
               },
-              onCancel: _closeTaskForm,
+              onCancel: _exitMode,
             ),
-          )
-        : BlocBuilder<TasksBloc, TasksState>(
-            buildWhen: (previous, current) => previous.selected?.id != current.selected?.id,
-            builder: (context, state) => Row(
-              children: [
-                state.selected != null
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.edit,
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                        onPressed: () => print("editing ${state.selected?.text ?? 'none'}"))
-                    : Container(),
-                state.selected != null
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.delete,
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                        onPressed: () => _deleteTask(context, state.selected!))
-                    : Container(),
-                Expanded(child: Container()),
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: _openTaskForm,
-                ),
-              ],
-            ),
-          );
+          ),
+        );
+
+      case _FormMode.CREATION:
+        return BlocProvider<TaskEditionBloc>(
+          create: (context) => TaskEditionBloc(
+            context.read<TaskRepository>(),
+            stepId: widget.step.id,
+          ),
+          child: TaskForm(
+            onValidate: (task) {
+              _refreshTasks(context);
+              _exitMode();
+            },
+            onCancel: _exitMode,
+          ),
+        );
+
+      case _FormMode.NORMAL:
+        return BlocBuilder<TasksBloc, TasksState>(
+          buildWhen: (previous, current) => previous.selected?.id != current.selected?.id,
+          builder: (context, state) => Row(
+            children: [
+              state.selected != null
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.edit,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      onPressed: _onEditTask)
+                  : Container(),
+              state.selected != null
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.delete,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      onPressed: () => _deleteTask(context, state.selected!))
+                  : Container(),
+              Expanded(child: Container()),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: _onCreateTask,
+              ),
+            ],
+          ),
+        );
+    }
   }
 
   @override
@@ -135,6 +162,7 @@ class _TaskListWrapperState extends State<TaskListWrapper> {
                       )
                     : TaskList(
                         tasks: state.tasks,
+                        selectedId: state.selected?.id ?? null,
                         onTaskSelect: (task) => _onSelectedTaskChanged(context, task),
                       ),
                 _buildBottomBar(context),
