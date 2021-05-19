@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:gobz_app/exceptions/BadRequestException.dart';
-import 'package:gobz_app/exceptions/FetchDataException.dart';
-import 'package:gobz_app/exceptions/UnauthorisedException.dart';
+import 'package:gobz_app/exceptions/UnreachableServerException.dart';
+import 'package:gobz_app/exceptions/api/BadRequestException.dart';
+import 'package:gobz_app/exceptions/api/FetchDataException.dart';
+import 'package:gobz_app/exceptions/api/UnauthorisedException.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -40,11 +41,14 @@ abstract class ApiClient {
         throw BadRequestException(response.body.toString());
       case 401:
       case 403:
-        throw UnauthorisedException(response.body.toString());
+        throw UnauthorisedException(
+            response.statusCode, response.body.toString());
       case 500:
       default:
         throw FetchDataException(
-            'Error occured while communication with server with StatusCode : ${response.statusCode}');
+          response.statusCode,
+          'Error occured while communication with server"',
+        );
     }
   }
 
@@ -54,10 +58,11 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response = await http.get(uri, headers: await buildHeaders());
+      final Response response =
+          await http.get(uri, headers: await buildHeaders());
       responseJson = buildResponse(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection');
+      throw UnreachableServerException();
     }
 
     return responseJson;
@@ -69,10 +74,11 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response = await http.post(uri, headers: await buildHeaders(), body: json.encode(body));
+      final Response response = await http.post(uri,
+          headers: await buildHeaders(), body: json.encode(body));
       responseJson = buildResponse(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection');
+      throw UnreachableServerException();
     }
     return responseJson;
   }
@@ -83,10 +89,11 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response = await http.put(uri, headers: await buildHeaders(), body: json.encode(body));
+      final Response response = await http.put(uri,
+          headers: await buildHeaders(), body: json.encode(body));
       responseJson = buildResponse(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection');
+      throw UnreachableServerException();
     }
     return responseJson;
   }
@@ -97,10 +104,11 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response = await http.patch(uri, headers: await buildHeaders(), body: json.encode(body));
+      final Response response = await http.patch(uri,
+          headers: await buildHeaders(), body: json.encode(body));
       responseJson = buildResponse(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection');
+      throw UnreachableServerException();
     }
     return responseJson;
   }
@@ -111,10 +119,11 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response = await http.delete(uri, headers: await buildHeaders());
+      final Response response =
+          await http.delete(uri, headers: await buildHeaders());
       responseJson = buildResponse(response);
     } on SocketException {
-      throw FetchDataException('No Internet connection');
+      throw UnreachableServerException();
     }
     return responseJson;
   }

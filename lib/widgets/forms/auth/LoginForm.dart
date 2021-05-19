@@ -2,20 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:gobz_app/blocs/LoginBloc.dart';
+import 'package:gobz_app/widgets/misc/BlocHandler.dart';
 
 class LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginBloc, LoginState>(
-      listener: (context, state) {
-        if (state.formStatus.isSubmissionFailure) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              const SnackBar(content: Text("Échec de l'authentification")),
-            );
-        }
-      },
+    return BlocHandler<LoginBloc, LoginState>.simple(
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
           if (!state.localValuesLoaded) {
