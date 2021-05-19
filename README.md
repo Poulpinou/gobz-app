@@ -1,16 +1,57 @@
 # Gobz App
-
 A project management mobile app
 
-## Getting Started
+## Install
+This project requires a connection to the [gobz-back](https://github.com/Poulpinou/gobz-back) API in order to work correctly.
 
-This project is a starting point for a Flutter application.
+Some classes have to be generated with this command :
+```
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+or if you want them to be generated while editing code:
+```
+flutter pub run build_runner watch --delete-conflicting-outputs
+```
 
-A few resources to get you started if this is your first Flutter project:
+To run this app, run one of those files *lib/main_{env}_{target}.dart* (if none of those files is matching your config, you can create your own).
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Structure
+```
+.
+│ pubspec.yaml
+│ pubspec.lock
+├── lib
+│   ├── blocs                          => A bloc provides a way for views to interract with repositories
+│   ├── clients                        => Api clients
+│   ├── configurations                 => Application configurations
+│   ├── exceptions                     => Custom exceptions
+│   ├── mixins                         
+│   ├── models
+│   │   ├── enums
+│   │   ├── requests                   => Request dtos
+│   │   ├── {model}.dart
+│   │   └── {model}.g.dart             => Generated models parts
+│   ├── repositories                   => A repository provides methods to exchange with APIs
+│   ├── utils
+│   ├── widgets
+│   │   ├── forms
+│   │   │   └── {form}
+│   │   │       └── fields             => Form widget parts
+│   │   │       └── inputs             => Formz input validators
+│   │   │       └── {Form}Form.dart    => The form widget
+│   │   ├── misc                       => Reusable widgets
+│   │   ├── pages
+│   │   │   └── {page}
+│   │   │       └── parts              => Page's parts
+│   │   │       └── {Page}Page.dart    => The page widget
+│   │   ├── themes
+│   │   └── GobzApp.dart
+│   └── main_{env}_{device}.dart
+├── android
+└── ios
+```
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Screenshots
+| Create your projects | Keep track of evolution | Create detailed tasks |
+|---|---|---|
+| ![Projects Screen](screenshots/projects_screen.png "Projects Screen") | ![Project Screen](screenshots/project_screen.png?raw=true "Project Screen") | ![Steps Screen](screenshots/steps_screen.png?raw=true "Project Screen") |
