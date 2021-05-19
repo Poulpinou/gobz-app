@@ -1,10 +1,10 @@
-class AppException implements Exception {
-  final _message;
-  final _prefix;
+abstract class AppException implements Exception {
+  final String message;
+  final String? _prefix;
 
-  AppException([this._message, this._prefix]);
+  AppException(this.message, {String? prefix}) : this._prefix = prefix;
 
   String toString() {
-    return "$_prefix$_message";
+    return "${_prefix ?? ""}$message";
   }
 }

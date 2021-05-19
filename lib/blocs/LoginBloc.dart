@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:gobz_app/configurations/StorageKeysConfig.dart';
+import 'package:gobz_app/exceptions/DisplayableException.dart';
+import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/requests/LoginRequest.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/utils/LocalStorageUtils.dart';
@@ -31,9 +33,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Future<LoginState> _loadLocalValues(LoginState state) async {
-    final bool? stayConnected = await LocalStorageUtils.getBool(StorageKeysConfig.instance.stayConnectedKey);
-    final String? email = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserEmailKey);
-    final String? password = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserPasswordKey);
+    final bool? stayConnected = await LocalStorageUtils.getBool(
+        StorageKeysConfig.instance.stayConnectedKey);
+    final String? email = await LocalStorageUtils.getString(
+        StorageKeysConfig.instance.currentUserEmailKey);
+    final String? password = await LocalStorageUtils.getString(
+        StorageKeysConfig.instance.currentUserPasswordKey);
 
     return state.copyWith(
         stayConnected: stayConnected,
@@ -44,19 +49,32 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _onFormSubmitted(LoginState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
+      yield state.copyWith(
+          formStatus: FormzStatus.submissionInProgress, isLoading: true);
       try {
-        await _authRepository.login(LoginRequest(state.email.value, state.password.value));
+        await _authRepository
+            .login(LoginRequest(state.email.value, state.password.value));
 
         // Store current user infos
-        await LocalStorageUtils.setBool(StorageKeysConfig.instance.stayConnectedKey, state.stayConnected);
-        await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserEmailKey, state.email.value);
-        await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserPasswordKey, state.password.value);
+        await LocalStorageUtils.setBool(
+            StorageKeysConfig.instance.stayConnectedKey, state.stayConnected);
+        await LocalStorageUtils.setString(
+            StorageKeysConfig.instance.currentUserEmailKey, state.email.value);
+        await LocalStorageUtils.setString(
+            StorageKeysConfig.instance.currentUserPasswordKey,
+            state.password.value);
 
         yield state.copyWith(formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         Log.error("Login failed", e);
-        yield state.copyWith(formStatus: FormzStatus.submissionFailure);
+
+        yield state.copyWith(
+            formStatus: FormzStatus.submissionFailure,
+            error: e is DisplayableException
+                ? e
+                : DisplayableException(
+                    internMessage: e.toString(),
+                    messageToDisplay: "L'authentification a échoué'"));
       }
     }
   }
@@ -68,11 +86,14 @@ abstract class LoginEvent {}
 abstract class LoginEvents {
   static _LoadLocalValues loadLocalValues() => _LoadLocalValues();
 
-  static _LoginEmailChanged emailChanged(String email) => _LoginEmailChanged(email);
+  static _LoginEmailChanged emailChanged(String email) =>
+      _LoginEmailChanged(email);
 
-  static _LoginPasswordChanged passwordChanged(String password) => _LoginPasswordChanged(password);
+  static _LoginPasswordChanged passwordChanged(String password) =>
+      _LoginPasswordChanged(password);
 
-  static _StayConnectedChanged stayConnectedChanged(bool stayConnected) => _StayConnectedChanged(stayConnected);
+  static _StayConnectedChanged stayConnectedChanged(bool stayConnected) =>
+      _StayConnectedChanged(stayConnected);
 
   static _LoginSubmitted loginSubmitted() => _LoginSubmitted();
 }
@@ -100,7 +121,7 @@ class _StayConnectedChanged extends LoginEvent {
 class _LoginSubmitted extends LoginEvent {}
 
 // States
-class LoginState with FormzMixin {
+class LoginState extends BlocState with FormzMixin {
   final FormzStatus formStatus;
   final EmailInput email;
   final PasswordInput password;
@@ -108,22 +129,29 @@ class LoginState with FormzMixin {
   final bool localValuesLoaded;
 
   const LoginState(
-      {this.formStatus = FormzStatus.pure,
+      {bool? isLoading,
+      Exception? error,
+      this.formStatus = FormzStatus.pure,
       this.email = const EmailInput.pure(),
       this.password = const PasswordInput.pure(),
       this.stayConnected = false,
-      this.localValuesLoaded = false});
+      this.localValuesLoaded = false})
+      : super(isLoading: isLoading, error: error);
 
   @override
   List<FormzInput> get inputs => [email, password];
 
   LoginState copyWith(
-          {FormzStatus? formStatus,
+          {bool? isLoading,
+          Exception? error,
+          FormzStatus? formStatus,
           EmailInput? email,
           PasswordInput? password,
           bool? stayConnected,
           bool? localValuesLoaded}) =>
       LoginState(
+          isLoading: isLoading ?? false,
+          error: error,
           formStatus: formStatus ?? this.status,
           email: email ?? this.email,
           password: password ?? this.password,

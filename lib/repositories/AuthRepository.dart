@@ -4,6 +4,8 @@ import 'package:gobz_app/clients/ApiClient.dart';
 import 'package:gobz_app/clients/GobzApiClient.dart';
 import 'package:gobz_app/configurations/GobzClientConfig.dart';
 import 'package:gobz_app/configurations/StorageKeysConfig.dart';
+import 'package:gobz_app/exceptions/DisplayableException.dart';
+import 'package:gobz_app/exceptions/api/UnauthorisedException.dart';
 import 'package:gobz_app/models/enums/AuthStatus.dart';
 import 'package:gobz_app/models/requests/LoginRequest.dart';
 import 'package:gobz_app/models/requests/SignInRequest.dart';
@@ -11,8 +13,10 @@ import 'package:gobz_app/utils/LocalStorageUtils.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class AuthRepository {
-  final StreamController<AuthStatus> _controller = StreamController<AuthStatus>();
-  final ApiClient _client = GobzApiClient(basePath: "/auth", withBearerToken: false);
+  final StreamController<AuthStatus> _controller =
+      StreamController<AuthStatus>();
+  final ApiClient _client =
+      GobzApiClient(basePath: "/auth", withBearerToken: false);
 
   Stream<AuthStatus> get statusStream async* {
     yield AuthStatus.UNAUTHENTICATED;
@@ -21,19 +25,33 @@ class AuthRepository {
 
   Future<void> login(LoginRequest request) async {
     Log.info("Trying to log user in with ${request.email}...");
-    final Map<String, dynamic> responseData = await _client.post("/login", body: request.toJson());
 
-    // TODO: Handle errors
+    final Map<String, dynamic> responseData;
+    try {
+      responseData = await _client.post("/login", body: request.toJson());
+    } on UnauthorisedException catch (e) {
+      if (e.statusCode == 401) {
+        throw new DisplayableException(
+            internMessage: e.toString(),
+            messageToDisplay: "Email ou mot de passe incorrect");
+      } else {
+        rethrow;
+      }
+    }
+
     final String accessToken = responseData["accessToken"];
-    await LocalStorageUtils.setString(GobzClientConfig.instance.accessTokenStorageKey, accessToken);
-    await LocalStorageUtils.setBool(StorageKeysConfig.instance.wasConnectedKey, true);
+    await LocalStorageUtils.setString(
+        GobzClientConfig.instance.accessTokenStorageKey, accessToken);
+    await LocalStorageUtils.setBool(
+        StorageKeysConfig.instance.wasConnectedKey, true);
 
     _controller.add(AuthStatus.AUTHENTICATED);
     Log.info("${request.email} successfully logged in");
   }
 
   Future<void> signIn(SignInRequest request) async {
-    Log.info("Trying to create user account for ${request.name} with ${request.email}...");
+    Log.info(
+        "Trying to create user account for ${request.name} with ${request.email}...");
 
     await _client.post("/signup", body: request.toJson());
 
@@ -43,8 +61,10 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
-    await LocalStorageUtils.removeKey(GobzClientConfig.instance.accessTokenStorageKey);
-    await LocalStorageUtils.setBool(StorageKeysConfig.instance.wasConnectedKey, false);
+    await LocalStorageUtils.removeKey(
+        GobzClientConfig.instance.accessTokenStorageKey);
+    await LocalStorageUtils.setBool(
+        StorageKeysConfig.instance.wasConnectedKey, false);
 
     Log.info("Successfully logged out");
 
