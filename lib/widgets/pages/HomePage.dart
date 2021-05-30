@@ -22,15 +22,18 @@ class _HomePageState extends State<HomePage> {
     _HomePageScreenInfo(
         title: 'Accueil',
         screen: const Text('Accueil'),
-        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil")),
+        navigationBarItem:
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil")),
     _HomePageScreenInfo(
         title: 'Run',
         screen: const Text('Run'),
-        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.pending_actions), label: "Run")),
+        navigationBarItem: BottomNavigationBarItem(
+            icon: Icon(Icons.pending_actions), label: "Run")),
     _HomePageScreenInfo(
         title: 'Projets',
         screen: ProjectsPage(),
-        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: "Projets")),
+        navigationBarItem: BottomNavigationBarItem(
+            icon: Icon(Icons.list_alt), label: "Projets")),
   ];
 
   AppBar _buildAppBar(BuildContext context) {
@@ -44,40 +47,47 @@ class _HomePageState extends State<HomePage> {
         style: Theme.of(context).appBarTheme.titleTextStyle,
       ),
       actions: [
-        PopupMenuButton<Function?>(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Avatar(
-              user,
-              size: 20,
+        BlocBuilder<AuthBloc, AuthState>(
+          buildWhen: (previous, current) =>
+              previous.user.id != current.user.id ||
+              previous.status != current.status,
+          builder: (context, state) => PopupMenuButton<Function?>(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Avatar(
+                state.user,
+                size: 20,
+              ),
             ),
-          ),
-          onSelected: (function) => function?.call(),
-          itemBuilder: (BuildContext context) {
-            return <PopupMenuEntry<Function?>>[
-              PopupMenuItem(
-                child: Row(
-                  children: [
-                    Avatar(
-                      user,
-                      size: 15,
-                    ),
-                    Expanded(
-                        child: Text(
-                      user.name,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                  ],
+            onSelected: (function) => function?.call(),
+            itemBuilder: (BuildContext context) {
+              return <PopupMenuEntry<Function?>>[
+                PopupMenuItem(
+                  child: Row(
+                    children: [
+                      Avatar(
+                        user,
+                        size: 15,
+                      ),
+                      Expanded(
+                          child: Text(
+                        state.user.name,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                    ],
+                  ),
                 ),
-              ),
-              PopupMenuDivider(),
-              PopupMenuItem(
-                child: const Text("Déconnexion"),
-                value: () => context.read<AuthBloc>().add(AuthEvents.logoutRequested()),
-              ),
-            ];
-          },
+                PopupMenuDivider(),
+                PopupMenuItem(
+                  child: const Text("Déconnexion"),
+                  value: () => context
+                      .read<AuthBloc>()
+                      .add(AuthEvents.logoutRequested()),
+                ),
+              ];
+            },
+          ),
         )
       ],
     );
@@ -108,5 +118,8 @@ class _HomePageScreenInfo {
   final Widget screen;
   final BottomNavigationBarItem navigationBarItem;
 
-  const _HomePageScreenInfo({required this.title, required this.screen, required this.navigationBarItem});
+  const _HomePageScreenInfo(
+      {required this.title,
+      required this.screen,
+      required this.navigationBarItem});
 }
