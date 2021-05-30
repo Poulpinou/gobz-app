@@ -9,7 +9,7 @@ class Project {
   final String description;
   final bool isShared;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   const Project(this.id, this.name, this.description, this.isShared, this.createdAt, this.updatedAt);
 
