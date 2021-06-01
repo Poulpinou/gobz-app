@@ -22,24 +22,46 @@ class ProjectRepository {
 
   Future<Project> getProject(int projectId) async {
     final Map<String, dynamic> responseData = await _client.get("/$projectId");
-    return Project.fromJson(responseData);
+
+    try {
+      return Project.fromJson(responseData);
+    } catch (e) {
+      Log.error("Failed to create project from response", e);
+      rethrow;
+    }
   }
 
   Future<ProjectInfos> getProjectInfos(int projectId) async {
     final Map<String, dynamic> responseData = await _client.get("/$projectId/infos");
-    return ProjectInfos.fromJson(responseData);
+
+    try {
+      return ProjectInfos.fromJson(responseData);
+    } catch (e) {
+      Log.error("Failed to create project infos from response", e);
+      rethrow;
+    }
   }
 
   Future<Project> createProject(ProjectCreationRequest request) async {
     final Map<String, dynamic> responseData = await _client.post("", body: request.toJson());
 
-    return Project.fromJson(responseData);
+    try {
+      return Project.fromJson(responseData);
+    } catch (e) {
+      Log.error("Failed to create project from response", e);
+      rethrow;
+    }
   }
 
   Future<Project> updateProject(int projectId, ProjectUpdateRequest request) async {
     final Map<String, dynamic> responseData = await _client.put("/$projectId", body: request.toJson());
 
-    return Project.fromJson(responseData);
+    try {
+      return Project.fromJson(responseData);
+    } catch (e) {
+      Log.error("Failed to create project from response", e);
+      rethrow;
+    }
   }
 
   Future<void> deleteProject(int projectId) async {

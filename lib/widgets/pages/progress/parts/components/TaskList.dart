@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gobz_app/models/Task.dart';
+import 'package:gobz_app/widgets/misc/AvatarRow.dart';
 
 class TaskList extends StatefulWidget {
   final List<Task> tasks;
@@ -92,6 +93,19 @@ class TaskListItem extends StatelessWidget {
                 overflow: TextOverflow.visible,
               ),
             ),
+            task.workers != null
+                ? ConstrainedBox(
+                    child: AvatarRow(
+                      avatars: task.workers!,
+                      avatarsSize: 12,
+                      maxDisplayAmount: 3,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                    ),
+                    constraints: BoxConstraints(
+                      maxWidth: 100,
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),

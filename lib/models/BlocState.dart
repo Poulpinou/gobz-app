@@ -9,4 +9,8 @@ abstract class BlocState {
   bool get isLoading => _loading;
 
   BlocState copyWith({bool? isLoading, Exception? error});
+
+  T loading<T extends BlocState>() => copyWith(isLoading: true) as T;
+
+  T errored<T extends BlocState>(Exception error) => copyWith(error: error) as T;
 }

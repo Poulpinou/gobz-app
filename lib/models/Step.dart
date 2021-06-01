@@ -7,7 +7,7 @@ class Step {
   final int id;
   final String name;
   final String description;
-  final double completion;
+  final double? completion;
 
   Step(this.id, this.name, this.description, this.completion);
 

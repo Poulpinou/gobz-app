@@ -6,7 +6,6 @@ import 'package:gobz_app/models/Task.dart';
 import 'package:gobz_app/models/requests/TaskCreationRequest.dart';
 import 'package:gobz_app/models/requests/TaskUpdateRequest.dart';
 import 'package:gobz_app/repositories/TaskRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/tasks/inputs/TaskTextInput.dart';
 
 class TaskEditionBloc extends Bloc<TaskEditionEvent, TaskEditionState> {
@@ -30,17 +29,17 @@ class TaskEditionBloc extends Bloc<TaskEditionEvent, TaskEditionState> {
 
   Stream<TaskEditionState> _onCreateTaskSubmitted(TaskEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(isLoading: true);
+      yield state.loading();
       try {
         final Task? task = await _taskRepository.createTask(_stepId!, TaskCreationRequest(text: state.text.value));
 
         yield state.copyWith(task: task);
       } catch (e) {
-        Log.error('Task creation failed', e);
-        yield state.copyWith(
-          error: DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Échec de la création de la tâche",
+        yield state.errored(
+          DisplayableException(
+            "Échec de la création de la tâche",
+            errorMessage: 'Task creation failed',
+            error: e is Exception ? e : null,
           ),
         );
       }
@@ -49,17 +48,17 @@ class TaskEditionBloc extends Bloc<TaskEditionEvent, TaskEditionState> {
 
   Stream<TaskEditionState> _onUpdateTaskSubmitted(TaskEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(isLoading: true);
+      yield state.loading();
       try {
         final Task? task = await _taskRepository.updateTask(state.task!.id, TaskUpdateRequest(text: state.text.value));
 
         yield state.copyWith(task: task);
       } catch (e) {
-        Log.error('Task update failed', e);
-        yield state.copyWith(
-          error: DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Échec de la sauvegarde de la tâche",
+        yield state.errored(
+          DisplayableException(
+            "Échec de la sauvegarde de la tâche",
+            errorMessage: 'Task update failed',
+            error: e is Exception ? e : null,
           ),
         );
       }

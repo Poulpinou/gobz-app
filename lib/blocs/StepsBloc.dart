@@ -4,13 +4,16 @@ import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Chapter.dart';
 import 'package:gobz_app/models/Step.dart';
 import 'package:gobz_app/repositories/StepRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class StepsBloc extends Bloc<StepsEvent, StepsState> {
   final Chapter chapter;
   final StepRepository stepRepository;
 
-  StepsBloc({required this.chapter, required this.stepRepository}) : super(StepsState());
+  StepsBloc({required this.chapter, required this.stepRepository, bool fetchOnStart = false}) : super(StepsState()) {
+    if (fetchOnStart) {
+      add(_FetchSteps());
+    }
+  }
 
   @override
   Stream<StepsState> mapEventToState(StepsEvent event) async* {
@@ -22,28 +25,34 @@ class StepsBloc extends Bloc<StepsEvent, StepsState> {
   }
 
   Stream<StepsState> _onFetchSteps(StepsState state) async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       final List<Step> steps = await stepRepository.getSteps(chapter.id);
       yield state.copyWith(steps: steps);
     } catch (e) {
-      Log.error("Failed to retrieve steps", e);
-      yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(), messageToDisplay: "La récupération des étapes a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La récupération des étapes a échoué",
+          errorMessage: "Failed to retrieve steps",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
   }
 
   Stream<StepsState> _onDeleteStep(_DeleteStep event, StepsState state) async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       await stepRepository.deleteStep(event.step.id);
       yield state.copyWith(deletedStep: event.step);
     } catch (e) {
-      Log.error("Failed to delete step ${event.step}", e);
-      yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(), messageToDisplay: "La suppression de ${event.step.name} a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La suppression de ${event.step.name} a échoué",
+          errorMessage: "Failed to delete step",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
 
     add(StepsEvents.fetch());

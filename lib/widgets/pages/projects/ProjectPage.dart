@@ -138,13 +138,11 @@ class ProjectPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ProjectBloc>(
-      create: (context) {
-        final ProjectBloc bloc = ProjectBloc(context.read<ProjectRepository>(), project);
-
-        bloc.add(ProjectEvents.fetch());
-
-        return bloc;
-      },
+      create: (context) => ProjectBloc(
+        context.read<ProjectRepository>(),
+        project,
+        fetchOnStart: true,
+      ),
       child: Scaffold(
         appBar: _buildAppBar(context),
         body: _buildHandler(

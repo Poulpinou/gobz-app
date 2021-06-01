@@ -6,7 +6,6 @@ import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/requests/LoginRequest.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/utils/LocalStorageUtils.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/auth/inputs/EmailInput.dart';
 import 'package:gobz_app/widgets/forms/auth/inputs/PasswordInput.dart';
 
@@ -33,12 +32,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Future<LoginState> _loadLocalValues(LoginState state) async {
-    final bool? stayConnected = await LocalStorageUtils.getBool(
-        StorageKeysConfig.instance.stayConnectedKey);
-    final String? email = await LocalStorageUtils.getString(
-        StorageKeysConfig.instance.currentUserEmailKey);
-    final String? password = await LocalStorageUtils.getString(
-        StorageKeysConfig.instance.currentUserPasswordKey);
+    final bool? stayConnected = await LocalStorageUtils.getBool(StorageKeysConfig.instance.stayConnectedKey);
+    final String? email = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserEmailKey);
+    final String? password = await LocalStorageUtils.getString(StorageKeysConfig.instance.currentUserPasswordKey);
 
     return state.copyWith(
         stayConnected: stayConnected,
@@ -49,32 +45,27 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _onFormSubmitted(LoginState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(
-          formStatus: FormzStatus.submissionInProgress, isLoading: true);
+      yield state.copyWith(formStatus: FormzStatus.submissionInProgress, isLoading: true);
       try {
-        await _authRepository
-            .login(LoginRequest(state.email.value, state.password.value));
+        await _authRepository.login(LoginRequest(state.email.value, state.password.value));
 
         // Store current user infos
-        await LocalStorageUtils.setBool(
-            StorageKeysConfig.instance.stayConnectedKey, state.stayConnected);
-        await LocalStorageUtils.setString(
-            StorageKeysConfig.instance.currentUserEmailKey, state.email.value);
-        await LocalStorageUtils.setString(
-            StorageKeysConfig.instance.currentUserPasswordKey,
-            state.password.value);
+        await LocalStorageUtils.setBool(StorageKeysConfig.instance.stayConnectedKey, state.stayConnected);
+        await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserEmailKey, state.email.value);
+        await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserPasswordKey, state.password.value);
 
         yield state.copyWith(formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
-        Log.error("Login failed", e);
-
         yield state.copyWith(
-            formStatus: FormzStatus.submissionFailure,
-            error: e is DisplayableException
-                ? e
-                : DisplayableException(
-                    internMessage: e.toString(),
-                    messageToDisplay: "L'authentification a échoué'"));
+          formStatus: FormzStatus.submissionFailure,
+          error: e is DisplayableException
+              ? e
+              : DisplayableException(
+                  "L'authentification a échoué",
+                  errorMessage: "Login failed",
+                  error: e is Exception ? e : null,
+                ),
+        );
       }
     }
   }
@@ -86,14 +77,11 @@ abstract class LoginEvent {}
 abstract class LoginEvents {
   static _LoadLocalValues loadLocalValues() => _LoadLocalValues();
 
-  static _LoginEmailChanged emailChanged(String email) =>
-      _LoginEmailChanged(email);
+  static _LoginEmailChanged emailChanged(String email) => _LoginEmailChanged(email);
 
-  static _LoginPasswordChanged passwordChanged(String password) =>
-      _LoginPasswordChanged(password);
+  static _LoginPasswordChanged passwordChanged(String password) => _LoginPasswordChanged(password);
 
-  static _StayConnectedChanged stayConnectedChanged(bool stayConnected) =>
-      _StayConnectedChanged(stayConnected);
+  static _StayConnectedChanged stayConnectedChanged(bool stayConnected) => _StayConnectedChanged(stayConnected);
 
   static _LoginSubmitted loginSubmitted() => _LoginSubmitted();
 }

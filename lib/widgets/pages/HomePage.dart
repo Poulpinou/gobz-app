@@ -4,6 +4,7 @@ import 'package:gobz_app/blocs/AuthBloc.dart';
 import 'package:gobz_app/models/User.dart';
 import 'package:gobz_app/widgets/misc/Avatar.dart';
 import 'package:gobz_app/widgets/pages/projects/ProjectsPage.dart';
+import 'package:gobz_app/widgets/pages/runs/RunsPage.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,18 +23,15 @@ class _HomePageState extends State<HomePage> {
     _HomePageScreenInfo(
         title: 'Accueil',
         screen: const Text('Accueil'),
-        navigationBarItem:
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil")),
+        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil")),
     _HomePageScreenInfo(
-        title: 'Run',
-        screen: const Text('Run'),
-        navigationBarItem: BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions), label: "Run")),
+        title: 'Runs',
+        screen: RunsPage(),
+        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.pending_actions), label: "Runs")),
     _HomePageScreenInfo(
         title: 'Projets',
         screen: ProjectsPage(),
-        navigationBarItem: BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt), label: "Projets")),
+        navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: "Projets")),
   ];
 
   AppBar _buildAppBar(BuildContext context) {
@@ -48,9 +46,7 @@ class _HomePageState extends State<HomePage> {
       ),
       actions: [
         BlocBuilder<AuthBloc, AuthState>(
-          buildWhen: (previous, current) =>
-              previous.user.id != current.user.id ||
-              previous.status != current.status,
+          buildWhen: (previous, current) => previous.user.id != current.user.id || previous.status != current.status,
           builder: (context, state) => PopupMenuButton<Function?>(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -81,9 +77,7 @@ class _HomePageState extends State<HomePage> {
                 PopupMenuDivider(),
                 PopupMenuItem(
                   child: const Text("Déconnexion"),
-                  value: () => context
-                      .read<AuthBloc>()
-                      .add(AuthEvents.logoutRequested()),
+                  value: () => context.read<AuthBloc>().add(AuthEvents.logoutRequested()),
                 ),
               ];
             },
@@ -118,8 +112,5 @@ class _HomePageScreenInfo {
   final Widget screen;
   final BottomNavigationBarItem navigationBarItem;
 
-  const _HomePageScreenInfo(
-      {required this.title,
-      required this.screen,
-      required this.navigationBarItem});
+  const _HomePageScreenInfo({required this.title, required this.screen, required this.navigationBarItem});
 }

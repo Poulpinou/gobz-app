@@ -48,8 +48,6 @@ class _TaskListWrapperState extends State<TaskListWrapper> {
 
   void _refreshTasks(BuildContext context) {
     context.read<TasksBloc>().add(TasksEvents.fetch());
-    //context.read<StepBloc>().add(StepEvents.fetch());
-    //context.read<ChapterBloc>().add(ChapterEvents.fetch());
   }
 
   void _deleteTask(BuildContext context, Task task) {
@@ -123,13 +121,11 @@ class _TaskListWrapperState extends State<TaskListWrapper> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<TasksBloc>(
-      create: (context) {
-        final TasksBloc bloc = TasksBloc(step: widget.step, taskRepository: context.read<TaskRepository>());
-
-        bloc.add(TasksEvents.fetch());
-
-        return bloc;
-      },
+      create: (context) => TasksBloc(
+        step: widget.step,
+        taskRepository: context.read<TaskRepository>(),
+        fetchOnStart: true,
+      ),
       child: BlocHandler<TasksBloc, TasksState>.simple(
         child: BlocBuilder<TasksBloc, TasksState>(
           buildWhen: (previous, current) => previous.isLoading != current.isLoading,

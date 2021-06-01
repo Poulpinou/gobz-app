@@ -50,18 +50,20 @@ class _ProjectSectionDisplay extends StatelessWidget {
           color: color,
         ),
         Card(
-            child: Row(
-          children: [
-            Expanded(
+          child: Row(
+            children: [
+              Expanded(
                 child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: child,
-            )),
-          ],
-        )),
+                  padding: const EdgeInsets.all(8.0),
+                  child: child,
+                ),
+              ),
+            ],
+          ),
+        ),
         Container(
           height: bottomMargin,
-        )
+        ),
       ],
     );
   }

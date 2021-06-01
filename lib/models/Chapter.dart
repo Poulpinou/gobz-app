@@ -7,7 +7,7 @@ class Chapter {
   final int id;
   final String name;
   final String description;
-  final double completion;
+  final double? completion;
 
   Chapter(this.id, this.name, this.description, this.completion);
 

@@ -4,13 +4,16 @@ import 'package:gobz_app/exceptions/DisplayableException.dart';
 import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/projects/inputs/ProjectSearchInput.dart';
 
 class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
   final ProjectRepository projectRepository;
 
-  ProjectsBloc({required this.projectRepository}) : super(ProjectsState());
+  ProjectsBloc({required this.projectRepository, bool fetchOnStart = false}) : super(ProjectsState()) {
+    if (fetchOnStart) {
+      add(_FetchProjects());
+    }
+  }
 
   @override
   Stream<ProjectsState> mapEventToState(ProjectsEvent event) async* {
@@ -22,15 +25,18 @@ class ProjectsBloc extends Bloc<ProjectsEvent, ProjectsState> {
   }
 
   Stream<ProjectsState> _onFetchProjects(ProjectsState state) async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       final List<Project> projects = await projectRepository.getAllProjects();
       yield state.copyWith(projects: projects);
     } catch (e) {
-      Log.error("Failed to retrieve projects", e);
-      yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(), messageToDisplay: "La récupération des projets a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La récupération des projets a échoué",
+          errorMessage: "Failed to retrieve projects",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
   }
 }

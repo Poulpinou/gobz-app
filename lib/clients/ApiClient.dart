@@ -41,8 +41,7 @@ abstract class ApiClient {
         throw BadRequestException(response.body.toString());
       case 401:
       case 403:
-        throw UnauthorisedException(
-            response.statusCode, response.body.toString());
+        throw UnauthorisedException(response.statusCode, response.body.toString());
       case 500:
       default:
         throw FetchDataException(
@@ -58,8 +57,7 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response =
-          await http.get(uri, headers: await buildHeaders());
+      final Response response = await http.get(uri, headers: await buildHeaders());
       responseJson = buildResponse(response);
     } on SocketException {
       throw UnreachableServerException();
@@ -74,8 +72,7 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response = await http.post(uri,
-          headers: await buildHeaders(), body: json.encode(body));
+      final Response response = await http.post(uri, headers: await buildHeaders(), body: json.encode(body));
       responseJson = buildResponse(response);
     } on SocketException {
       throw UnreachableServerException();
@@ -89,8 +86,7 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response = await http.put(uri,
-          headers: await buildHeaders(), body: json.encode(body));
+      final Response response = await http.put(uri, headers: await buildHeaders(), body: json.encode(body));
       responseJson = buildResponse(response);
     } on SocketException {
       throw UnreachableServerException();
@@ -104,8 +100,7 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response = await http.patch(uri,
-          headers: await buildHeaders(), body: json.encode(body));
+      final Response response = await http.patch(uri, headers: await buildHeaders(), body: json.encode(body));
       responseJson = buildResponse(response);
     } on SocketException {
       throw UnreachableServerException();
@@ -119,8 +114,7 @@ abstract class ApiClient {
 
     var responseJson;
     try {
-      final Response response =
-          await http.delete(uri, headers: await buildHeaders());
+      final Response response = await http.delete(uri, headers: await buildHeaders());
       responseJson = buildResponse(response);
     } on SocketException {
       throw UnreachableServerException();
