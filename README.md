@@ -21,41 +21,44 @@ To run this app, run one of those files *lib/main_{env}_{target}.dart* (if none 
 
 
 ## Structure
+
 ```
 .
 │ pubspec.yaml
 │ pubspec.lock
 ├── lib
-│   ├── blocs                          => A bloc provides a way for views to interract with repositories
-│   ├── clients                        => Api clients
-│   ├── configurations                 => Application configurations
-│   ├── exceptions                     => Custom exceptions
-│   ├── mixins                         
-│   ├── models
-│   │   ├── enums
-│   │   ├── requests                   => Request dtos
-│   │   ├── {model}.dart
-│   │   └── {model}.g.dart             => Generated models parts
-│   ├── repositories                   => A repository provides methods to exchange with APIs
-│   ├── utils
-│   ├── widgets
-│   │   ├── forms
-│   │   │   └── {form}
-│   │   │       └── fields             => Form widget parts
-│   │   │       └── inputs             => Formz input validators
-│   │   │       └── {Form}Form.dart    => The form widget
-│   │   ├── misc                       => Reusable widgets
-│   │   ├── pages
-│   │   │   └── {page}
-│   │   │       └── parts              => Page's parts
-│   │   │       └── {Page}Page.dart    => The page widget
+│   ├── data                           => Contains data related objects
+│   │   ├── blocs                      => A bloc provides a way for views to interract with repositories
+│   │   ├── clients                    => Api clients
+│   │   ├── configurations             => Application configurations
+│   │   ├── exceptions                 => Custom exceptions
+│   │   ├── formInputs                 => Formz input validators
+│   │   ├── mixins
+│   │   ├── models
+│   │   │   ├── enums
+│   │   │   ├── requests               => Request dtos
+│   │   │   ├── {model}.dart
+│   │   │   └── {model}.g.dart         => Generated models parts
+│   │   ├── repositories               => A repository provides methods to exchange with APIs
 │   │   ├── themes
+│   │   └── utils
+│   ├── view                           => Contains widgets used to build views
+│   │   ├── components                 => Components are widgets that links blocs and display widgets
+│   │   │   ├── forms
+│   │   │   └── {component}.dart
+│   │   ├── pages
+│   │   ├── widgets                    => Those widgets are used for display, not for data interaction 
+│   │   │   ├── generic                => Reusable widgets
+│   │   │   └── {widgetCategory}
 │   │   └── GobzApp.dart
-│   └── main_{env}_{device}.dart
+│   └── main_{env}_{device}.dart       => Start files
 ├── scripts                            => Some useful scripts
+├── tests                              => TODO
 ├── android
 └── ios
 ```
+![Project structure](screenshots/project_structure.jpg "Projects Screen")
+
 
 ## Screenshots
 | Create your projects | Keep track of evolution | Create detailed tasks |

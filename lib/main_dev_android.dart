@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gobz_app/configurations/AppConfig.dart';
-import 'package:gobz_app/configurations/GobzClientConfig.dart';
-import 'package:gobz_app/widgets/GobzApp.dart';
+import 'package:gobz_app/data/configurations/AppConfig.dart';
+import 'package:gobz_app/data/configurations/GobzClientConfig.dart';
+import 'package:gobz_app/view/GobzApp.dart';
 
 void main() {
   AppConfig.create(AppConfig(
