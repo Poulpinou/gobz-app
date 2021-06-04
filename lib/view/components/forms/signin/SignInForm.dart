@@ -6,11 +6,8 @@ import 'package:gobz_app/data/repositories/AuthRepository.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 
 part 'fields/EmailInput.dart';
-
 part 'fields/PasswordInput.dart';
-
 part 'fields/PasswordRepeatInput.dart';
-
 part 'fields/UsernameInput.dart';
 
 class SignInForm extends StatelessWidget {

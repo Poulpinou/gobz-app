@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/data/blocs/runs/RunsBloc.dart';
+import 'package:gobz_app/data/models/Run.dart';
 import 'package:gobz_app/data/repositories/RunRepository.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
-import 'package:gobz_app/view/widgets/lists/RunList.dart';
+import 'package:gobz_app/view/widgets/lists/GenericList.dart';
 
 import 'RunListItemComponent.dart';
 
@@ -58,9 +59,9 @@ class RunListComponent extends StatelessWidget {
                     );
                   }
 
-                  return RunList(
+                  return GenericList<Run>(
+                    data: state.runs,
                     itemBuilder: (context, run) => RunListItemComponent(run: run),
-                    runs: state.runs,
                   );
                 },
               ),

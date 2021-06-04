@@ -9,7 +9,7 @@ import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/lists/TaskList.dart';
 
-import '../forms/tasks/TaskForm.dart';
+import '../../forms/tasks/TaskForm.dart';
 
 class TaskListComponent extends StatefulWidget {
   final Step step;

@@ -10,7 +10,8 @@ import 'package:gobz_app/view/pages/FormPage.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/generic/HoldMenu.dart';
-import 'package:gobz_app/view/widgets/lists/StepList.dart';
+import 'package:gobz_app/view/widgets/lists/GenericList.dart';
+import 'package:gobz_app/view/widgets/lists/items/StepListItem.dart';
 
 class StepListComponent extends StatelessWidget {
   final Chapter chapter;
@@ -123,9 +124,9 @@ class StepListComponent extends StatelessWidget {
                 );
               }
 
-              return StepList.builder(
-                steps: state.steps,
-                builder: (context, step) => BlocProvider<StepBloc>(
+              return GenericList<Step>(
+                data: state.steps,
+                itemBuilder: (context, step) => BlocProvider<StepBloc>(
                   create: (context) => StepBloc(context.read<StepRepository>(), step),
                   child: BlocBuilder<StepBloc, StepState>(
                       buildWhen: (previous, current) => previous.isLoading != current.isLoading,

@@ -10,7 +10,6 @@ import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import '../FormComponent.dart';
 
 part 'fields/DescriptionField.dart';
-
 part 'fields/NameField.dart';
 
 class NewStepForm extends _StepFormBase {

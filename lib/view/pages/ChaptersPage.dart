@@ -8,7 +8,8 @@ import 'package:gobz_app/view/components/forms/chapters/ChapterForm.dart';
 import 'package:gobz_app/view/pages/FormPage.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
-import 'package:gobz_app/view/widgets/lists/ChapterList.dart';
+import 'package:gobz_app/view/widgets/lists/GenericList.dart';
+import 'package:gobz_app/view/widgets/lists/items/ChapterListItem.dart';
 
 import 'ChapterPage.dart';
 
@@ -109,9 +110,15 @@ class ChaptersPage extends StatelessWidget {
                   }
 
                   return Expanded(
-                    child: ChapterList(
-                      chapters: state.chapters,
-                      onChapterClicked: (chapter) => _clickChapter(context, chapter),
+                    child: GenericList<Chapter>(
+                      data: state.chapters,
+                      itemBuilder: (context, chapter) => ChapterListItem(
+                        chapter: chapter,
+                        onClick: (chapter) => _clickChapter(context, chapter),
+                      ),
+                      separatorBuilder: (context, index) => Divider(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                     ),
                   );
                 },

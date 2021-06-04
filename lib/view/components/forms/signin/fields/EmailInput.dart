@@ -10,7 +10,7 @@ class _EmailInput extends StatelessWidget {
           key: const Key('signInForm_emailInput'),
           onChanged: (email) => context.read<SignInBloc>().add(SignInEvents.emailChanged(email)),
           decoration:
-          InputDecoration(labelText: 'Email', errorText: state.email.invalid ? state.email.error?.message : null),
+              InputDecoration(labelText: 'Email', errorText: state.email.invalid ? state.email.error?.message : null),
         );
       },
     );

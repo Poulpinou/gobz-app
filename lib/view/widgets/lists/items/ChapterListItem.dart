@@ -2,38 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-class ChapterList extends StatelessWidget {
-  final List<Chapter> chapters;
-  final Function(Chapter chapter)? onChapterClicked;
-
-  const ChapterList({
-    Key? key,
-    required this.chapters,
-    this.onChapterClicked,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-        itemBuilder: (context, index) => ChapterListItem(
-              chapter: chapters[index],
-              onChapterClicked: onChapterClicked,
-            ),
-        separatorBuilder: (BuildContext context, int index) => Divider(
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-        itemCount: chapters.length);
-  }
-}
-
 class ChapterListItem extends StatelessWidget {
   final Chapter chapter;
-  final Function(Chapter chapter)? onChapterClicked;
+  final Function? onClick;
 
   const ChapterListItem({
     Key? key,
     required this.chapter,
-    this.onChapterClicked,
+    this.onClick,
   }) : super(key: key);
 
   @override
@@ -77,7 +53,7 @@ class ChapterListItem extends StatelessWidget {
           ),
         ),
       ),
-      onTap: () => onChapterClicked?.call(chapter),
+      onTap: () => onClick?.call(),
     );
   }
 }

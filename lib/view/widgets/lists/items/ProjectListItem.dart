@@ -1,39 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gobz_app/data/models/Project.dart';
 
-class ProjectList extends StatelessWidget {
-  final List<Project> projects;
-  final Function(Project project)? onProjectClicked;
-
-  const ProjectList({
-    Key? key,
-    required this.projects,
-    this.onProjectClicked,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) => ProjectListItem(
-        project: projects[index],
-        onProjectClicked: onProjectClicked,
-      ),
-      itemCount: projects.length,
-      separatorBuilder: (BuildContext context, int index) => Divider(
-        color: Theme.of(context).colorScheme.secondary,
-      ),
-    );
-  }
-}
-
 class ProjectListItem extends StatelessWidget {
   final Project project;
-  final Function(Project)? onProjectClicked;
+  final Function? onClick;
 
   const ProjectListItem({
     Key? key,
     required this.project,
-    this.onProjectClicked,
+    this.onClick,
   }) : super(key: key);
 
   @override
@@ -70,7 +45,7 @@ class ProjectListItem extends StatelessWidget {
           ),
         ),
       ),
-      onTap: () => onProjectClicked?.call(project),
+      onTap: () => onClick?.call(),
     );
   }
 }

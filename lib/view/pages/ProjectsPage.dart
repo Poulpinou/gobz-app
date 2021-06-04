@@ -7,7 +7,8 @@ import 'package:gobz_app/view/components/forms/projects/ProjectForm.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/inputs/SearchBar.dart';
-import 'package:gobz_app/view/widgets/lists/ProjectList.dart';
+import 'package:gobz_app/view/widgets/lists/GenericList.dart';
+import 'package:gobz_app/view/widgets/lists/items/ProjectListItem.dart';
 
 import 'FormPage.dart';
 import 'ProjectPage.dart';
@@ -91,9 +92,17 @@ class ProjectsPage extends StatelessWidget {
                 }
 
                 return Expanded(
-                    child: ProjectList(
-                        projects: state.filteredProjects,
-                        onProjectClicked: (project) => _clickProject(context, project)));
+                  child: GenericList<Project>(
+                    data: state.filteredProjects,
+                    itemBuilder: (context, project) => ProjectListItem(
+                      project: project,
+                      onClick: () => _clickProject(context, project),
+                    ),
+                    separatorBuilder: (context, index) => Divider(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                );
               },
             ),
           ]),

@@ -7,7 +7,7 @@ import 'package:gobz_app/view/components/forms/chapters/ChapterForm.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-import '../components/specific/StepListComponent.dart';
+import '../components/specific/steps/StepListComponent.dart';
 import 'FormPage.dart';
 
 class ChapterPage extends StatelessWidget {
