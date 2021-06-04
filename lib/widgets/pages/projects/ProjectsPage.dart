@@ -31,13 +31,10 @@ class ProjectsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) {
-        final ProjectsBloc bloc = ProjectsBloc(projectRepository: RepositoryProvider.of<ProjectRepository>(context));
-
-        bloc.add(ProjectsEvents.fetch());
-
-        return bloc;
-      },
+      create: (context) => ProjectsBloc(
+        projectRepository: RepositoryProvider.of<ProjectRepository>(context),
+        fetchOnStart: true,
+      ),
       child: Scaffold(
         body: BlocHandler<ProjectsBloc, ProjectsState>.simple(
           child: Column(children: [

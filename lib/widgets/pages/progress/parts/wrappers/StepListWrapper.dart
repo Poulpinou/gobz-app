@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Step, StepState;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/blocs/ChapterBloc.dart';
 import 'package:gobz_app/blocs/StepBloc.dart';
 import 'package:gobz_app/blocs/StepsBloc.dart';
 import 'package:gobz_app/models/Chapter.dart';
@@ -29,7 +28,7 @@ class StepListWrapper extends StatelessWidget {
 
   void _createStep(BuildContext context) async {
     await Navigator.push(context, NewStepPage.route(chapter));
-    _refreshSteps(context);
+    _refreshStep(context);
   }
 
   void _deleteStep(BuildContext context, Step step) async {
@@ -58,25 +57,25 @@ class StepListWrapper extends StatelessWidget {
   void _editStep(BuildContext context, Step step) async {
     final Step? result = await Navigator.push(context, EditStepPage.route(step));
     if (result != null) {
-      _refreshSteps(context);
+      _refreshStep(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<StepsBloc>(
-      create: (context) {
-        final StepsBloc bloc = StepsBloc(chapter: chapter, stepRepository: context.read<StepRepository>());
-
-        bloc.add(StepsEvents.fetch());
-
-        return bloc;
-      },
+      create: (context) => StepsBloc(
+        chapter: chapter,
+        stepRepository: context.read<StepRepository>(),
+        fetchOnStart: true,
+      ),
       child: Scaffold(
         body: BlocHandler<StepsBloc, StepsState>.custom(
           mapErrorToNotification: (state) {
             if (state.deletedStep != null) {
-              return BlocNotification.success("${state.deletedStep!.name} a été supprimé");
+              return BlocNotification.success(
+                "${state.deletedStep!.name} a été supprimé",
+              ).copyWith(postAction: _refreshSteps);
             }
           },
           child: BlocBuilder<StepsBloc, StepsState>(
@@ -108,13 +107,7 @@ class StepListWrapper extends StatelessWidget {
               return StepList.builder(
                 steps: state.steps,
                 builder: (context, step) => BlocProvider<StepBloc>(
-                  create: (context) {
-                    final StepBloc bloc = StepBloc(context.read<StepRepository>(), step);
-
-                    bloc.add(StepEvents.fetch());
-
-                    return bloc;
-                  },
+                  create: (context) => StepBloc(context.read<StepRepository>(), step),
                   child: BlocBuilder<StepBloc, StepState>(
                       buildWhen: (previous, current) => previous.isLoading != current.isLoading,
                       builder: (context, state) {

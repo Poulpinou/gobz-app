@@ -6,12 +6,16 @@ import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/models/ProjectInfos.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   final ProjectRepository _projectRepository;
 
-  ProjectBloc(this._projectRepository, Project project) : super(ProjectState(project: project));
+  ProjectBloc(this._projectRepository, Project project, {bool fetchOnStart = false})
+      : super(ProjectState(project: project)) {
+    if (fetchOnStart) {
+      add(_FetchProject());
+    }
+  }
 
   @override
   Stream<ProjectState> mapEventToState(ProjectEvent event) async* {
@@ -23,28 +27,34 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   }
 
   Stream<ProjectState> _fetchProject() async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       final ProjectInfos projectInfos = await _projectRepository.getProjectInfos(state.project.id);
       yield state.copyWith(project: projectInfos.project, projectInfos: projectInfos);
     } catch (e) {
-      Log.error("Failed to retrieve project", e);
-      yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(), messageToDisplay: "La récupération du projet a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La récupération du projet a échoué",
+          errorMessage: "Failed to retrieve project",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
   }
 
   Stream<ProjectState> _deleteProject() async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       await _projectRepository.deleteProject(state.project.id);
       yield state.copyWith(projectDeleted: true);
     } catch (e) {
-      Log.error("Failed to delete project", e);
-      yield state.copyWith(
-          error:
-              DisplayableException(internMessage: e.toString(), messageToDisplay: "La suppression du projet a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La suppression du projet a échoué",
+          errorMessage: "Failed to delete project",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
   }
 }

@@ -39,16 +39,11 @@ class ChaptersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) {
-        final ChaptersBloc bloc = ChaptersBloc(
-          project: project,
-          chapterRepository: RepositoryProvider.of<ChapterRepository>(context),
-        );
-
-        bloc.add(ChaptersEvents.fetch());
-
-        return bloc;
-      },
+      create: (context) => ChaptersBloc(
+        project: project,
+        chapterRepository: RepositoryProvider.of<ChapterRepository>(context),
+        fetchOnStart: true,
+      ),
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Chapitres"),

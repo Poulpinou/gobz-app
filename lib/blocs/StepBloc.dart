@@ -5,7 +5,6 @@ import 'package:gobz_app/exceptions/DisplayableException.dart';
 import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Step.dart';
 import 'package:gobz_app/repositories/StepRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class StepBloc extends Bloc<StepEvent, StepState> {
   final StepRepository _stepRepository;
@@ -20,15 +19,18 @@ class StepBloc extends Bloc<StepEvent, StepState> {
   }
 
   Stream<StepState> _fetchStep() async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       final Step step = await _stepRepository.getStep(state.step.id);
       yield state.copyWith(step: step);
     } catch (e) {
-      Log.error("Failed to retrieve step", e);
-      yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(), messageToDisplay: "La récupération de l'étape a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La récupération de l'étape a échoué",
+          errorMessage: "Failed to retrieve step",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
   }
 }

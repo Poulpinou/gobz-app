@@ -7,6 +7,7 @@ import 'package:gobz_app/models/enums/AuthStatus.dart';
 import 'package:gobz_app/repositories/AuthRepository.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
+import 'package:gobz_app/repositories/RunRepository.dart';
 import 'package:gobz_app/repositories/StepRepository.dart';
 import 'package:gobz_app/repositories/TaskRepository.dart';
 import 'package:gobz_app/repositories/UserRepository.dart';
@@ -30,10 +31,10 @@ class GobzApp extends StatelessWidget {
         RepositoryProvider(create: (_) => ChapterRepository()),
         RepositoryProvider(create: (_) => StepRepository()),
         RepositoryProvider(create: (_) => TaskRepository()),
+        RepositoryProvider(create: (_) => RunRepository()),
       ],
       child: BlocProvider(
-        create: (_) => AuthBloc(
-            authRepository: authRepository, userRepository: userRepository),
+        create: (_) => AuthBloc(authRepository: authRepository, userRepository: userRepository),
         child: GobzAppView(),
       ),
     );
@@ -66,16 +67,13 @@ class _GobzAppViewState extends State<GobzAppView> {
                 );
                 break;
               case AuthStatus.UNAUTHENTICATED:
-                final bool wasConnected = await LocalStorageUtils.getBool(
-                        StorageKeysConfig.instance.wasConnectedKey) ??
-                    false;
-                final bool stayConnected = await LocalStorageUtils.getBool(
-                        StorageKeysConfig.instance.stayConnectedKey) ??
-                    false;
+                final bool wasConnected =
+                    await LocalStorageUtils.getBool(StorageKeysConfig.instance.wasConnectedKey) ?? false;
+                final bool stayConnected =
+                    await LocalStorageUtils.getBool(StorageKeysConfig.instance.stayConnectedKey) ?? false;
 
                 if (wasConnected && stayConnected) {
-                  BlocProvider.of<AuthBloc>(context)
-                      .add(AuthEvents.autoReconnectRequested());
+                  BlocProvider.of<AuthBloc>(context).add(AuthEvents.autoReconnectRequested());
                 } else {
                   _navigator.pushAndRemoveUntil<void>(
                     LoginPage.route(),

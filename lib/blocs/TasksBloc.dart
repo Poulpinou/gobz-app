@@ -4,13 +4,16 @@ import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Step.dart';
 import 'package:gobz_app/models/Task.dart';
 import 'package:gobz_app/repositories/TaskRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class TasksBloc extends Bloc<TasksEvent, TasksState> {
   final Step step;
   final TaskRepository taskRepository;
 
-  TasksBloc({required this.step, required this.taskRepository}) : super(TasksState());
+  TasksBloc({required this.step, required this.taskRepository, bool fetchOnStart = false}) : super(TasksState()) {
+    if (fetchOnStart) {
+      add(_FetchTasks());
+    }
+  }
 
   @override
   Stream<TasksState> mapEventToState(TasksEvent event) async* {
@@ -24,28 +27,34 @@ class TasksBloc extends Bloc<TasksEvent, TasksState> {
   }
 
   Stream<TasksState> _onFetchTasks(_FetchTasks event, TasksState state) async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       final List<Task> tasks = await taskRepository.getTasks(step.id);
       yield state.copyWith(tasks: tasks);
     } catch (e) {
-      Log.error("Failed to retrieve tasks", e);
-      yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(), messageToDisplay: "La récupération des tâches a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La récupération des tâches a échoué",
+          errorMessage: 'Failed to retrieve tasks',
+          error: e is Exception ? e : null,
+        ),
+      );
     }
   }
 
   Stream<TasksState> _onDeleteTask(_DeleteTask event, TasksState state) async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       await taskRepository.deleteTask(event.task.id);
       yield state.selected?.id == event.task.id ? state.clearSelected() : state;
     } catch (e) {
-      Log.error("Failed to delete task", e);
-      yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(), messageToDisplay: "La suppression de la tâche a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La suppression de la tâche a échoué",
+          errorMessage: "Failed to delete task",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
 
     add(TasksEvents.fetch());

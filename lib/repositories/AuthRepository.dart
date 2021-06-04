@@ -13,10 +13,8 @@ import 'package:gobz_app/utils/LocalStorageUtils.dart';
 import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class AuthRepository {
-  final StreamController<AuthStatus> _controller =
-      StreamController<AuthStatus>();
-  final ApiClient _client =
-      GobzApiClient(basePath: "/auth", withBearerToken: false);
+  final StreamController<AuthStatus> _controller = StreamController<AuthStatus>();
+  final ApiClient _client = GobzApiClient(basePath: "/auth", withBearerToken: false);
 
   Stream<AuthStatus> get statusStream async* {
     yield AuthStatus.UNAUTHENTICATED;
@@ -32,26 +30,25 @@ class AuthRepository {
     } on UnauthorisedException catch (e) {
       if (e.statusCode == 401) {
         throw new DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Email ou mot de passe incorrect");
+          "Email ou mot de passe incorrect",
+          errorMessage: "Invalid credentials",
+          error: e,
+        );
       } else {
         rethrow;
       }
     }
 
     final String accessToken = responseData["accessToken"];
-    await LocalStorageUtils.setString(
-        GobzClientConfig.instance.accessTokenStorageKey, accessToken);
-    await LocalStorageUtils.setBool(
-        StorageKeysConfig.instance.wasConnectedKey, true);
+    await LocalStorageUtils.setString(GobzClientConfig.instance.accessTokenStorageKey, accessToken);
+    await LocalStorageUtils.setBool(StorageKeysConfig.instance.wasConnectedKey, true);
 
     _controller.add(AuthStatus.AUTHENTICATED);
     Log.info("${request.email} successfully logged in");
   }
 
   Future<void> signIn(SignInRequest request) async {
-    Log.info(
-        "Trying to create user account for ${request.name} with ${request.email}...");
+    Log.info("Trying to create user account for ${request.name} with ${request.email}...");
 
     await _client.post("/signup", body: request.toJson());
 
@@ -61,10 +58,8 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
-    await LocalStorageUtils.removeKey(
-        GobzClientConfig.instance.accessTokenStorageKey);
-    await LocalStorageUtils.setBool(
-        StorageKeysConfig.instance.wasConnectedKey, false);
+    await LocalStorageUtils.removeKey(GobzClientConfig.instance.accessTokenStorageKey);
+    await LocalStorageUtils.setBool(StorageKeysConfig.instance.wasConnectedKey, false);
 
     Log.info("Successfully logged out");
 

@@ -48,10 +48,10 @@ class StepListItem extends StatelessWidget {
             animationDuration: 600,
             radius: 40,
             lineWidth: 5.0,
-            percent: step.completion,
-            center: step.completion < 1
+            percent: step.completion!,
+            center: step.completion! < 1
                 ? Text(
-                    "${(step.completion * 100).round()}%",
+                    "${(step.completion! * 100).round()}%",
                     style: Theme.of(context).textTheme.headline6?.copyWith(color: color, fontSize: 10),
                   )
                 : Icon(

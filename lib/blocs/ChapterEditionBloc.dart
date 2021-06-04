@@ -6,7 +6,6 @@ import 'package:gobz_app/models/Chapter.dart';
 import 'package:gobz_app/models/requests/ChapterCreationRequest.dart';
 import 'package:gobz_app/models/requests/ChapterUpdateRequest.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/chapters/inputs/ChapterDescriptionInput.dart';
 import 'package:gobz_app/widgets/forms/chapters/inputs/ChapterNameInput.dart';
 
@@ -33,7 +32,7 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
 
   Stream<ChapterEditionState> _onCreateChapterSubmitted(ChapterEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(isLoading: true);
+      yield state.loading();
       try {
         final Chapter? chapter = await _chapterRepository.createChapter(
             _projectId!,
@@ -44,11 +43,11 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
 
         yield state.copyWith(chapter: chapter);
       } catch (e) {
-        Log.error('Chapter creation failed', e);
-        yield state.copyWith(
-          error: DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Échec de la création du chapitre",
+        yield state.errored(
+          DisplayableException(
+            "Échec de la création du chapitre",
+            errorMessage: 'Chapter creation failed',
+            error: e is Exception ? e : null,
           ),
         );
       }
@@ -57,7 +56,7 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
 
   Stream<ChapterEditionState> _onUpdateChapterSubmitted(ChapterEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(isLoading: true);
+      yield state.loading();
       try {
         final Chapter? chapter = await _chapterRepository.updateChapter(
             state.chapter!.id,
@@ -68,11 +67,11 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
 
         yield state.copyWith(chapter: chapter);
       } catch (e) {
-        Log.error('Chapter update failed', e);
-        yield state.copyWith(
-          error: DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Échec de la sauvegarde du chapitre",
+        yield state.errored(
+          DisplayableException(
+            "Échec de la sauvegarde du chapitre",
+            errorMessage: 'Chapter update failed',
+            error: e is Exception ? e : null,
           ),
         );
       }

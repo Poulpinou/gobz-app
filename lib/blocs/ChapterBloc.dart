@@ -3,12 +3,16 @@ import 'package:gobz_app/exceptions/DisplayableException.dart';
 import 'package:gobz_app/models/BlocState.dart';
 import 'package:gobz_app/models/Chapter.dart';
 import 'package:gobz_app/repositories/ChapterRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 
 class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
   final ChapterRepository _chapterRepository;
 
-  ChapterBloc(this._chapterRepository, Chapter chapter) : super(ChapterState(chapter: chapter));
+  ChapterBloc(this._chapterRepository, Chapter chapter, {bool fetchOnStart = false})
+      : super(ChapterState(chapter: chapter)) {
+    if (fetchOnStart) {
+      add(_FetchChapter());
+    }
+  }
 
   @override
   Stream<ChapterState> mapEventToState(ChapterEvent event) async* {
@@ -20,28 +24,34 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
   }
 
   Stream<ChapterState> _fetchChapter() async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       final Chapter chapter = await _chapterRepository.getChapter(state.chapter.id);
       yield state.copyWith(chapter: chapter);
     } catch (e) {
-      Log.error("Failed to retrieve chapter", e);
-      yield state.copyWith(
-          error: DisplayableException(
-              internMessage: e.toString(), messageToDisplay: "La récupération du chapitre a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La récupération du chapitre a échoué",
+          errorMessage: "Failed to retrieve chapter",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
   }
 
   Stream<ChapterState> _deleteChapter() async* {
-    yield state.copyWith(isLoading: true);
+    yield state.loading();
     try {
       await _chapterRepository.deleteChapter(state.chapter.id);
       yield state.copyWith(chapterDeleted: true);
     } catch (e) {
-      Log.error("Failed to delete chapter", e);
-      yield state.copyWith(
-          error:
-              DisplayableException(internMessage: e.toString(), messageToDisplay: "La suppression du projet a échoué"));
+      yield state.errored(
+        DisplayableException(
+          "La suppression du chapitre a échoué",
+          errorMessage: "Failed to delete chapter",
+          error: e is Exception ? e : null,
+        ),
+      );
     }
   }
 }

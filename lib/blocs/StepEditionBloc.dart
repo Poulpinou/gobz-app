@@ -6,7 +6,6 @@ import 'package:gobz_app/models/Step.dart';
 import 'package:gobz_app/models/requests/StepCreationRequest.dart';
 import 'package:gobz_app/models/requests/StepUpdateRequest.dart';
 import 'package:gobz_app/repositories/StepRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/steps/inputs/StepDescriptionInput.dart';
 import 'package:gobz_app/widgets/forms/steps/inputs/StepNameInput.dart';
 
@@ -33,7 +32,7 @@ class StepEditionBloc extends Bloc<StepEditionEvent, StepEditionState> {
 
   Stream<StepEditionState> _onCreateStepSubmitted(StepEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(isLoading: true);
+      yield state.loading();
       try {
         final Step? step = await _stepRepository.createStep(
             _chapterId!,
@@ -44,11 +43,11 @@ class StepEditionBloc extends Bloc<StepEditionEvent, StepEditionState> {
 
         yield state.copyWith(step: step);
       } catch (e) {
-        Log.error('Step creation failed', e);
-        yield state.copyWith(
-          error: DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Échec de la création du l'étape",
+        yield state.errored(
+          DisplayableException(
+            "Échec de la création du l'étape",
+            errorMessage: 'Step creation failed',
+            error: e is Exception ? e : null,
           ),
         );
       }
@@ -57,7 +56,7 @@ class StepEditionBloc extends Bloc<StepEditionEvent, StepEditionState> {
 
   Stream<StepEditionState> _onUpdateStepSubmitted(StepEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(isLoading: true);
+      yield state.loading();
       try {
         final Step? step = await _stepRepository.updateStep(
             state.step!.id,
@@ -68,11 +67,11 @@ class StepEditionBloc extends Bloc<StepEditionEvent, StepEditionState> {
 
         yield state.copyWith(step: step);
       } catch (e) {
-        Log.error('Step update failed', e);
-        yield state.copyWith(
-          error: DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Échec de la sauvegarde de l'étape",
+        yield state.errored(
+          DisplayableException(
+            "Échec de la sauvegarde de l'étape",
+            errorMessage: 'Step update failed',
+            error: e is Exception ? e : null,
           ),
         );
       }

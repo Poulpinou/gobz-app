@@ -6,7 +6,6 @@ import 'package:gobz_app/models/Project.dart';
 import 'package:gobz_app/models/requests/ProjectCreationRequest.dart';
 import 'package:gobz_app/models/requests/ProjectUpdateRequest.dart';
 import 'package:gobz_app/repositories/ProjectRepository.dart';
-import 'package:gobz_app/utils/LoggingUtils.dart';
 import 'package:gobz_app/widgets/forms/projects/inputs/ProjectDescriptionInput.dart';
 import 'package:gobz_app/widgets/forms/projects/inputs/ProjectNameInput.dart';
 
@@ -33,18 +32,18 @@ class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> 
 
   Stream<ProjectEditionState> _onCreateProjectFormSubmitted(ProjectEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(isLoading: true);
+      yield state.loading();
       try {
         final Project project = (await _projectRepository
             .createProject(ProjectCreationRequest(state.name.value, state.description.value, state.isShared)));
 
         yield state.copyWith(project: project);
       } catch (e) {
-        Log.error('Project creation failed', e);
-        yield state.copyWith(
-          error: DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Échec de la création du projet",
+        yield state.errored(
+          DisplayableException(
+            "Échec de la création du projet",
+            errorMessage: 'Project creation failed',
+            error: e is Exception ? e : null,
           ),
         );
       }
@@ -53,18 +52,18 @@ class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> 
 
   Stream<ProjectEditionState> _onUpdateProjectFormSubmitted(ProjectEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(isLoading: true);
+      yield state.loading();
       try {
         final Project project = (await _projectRepository.updateProject(
             state.project!.id, ProjectUpdateRequest(state.name.value, state.description.value, state.isShared)));
 
         yield state.copyWith(project: project);
       } catch (e) {
-        Log.error('Project update failure', e);
-        yield state.copyWith(
-          error: DisplayableException(
-            internMessage: e.toString(),
-            messageToDisplay: "Échec de la sauvegarde du projet",
+        yield state.errored(
+          DisplayableException(
+            "Échec de la sauvegarde du projet",
+            errorMessage: 'Project update failure',
+            error: e is Exception ? e : null,
           ),
         );
       }

@@ -128,9 +128,9 @@ class ChapterPage extends StatelessWidget {
               lineHeight: 20.0,
               animation: true,
               animationDuration: 600,
-              percent: state.chapter.completion,
-              center:
-                  Text(state.chapter.completion < 1 ? "${(state.chapter.completion * 100).toStringAsFixed(1)}%" : "OK"),
+              percent: state.chapter.completion!,
+              center: Text(
+                  state.chapter.completion! < 1 ? "${(state.chapter.completion! * 100).toStringAsFixed(1)}%" : "OK"),
               progressColor: Theme.of(context).colorScheme.secondary,
               linearStrokeCap: LinearStrokeCap.butt,
             ),
@@ -157,13 +157,11 @@ class ChapterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ChapterBloc>(
-      create: (context) {
-        final ChapterBloc bloc = ChapterBloc(context.read<ChapterRepository>(), chapter);
-
-        bloc.add(ChapterEvents.fetch());
-
-        return bloc;
-      },
+      create: (context) => ChapterBloc(
+        context.read<ChapterRepository>(),
+        chapter,
+        fetchOnStart: true,
+      ),
       child: Scaffold(
         appBar: _buildAppBar(context),
         body: _buildHandler(
