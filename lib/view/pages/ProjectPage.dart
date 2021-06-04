@@ -4,13 +4,14 @@ import 'package:gobz_app/data/blocs/projects/ProjectBloc.dart';
 import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/models/ProjectInfos.dart';
 import 'package:gobz_app/data/repositories/ProjectRepository.dart';
+import 'package:gobz_app/view/components/forms/projects/ProjectForm.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/SectionDisplay.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import 'ChaptersPage.dart';
-import 'EditProjectPage.dart';
+import 'FormPage.dart';
 
 class ProjectPage extends StatelessWidget {
   final Project project;
@@ -23,7 +24,16 @@ class ProjectPage extends StatelessWidget {
 
   // Actions
   void _editProject(BuildContext context) async {
-    final Project? project = await Navigator.push(context, EditProjectPage.route(project: this.project));
+    final Project? project = await Navigator.push(
+      context,
+      FormPage.route<Project>(
+        EditProjectForm(
+          project: this.project,
+          onValidate: (result) => Navigator.pop(context, result),
+        ),
+        title: "Edition de ${this.project.name}",
+      ),
+    );
 
     if (project != null) {
       context.read<ProjectBloc>().add(ProjectEvents.fetch());
@@ -97,7 +107,7 @@ class ProjectPage extends StatelessWidget {
 
   Widget _buildHandler({required Widget child}) {
     return BlocHandler<ProjectBloc, ProjectState>.custom(
-      mapErrorToNotification: (state) {
+      mapEventToNotification: (state) {
         if (state.projectDeleted) {
           return BlocNotification.success("${state.project.name} a été supprimé")
               .copyWith(postAction: (context) => Navigator.pop(context, null));

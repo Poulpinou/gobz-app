@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gobz_app/data/blocs/BlocState.dart';
 import 'package:gobz_app/data/mixins/DisplayableMessage.dart';
-import 'package:gobz_app/data/models/BlocState.dart';
 
 class BlocHandler<B extends BlocBase<S>, S extends BlocState> extends StatelessWidget {
   final Widget child;
   final String? errorMessage;
   final SnackBar Function(S state, BlocNotification notification)? snackbarBuilder;
-  final BlocNotification? Function(S state)? mapErrorToNotification;
+  final BlocNotification? Function(S state)? mapEventToNotification;
 
   const BlocHandler({
     Key? key,
     required this.child,
     this.errorMessage,
-    this.mapErrorToNotification,
+    this.mapEventToNotification,
     this.snackbarBuilder,
   }) : super(key: key);
 
@@ -21,11 +21,11 @@ class BlocHandler<B extends BlocBase<S>, S extends BlocState> extends StatelessW
 
   factory BlocHandler.custom({
     required Widget child,
-    required BlocNotification? Function(S state) mapErrorToNotification,
+    required BlocNotification? Function(S state) mapEventToNotification,
   }) =>
       BlocHandler(
         child: child,
-        mapErrorToNotification: mapErrorToNotification,
+        mapEventToNotification: mapEventToNotification,
       );
 
   @override
@@ -34,8 +34,8 @@ class BlocHandler<B extends BlocBase<S>, S extends BlocState> extends StatelessW
       listener: (context, state) {
         BlocNotification? notification;
 
-        if (mapErrorToNotification != null) {
-          notification = mapErrorToNotification!(state);
+        if (mapEventToNotification != null) {
+          notification = mapEventToNotification!(state);
         }
 
         if (notification == null && state.isErrored) {
@@ -94,4 +94,6 @@ class BlocNotification {
         textColor: textColor ?? this.textColor,
         postAction: postAction ?? this.postAction,
       );
+
+  BlocNotification withPostAction(Function(BuildContext context) action) => copyWith(postAction: action);
 }

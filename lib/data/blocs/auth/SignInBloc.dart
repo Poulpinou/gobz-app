@@ -1,12 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/formInputs/auth/EmailInput.dart';
 import 'package:gobz_app/data/formInputs/auth/PasswordInput.dart';
 import 'package:gobz_app/data/formInputs/auth/PasswordValidationInput.dart';
 import 'package:gobz_app/data/formInputs/auth/UsernameInput.dart';
 import 'package:gobz_app/data/models/requests/SignInRequest.dart';
 import 'package:gobz_app/data/repositories/AuthRepository.dart';
-import 'package:gobz_app/data/utils/LoggingUtils.dart';
+
+import '../EditionBlocState.dart';
 
 class SignInBloc extends Bloc<SignInEvent, SignInState> {
   final AuthRepository _authRepository;
@@ -30,14 +32,19 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
   Stream<SignInState> _onFormSubmitted(SignInState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(formStatus: FormzStatus.submissionInProgress);
+      yield state.formSubmitting();
       try {
         await _authRepository.signIn(SignInRequest(state.username.value, state.email.value, state.password.value));
 
         yield state.copyWith(formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
-        Log.error("Sign in failed", e);
-        yield state.copyWith(formStatus: FormzStatus.submissionFailure);
+        yield state.formSubmissionFailed(
+          DisplayableException(
+            "La création du compte a échoué",
+            errorMessage: "Sign in failed",
+            error: e as Exception,
+          ),
+        );
       }
     }
   }
@@ -86,30 +93,34 @@ class _SignInPasswordRepeatChanged extends SignInEvent {
 class _SignInSubmitted extends SignInEvent {}
 
 // State
-class SignInState with FormzMixin {
-  final FormzStatus formStatus;
+class SignInState extends EditionBlocState {
   final UsernameInput username;
   final EmailInput email;
   final PasswordInput password;
   final PasswordRepeatInput repeatPassword;
 
   const SignInState(
-      {this.formStatus = FormzStatus.pure,
+      {Exception? error,
+      FormzStatus formStatus = FormzStatus.pure,
       this.username = const UsernameInput.pure(),
       this.email = const EmailInput.pure(),
       this.password = const PasswordInput.pure(),
-      this.repeatPassword = const PasswordRepeatInput.pure()});
+      this.repeatPassword = const PasswordRepeatInput.pure()})
+      : super(formStatus: formStatus, error: error);
 
   @override
   List<FormzInput> get inputs => [username, email, password];
 
   SignInState copyWith(
-          {FormzStatus? formStatus,
+          {bool? isLoading,
+          Exception? error,
+          FormzStatus? formStatus,
           UsernameInput? username,
           EmailInput? email,
           PasswordInput? password,
           PasswordRepeatInput? repeatPassword}) =>
       SignInState(
+          error: error,
           formStatus: formStatus ?? this.status,
           username: username ?? this.username,
           email: email ?? this.email,

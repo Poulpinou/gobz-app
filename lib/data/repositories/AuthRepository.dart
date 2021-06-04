@@ -43,6 +43,10 @@ class AuthRepository {
     await LocalStorageUtils.setString(GobzClientConfig.instance.accessTokenStorageKey, accessToken);
     await LocalStorageUtils.setBool(StorageKeysConfig.instance.wasConnectedKey, true);
 
+    // Store current user infos
+    await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserEmailKey, request.email);
+    await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserPasswordKey, request.password);
+
     _controller.add(AuthStatus.AUTHENTICATED);
     Log.info("${request.email} successfully logged in");
   }

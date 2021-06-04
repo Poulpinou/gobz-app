@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gobz_app/view/components/RunListComponent.dart';
+import 'package:gobz_app/view/components/specific/RunListComponent.dart';
 
 class RunsPage extends StatelessWidget {
   static Route route() {

@@ -3,11 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/data/blocs/chapters/ChapterBloc.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
 import 'package:gobz_app/data/repositories/ChapterRepository.dart';
+import 'package:gobz_app/view/components/forms/chapters/ChapterForm.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-import '../components/StepListComponent.dart';
-import 'EditChapterPage.dart';
+import '../components/specific/StepListComponent.dart';
+import 'FormPage.dart';
 
 class ChapterPage extends StatelessWidget {
   final Chapter chapter;
@@ -47,7 +48,16 @@ class ChapterPage extends StatelessWidget {
   }
 
   void _editChapter(BuildContext context) async {
-    final Chapter? chapter = await Navigator.push(context, EditChapterPage.route(this.chapter));
+    final Chapter? chapter = await Navigator.push(
+      context,
+      FormPage.route<Chapter>(
+        EditChapterForm(
+          chapter: this.chapter,
+          onValidate: (result) => Navigator.pop(context, result),
+        ),
+        title: "Edition de ${this.chapter.name}",
+      ),
+    );
 
     if (chapter != null) {
       context.read<ChapterBloc>().add(ChapterEvents.fetch());
@@ -106,7 +116,7 @@ class ChapterPage extends StatelessWidget {
 
   Widget _buildHandler({required Widget child}) {
     return BlocHandler<ChapterBloc, ChapterState>.custom(
-      mapErrorToNotification: (state) {
+      mapEventToNotification: (state) {
         if (state.chapterDeleted) {
           return BlocNotification.success("${state.chapter.name} a été supprimé")
               .copyWith(postAction: (context) => Navigator.pop(context, null));

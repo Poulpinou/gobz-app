@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gobz_app/data/blocs/BlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
-import 'package:gobz_app/data/models/BlocState.dart';
 import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/models/ProjectInfos.dart';
 import 'package:gobz_app/data/repositories/ProjectRepository.dart';

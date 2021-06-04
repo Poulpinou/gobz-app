@@ -3,17 +3,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/data/blocs/projects/ProjectsBloc.dart';
 import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/repositories/ProjectRepository.dart';
+import 'package:gobz_app/view/components/forms/projects/ProjectForm.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/inputs/SearchBar.dart';
 import 'package:gobz_app/view/widgets/lists/ProjectList.dart';
 
-import 'NewProjectPage.dart';
+import 'FormPage.dart';
 import 'ProjectPage.dart';
 
 class ProjectsPage extends StatelessWidget {
   void _createProject(BuildContext context) async {
-    final Project? project = await Navigator.push(context, NewProjectPage.route());
+    final Project? project = await Navigator.push(
+      context,
+      FormPage.route<Project>(
+        NewProjectForm(
+          onValidate: (result) => Navigator.pop(context, result),
+        ),
+        title: "Nouveau Projet",
+      ),
+    );
 
     if (project != null) {
       context.read<ProjectsBloc>().add(ProjectsEvents.fetch());

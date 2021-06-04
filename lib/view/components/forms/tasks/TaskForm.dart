@@ -3,26 +3,75 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:gobz_app/data/blocs/tasks/TaskEditionBloc.dart';
 import 'package:gobz_app/data/models/Task.dart';
+import 'package:gobz_app/data/models/enums/FormMode.dart';
+import 'package:gobz_app/data/repositories/TaskRepository.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
+
+import '../FormComponent.dart';
 
 part 'fields/TextField.dart';
 
-class TaskForm extends StatelessWidget {
-  final Task? task;
-  final Function(Task task)? onValidate;
-  final Function? onCancel;
-  final bool isCreation;
+class NewTaskForm extends _TaskFormBase {
+  final int stepId;
 
-  const TaskForm({Key? key, this.task, this.onValidate, this.onCancel})
-      : this.isCreation = task == null,
-        super(key: key);
+  NewTaskForm({required this.stepId, Function(Task task)? onValidate, Function? onCancel})
+      : super(FormMode.CREATE, onValidate, onCancel);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<TaskEditionBloc>(
+      create: (context) => TaskEditionBloc.creation(context.read<TaskRepository>()),
+      child: super.build(context),
+    );
+  }
+
+  @override
+  TaskEditionEvent get submissionEvent => TaskEditionEvents.create(stepId);
+}
+
+class EditTaskForm extends _TaskFormBase {
+  final Task task;
+
+  EditTaskForm({required this.task, Function(Task task)? onValidate, Function? onCancel})
+      : super(FormMode.EDIT, onValidate, onCancel);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<TaskEditionBloc>(
+      create: (context) => TaskEditionBloc.edition(
+        context.read<TaskRepository>(),
+        task,
+      ),
+      child: super.build(context),
+    );
+  }
+
+  @override
+  TaskEditionEvent get submissionEvent => TaskEditionEvents.update();
+}
+
+abstract class _TaskFormBase extends StatelessWidget implements FormComponent<Task> {
+  final FormMode formMode;
+  final Function(Task)? onValidate;
+  final Function? onCancel;
+
+  const _TaskFormBase(
+    this.formMode,
+    this.onValidate,
+    this.onCancel, {
+    Key? key,
+  }) : super(key: key);
+
+  bool get isCreation => formMode == FormMode.CREATE;
+
+  TaskEditionEvent get submissionEvent;
 
   @override
   Widget build(BuildContext context) {
     return BlocHandler<TaskEditionBloc, TaskEditionState>.simple(
         child: BlocListener<TaskEditionBloc, TaskEditionState>(
       listener: (context, state) {
-        if (state.hasBeenUpdated && state.task != null) {
+        if (state.isSubmissionSuccess && state.task != null) {
           onValidate?.call(state.task!);
         }
       },
@@ -54,11 +103,8 @@ class TaskForm extends StatelessWidget {
                   buildWhen: (previous, current) => previous.status != current.status,
                   builder: (context, state) => IconButton(
                     icon: Icon(Icons.check),
-                    onPressed: state.status.isValidated
-                        ? () => context.read<TaskEditionBloc>().add(isCreation
-                            ? TaskEditionEvents.createFormSubmitted()
-                            : TaskEditionEvents.updateFormSubmitted())
-                        : null,
+                    onPressed:
+                        state.status.isValidated ? () => context.read<TaskEditionBloc>().add(submissionEvent) : null,
                   ),
                 ),
               ],

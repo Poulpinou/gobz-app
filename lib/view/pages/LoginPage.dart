@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/data/blocs/auth/LoginBloc.dart';
-import 'package:gobz_app/data/repositories/AuthRepository.dart';
-import 'package:gobz_app/view/components/forms/auth/LoginForm.dart';
+import 'package:gobz_app/view/components/forms/login/LoginForm.dart';
 
 import 'SignInPage.dart';
 
@@ -15,22 +12,17 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Connexion')),
-      body: BlocProvider<LoginBloc>(
-        create: (context) => LoginBloc(
-          RepositoryProvider.of<AuthRepository>(context),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                LoginForm(),
-                const Padding(padding: EdgeInsets.all(12)),
-                TextButton(
-                    onPressed: () => Navigator.of(context).pushAndRemoveUntil(SignInPage.route(), (route) => false),
-                    child: const Text("Créer un compte")),
-              ],
-            ),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              LoginForm(),
+              const Padding(padding: EdgeInsets.all(12)),
+              TextButton(
+                  onPressed: () => Navigator.of(context).pushAndRemoveUntil(SignInPage.route(), (route) => false),
+                  child: const Text("Créer un compte")),
+            ],
           ),
         ),
       ),

@@ -1,21 +1,26 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:gobz_app/data/blocs/EditionBlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/formInputs/steps/StepDescriptionInput.dart';
 import 'package:gobz_app/data/formInputs/steps/StepNameInput.dart';
-import 'package:gobz_app/data/models/BlocState.dart';
 import 'package:gobz_app/data/models/Step.dart';
 import 'package:gobz_app/data/models/requests/StepCreationRequest.dart';
 import 'package:gobz_app/data/models/requests/StepUpdateRequest.dart';
 import 'package:gobz_app/data/repositories/StepRepository.dart';
 
 class StepEditionBloc extends Bloc<StepEditionEvent, StepEditionState> {
-  final int? _chapterId;
   final StepRepository _stepRepository;
 
-  StepEditionBloc(this._stepRepository, {int? chapterId, Step? step})
-      : _chapterId = chapterId,
-        super(step != null ? StepEditionState.fromStep(step) : StepEditionState.pure());
+  StepEditionBloc._(this._stepRepository, StepEditionState state) : super(state);
+
+  factory StepEditionBloc.creation(StepRepository stepRepository) {
+    return StepEditionBloc._(stepRepository, StepEditionState.pure());
+  }
+
+  factory StepEditionBloc.edition(StepRepository stepRepository, Step step) {
+    return StepEditionBloc._(stepRepository, StepEditionState.fromStep(step));
+  }
 
   @override
   Stream<StepEditionState> mapEventToState(StepEditionEvent event) async* {
@@ -24,18 +29,18 @@ class StepEditionBloc extends Bloc<StepEditionEvent, StepEditionState> {
     } else if (event is _StepDescriptionChanged) {
       yield state.copyWith(description: StepDescriptionInput.dirty(event.description));
     } else if (event is _CreateStepFormSubmitted) {
-      yield* _onCreateStepSubmitted(state);
+      yield* _onCreateStepSubmitted(state, event);
     } else if (event is _UpdateStepFormSubmitted) {
       yield* _onUpdateStepSubmitted(state);
     }
   }
 
-  Stream<StepEditionState> _onCreateStepSubmitted(StepEditionState state) async* {
+  Stream<StepEditionState> _onCreateStepSubmitted(StepEditionState state, _CreateStepFormSubmitted event) async* {
     if (state.status.isValidated) {
       yield state.loading();
       try {
         final Step? step = await _stepRepository.createStep(
-            _chapterId!,
+            event.chapterId,
             StepCreationRequest(
               name: state.name.value,
               description: state.description.value,
@@ -87,9 +92,9 @@ abstract class StepEditionEvents {
 
   static _StepDescriptionChanged descriptionChanged(String description) => _StepDescriptionChanged(description);
 
-  static _CreateStepFormSubmitted createFormSubmitted() => _CreateStepFormSubmitted();
+  static _CreateStepFormSubmitted create(int chapterId) => _CreateStepFormSubmitted(chapterId);
 
-  static _UpdateStepFormSubmitted updateFormSubmitted() => _UpdateStepFormSubmitted();
+  static _UpdateStepFormSubmitted update() => _UpdateStepFormSubmitted();
 }
 
 class _StepNameChanged extends StepEditionEvent {
@@ -104,25 +109,27 @@ class _StepDescriptionChanged extends StepEditionEvent {
   _StepDescriptionChanged(this.description);
 }
 
-class _CreateStepFormSubmitted extends StepEditionEvent {}
+class _CreateStepFormSubmitted extends StepEditionEvent {
+  final int chapterId;
+
+  _CreateStepFormSubmitted(this.chapterId);
+}
 
 class _UpdateStepFormSubmitted extends StepEditionEvent {}
 
 // State
-class StepEditionState extends BlocState with FormzMixin {
+class StepEditionState extends EditionBlocState {
   final Step? step;
-  final bool hasBeenUpdated;
   final StepNameInput name;
   final StepDescriptionInput description;
 
   const StepEditionState._({
-    bool? isLoading,
+    FormzStatus formStatus = FormzStatus.pure,
     Exception? error,
-    this.hasBeenUpdated = false,
     this.step,
     this.name = const StepNameInput.pure(),
     this.description = const StepDescriptionInput.pure(),
-  }) : super(isLoading: isLoading, error: error);
+  }) : super(formStatus: formStatus, error: error);
 
   factory StepEditionState.pure() => StepEditionState._();
 
@@ -136,15 +143,15 @@ class StepEditionState extends BlocState with FormzMixin {
   StepEditionState copyWith({
     bool? isLoading,
     Exception? error,
+    FormzStatus? formStatus,
     Step? step,
     StepNameInput? name,
     StepDescriptionInput? description,
   }) =>
       StepEditionState._(
-        isLoading: isLoading ?? false,
         error: error,
+        formStatus: formStatus ?? this.formStatus,
         step: step ?? this.step,
-        hasBeenUpdated: step != null,
         name: name ?? this.name,
         description: description ?? this.description,
       );

@@ -4,12 +4,13 @@ import 'package:gobz_app/data/blocs/chapters/ChaptersBloc.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
 import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/repositories/ChapterRepository.dart';
+import 'package:gobz_app/view/components/forms/chapters/ChapterForm.dart';
+import 'package:gobz_app/view/pages/FormPage.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/lists/ChapterList.dart';
 
 import 'ChapterPage.dart';
-import 'NewChapterPage.dart';
 
 class ChaptersPage extends StatelessWidget {
   final Project project;
@@ -21,7 +22,16 @@ class ChaptersPage extends StatelessWidget {
   }
 
   void _createChapter(BuildContext context) async {
-    final Chapter? chapter = await Navigator.push(context, NewChapterPage.route(project));
+    final Chapter? chapter = await Navigator.push(
+      context,
+      FormPage.route<Chapter>(
+        NewChapterForm(
+          projectId: project.id,
+          onValidate: (result) => Navigator.pop(context, result),
+        ),
+        title: "Nouveau Chapitre",
+      ),
+    );
 
     if (chapter != null) {
       context.read<ChaptersBloc>().add(ChaptersEvents.fetch());

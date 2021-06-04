@@ -5,8 +5,8 @@ import 'package:gobz_app/data/blocs/steps/StepsBloc.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
 import 'package:gobz_app/data/models/Step.dart';
 import 'package:gobz_app/data/repositories/StepRepository.dart';
-import 'package:gobz_app/view/pages/EditStepPage.dart';
-import 'package:gobz_app/view/pages/NewStepPage.dart';
+import 'package:gobz_app/view/components/forms/steps/StepForm.dart';
+import 'package:gobz_app/view/pages/FormPage.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/generic/HoldMenu.dart';
@@ -26,8 +26,35 @@ class StepListComponent extends StatelessWidget {
   }
 
   void _createStep(BuildContext context) async {
-    await Navigator.push(context, NewStepPage.route(chapter));
+    await Navigator.push(
+      context,
+      FormPage.route<Step>(
+        NewStepForm(
+          chapterId: chapter.id,
+          onValidate: (result) => Navigator.pop(context, result),
+        ),
+        title: "Nouvelle étape",
+      ),
+    );
+
     _refreshStep(context);
+  }
+
+  void _editStep(BuildContext context, Step step) async {
+    final Step? result = await Navigator.push(
+      context,
+      FormPage.route<Step>(
+        EditStepForm(
+          step: step,
+          onValidate: (result) => Navigator.pop(context, result),
+        ),
+        title: "Edition de ${step.name}",
+      ),
+    );
+
+    if (result != null) {
+      _refreshStep(context);
+    }
   }
 
   void _deleteStep(BuildContext context, Step step) async {
@@ -53,13 +80,6 @@ class StepListComponent extends StatelessWidget {
     }
   }
 
-  void _editStep(BuildContext context, Step step) async {
-    final Step? result = await Navigator.push(context, EditStepPage.route(step));
-    if (result != null) {
-      _refreshStep(context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider<StepsBloc>(
@@ -70,7 +90,7 @@ class StepListComponent extends StatelessWidget {
       ),
       child: Scaffold(
         body: BlocHandler<StepsBloc, StepsState>.custom(
-          mapErrorToNotification: (state) {
+          mapEventToNotification: (state) {
             if (state.deletedStep != null) {
               return BlocNotification.success(
                 "${state.deletedStep!.name} a été supprimé",

@@ -57,7 +57,6 @@ To run this app, run one of those files *lib/main_{env}_{target}.dart* (if none 
 ├── android
 └── ios
 ```
-![Project structure](screenshots/project_structure.jpg "Projects Screen")
 
 
 ## Screenshots

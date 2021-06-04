@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart' hide Step;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/data/blocs/tasks/TaskEditionBloc.dart';
 import 'package:gobz_app/data/blocs/tasks/TasksBloc.dart';
 import 'package:gobz_app/data/models/Step.dart';
 import 'package:gobz_app/data/models/Task.dart';
+import 'package:gobz_app/data/models/enums/FormMode.dart';
 import 'package:gobz_app/data/repositories/TaskRepository.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/lists/TaskList.dart';
 
-import 'forms/tasks/TaskForm.dart';
+import '../forms/tasks/TaskForm.dart';
 
 class TaskListComponent extends StatefulWidget {
   final Step step;
@@ -20,26 +20,24 @@ class TaskListComponent extends StatefulWidget {
   _TaskListComponentState createState() => _TaskListComponentState();
 }
 
-enum _FormMode { NORMAL, CREATION, EDITION }
-
 class _TaskListComponentState extends State<TaskListComponent> {
-  _FormMode _mode = _FormMode.NORMAL;
+  FormMode? _mode;
 
   void _onCreateTask() {
     setState(() {
-      _mode = _FormMode.CREATION;
+      _mode = FormMode.CREATE;
     });
   }
 
   void _onEditTask() {
     setState(() {
-      _mode = _FormMode.EDITION;
+      _mode = FormMode.EDIT;
     });
   }
 
   void _exitMode() {
     setState(() {
-      _mode = _FormMode.NORMAL;
+      _mode = null;
     });
   }
 
@@ -57,37 +55,29 @@ class _TaskListComponentState extends State<TaskListComponent> {
 
   Widget _buildBottomBar(BuildContext context) {
     switch (_mode) {
-      case _FormMode.EDITION:
+      case FormMode.EDIT:
         return BlocBuilder<TasksBloc, TasksState>(
-          builder: (context, state) => BlocProvider<TaskEditionBloc>(
-            create: (context) => TaskEditionBloc(context.read<TaskRepository>(), task: state.selected),
-            child: TaskForm(
-              task: state.selected,
-              onValidate: (task) {
-                _exitMode();
-                _refreshTasks(context);
-              },
-              onCancel: _exitMode,
-            ),
-          ),
-        );
-
-      case _FormMode.CREATION:
-        return BlocProvider<TaskEditionBloc>(
-          create: (context) => TaskEditionBloc(
-            context.read<TaskRepository>(),
-            stepId: widget.step.id,
-          ),
-          child: TaskForm(
+          builder: (context, state) => EditTaskForm(
+            task: state.selected!,
             onValidate: (task) {
-              _refreshTasks(context);
               _exitMode();
+              _refreshTasks(context);
             },
             onCancel: _exitMode,
           ),
         );
 
-      case _FormMode.NORMAL:
+      case FormMode.CREATE:
+        return NewTaskForm(
+          stepId: widget.step.id,
+          onValidate: (task) {
+            _refreshTasks(context);
+            _exitMode();
+          },
+          onCancel: _exitMode,
+        );
+
+      default:
         return BlocBuilder<TasksBloc, TasksState>(
           buildWhen: (previous, current) => previous.selected?.id != current.selected?.id,
           builder: (context, state) => Row(

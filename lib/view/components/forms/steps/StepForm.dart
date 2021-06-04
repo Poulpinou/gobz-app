@@ -3,26 +3,74 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:gobz_app/data/blocs/steps/StepEditionBloc.dart';
 import 'package:gobz_app/data/models/Step.dart';
+import 'package:gobz_app/data/models/enums/FormMode.dart';
+import 'package:gobz_app/data/repositories/StepRepository.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 
+import '../FormComponent.dart';
+
 part 'fields/DescriptionField.dart';
+
 part 'fields/NameField.dart';
 
-class StepForm extends StatelessWidget {
-  final Step? step;
-  final Function(Step)? onValidate;
-  final bool isCreation;
+class NewStepForm extends _StepFormBase {
+  final int chapterId;
 
-  const StepForm({Key? key, Step? step, this.onValidate})
-      : this.step = step,
-        this.isCreation = step == null,
-        super(key: key);
+  NewStepForm({
+    required this.chapterId,
+    Function(Step step)? onValidate,
+  }) : super(FormMode.CREATE, onValidate);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<StepEditionBloc>(
+      create: (context) => StepEditionBloc.creation(context.read<StepRepository>()),
+      child: super.build(context),
+    );
+  }
+
+  @override
+  StepEditionEvent get submissionEvent => StepEditionEvents.create(chapterId);
+}
+
+class EditStepForm extends _StepFormBase {
+  final Step step;
+
+  EditStepForm({
+    required this.step,
+    Function(Step step)? onValidate,
+  }) : super(FormMode.EDIT, onValidate);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<StepEditionBloc>(
+      create: (context) => StepEditionBloc.edition(
+        context.read<StepRepository>(),
+        step,
+      ),
+      child: super.build(context),
+    );
+  }
+
+  @override
+  StepEditionEvent get submissionEvent => StepEditionEvents.update();
+}
+
+abstract class _StepFormBase extends StatelessWidget implements FormComponent<Step> {
+  final FormMode formMode;
+  final Function(Step)? onValidate;
+
+  const _StepFormBase(this.formMode, this.onValidate, {Key? key}) : super(key: key);
+
+  bool get isCreation => formMode == FormMode.CREATE;
+
+  StepEditionEvent get submissionEvent;
 
   @override
   Widget build(BuildContext context) {
     return BlocHandler<StepEditionBloc, StepEditionState>.custom(
-      mapErrorToNotification: (state) {
-        if (state.hasBeenUpdated && state.step != null) {
+      mapEventToNotification: (state) {
+        if (state.isSubmissionSuccess && state.step != null) {
           return BlocNotification.success("${isCreation ? 'Création' : 'Sauvegarde'} de ${state.step!.name} réussie!")
               .copyWith(
             postAction: (context) => onValidate?.call(state.step!),
@@ -53,11 +101,8 @@ class StepForm extends StatelessWidget {
                 buildWhen: (previous, current) => previous.status != current.status,
                 builder: (context, state) => ElevatedButton(
                   key: const Key("stepForm_submit"),
-                  onPressed: state.status.isValidated
-                      ? () => context.read<StepEditionBloc>().add(isCreation
-                          ? StepEditionEvents.createFormSubmitted()
-                          : StepEditionEvents.updateFormSubmitted())
-                      : null,
+                  onPressed:
+                      state.status.isValidated ? () => context.read<StepEditionBloc>().add(submissionEvent) : null,
                   child: Text(isCreation ? 'Créer' : 'Sauvegarder'),
                 ),
               )

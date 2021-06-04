@@ -1,21 +1,26 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:gobz_app/data/blocs/EditionBlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/formInputs/chapters/ChapterDescriptionInput.dart';
 import 'package:gobz_app/data/formInputs/chapters/ChapterNameInput.dart';
-import 'package:gobz_app/data/models/BlocState.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
 import 'package:gobz_app/data/models/requests/ChapterCreationRequest.dart';
 import 'package:gobz_app/data/models/requests/ChapterUpdateRequest.dart';
 import 'package:gobz_app/data/repositories/ChapterRepository.dart';
 
 class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> {
-  final int? _projectId;
   final ChapterRepository _chapterRepository;
 
-  ChapterEditionBloc(this._chapterRepository, {int? projectId, Chapter? chapter})
-      : _projectId = projectId,
-        super(chapter != null ? ChapterEditionState.fromChapter(chapter) : ChapterEditionState.pure());
+  ChapterEditionBloc._(this._chapterRepository, ChapterEditionState state) : super(state);
+
+  factory ChapterEditionBloc.creation(ChapterRepository chapterRepository) {
+    return ChapterEditionBloc._(chapterRepository, ChapterEditionState.pure());
+  }
+
+  factory ChapterEditionBloc.edition(ChapterRepository chapterRepository, Chapter chapter) {
+    return ChapterEditionBloc._(chapterRepository, ChapterEditionState.fromChapter(chapter));
+  }
 
   @override
   Stream<ChapterEditionState> mapEventToState(ChapterEditionEvent event) async* {
@@ -24,24 +29,24 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
     } else if (event is _ChapterDescriptionChanged) {
       yield state.copyWith(description: ChapterDescriptionInput.dirty(event.description));
     } else if (event is _CreateChapterFormSubmitted) {
-      yield* _onCreateChapterSubmitted(state);
+      yield* _onCreateChapterSubmitted(state, event);
     } else if (event is _UpdateChapterFormSubmitted) {
       yield* _onUpdateChapterSubmitted(state);
     }
   }
 
-  Stream<ChapterEditionState> _onCreateChapterSubmitted(ChapterEditionState state) async* {
+  Stream<ChapterEditionState> _onCreateChapterSubmitted(
+      ChapterEditionState state, _CreateChapterFormSubmitted event) async* {
     if (state.status.isValidated) {
       yield state.loading();
       try {
         final Chapter? chapter = await _chapterRepository.createChapter(
-            _projectId!,
+            event.projectId,
             ChapterCreationRequest(
               name: state.name.value,
               description: state.description.value,
             ));
-
-        yield state.copyWith(chapter: chapter);
+        yield state.copyWith(formStatus: FormzStatus.submissionSuccess, chapter: chapter);
       } catch (e) {
         yield state.errored(
           DisplayableException(
@@ -56,7 +61,7 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
 
   Stream<ChapterEditionState> _onUpdateChapterSubmitted(ChapterEditionState state) async* {
     if (state.status.isValidated) {
-      yield state.loading();
+      yield state.formSubmitting();
       try {
         final Chapter? chapter = await _chapterRepository.updateChapter(
             state.chapter!.id,
@@ -64,10 +69,9 @@ class ChapterEditionBloc extends Bloc<ChapterEditionEvent, ChapterEditionState> 
               name: state.name.value,
               description: state.description.value,
             ));
-
-        yield state.copyWith(chapter: chapter);
+        yield state.copyWith(formStatus: FormzStatus.submissionSuccess, chapter: chapter);
       } catch (e) {
-        yield state.errored(
+        yield state.formSubmissionFailed(
           DisplayableException(
             "Échec de la sauvegarde du chapitre",
             errorMessage: 'Chapter update failed',
@@ -87,9 +91,9 @@ abstract class ChapterEditionEvents {
 
   static _ChapterDescriptionChanged descriptionChanged(String description) => _ChapterDescriptionChanged(description);
 
-  static _CreateChapterFormSubmitted createFormSubmitted() => _CreateChapterFormSubmitted();
+  static _CreateChapterFormSubmitted create(int projectId) => _CreateChapterFormSubmitted(projectId);
 
-  static _UpdateChapterFormSubmitted updateFormSubmitted() => _UpdateChapterFormSubmitted();
+  static _UpdateChapterFormSubmitted update() => _UpdateChapterFormSubmitted();
 }
 
 class _ChapterNameChanged extends ChapterEditionEvent {
@@ -104,25 +108,27 @@ class _ChapterDescriptionChanged extends ChapterEditionEvent {
   _ChapterDescriptionChanged(this.description);
 }
 
-class _CreateChapterFormSubmitted extends ChapterEditionEvent {}
+class _CreateChapterFormSubmitted extends ChapterEditionEvent {
+  final int projectId;
+
+  _CreateChapterFormSubmitted(this.projectId);
+}
 
 class _UpdateChapterFormSubmitted extends ChapterEditionEvent {}
 
 // State
-class ChapterEditionState extends BlocState with FormzMixin {
+class ChapterEditionState extends EditionBlocState {
   final Chapter? chapter;
-  final bool hasBeenUpdated;
   final ChapterNameInput name;
   final ChapterDescriptionInput description;
 
   const ChapterEditionState._({
-    bool? isLoading,
+    FormzStatus formStatus = FormzStatus.pure,
     Exception? error,
-    this.hasBeenUpdated = false,
     this.chapter,
     this.name = const ChapterNameInput.pure(),
     this.description = const ChapterDescriptionInput.pure(),
-  }) : super(isLoading: isLoading, error: error);
+  }) : super(formStatus: formStatus, error: error);
 
   factory ChapterEditionState.pure() => ChapterEditionState._();
 
@@ -136,15 +142,15 @@ class ChapterEditionState extends BlocState with FormzMixin {
   ChapterEditionState copyWith({
     bool? isLoading,
     Exception? error,
+    FormzStatus? formStatus,
     Chapter? chapter,
     ChapterNameInput? name,
     ChapterDescriptionInput? description,
   }) =>
       ChapterEditionState._(
-        isLoading: isLoading ?? false,
         error: error,
+        formStatus: formStatus ?? this.formStatus,
         chapter: chapter ?? this.chapter,
-        hasBeenUpdated: chapter != null,
         name: name ?? this.name,
         description: description ?? this.description,
       );

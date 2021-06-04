@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:gobz_app/data/blocs/EditionBlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/formInputs/projects/ProjectDescriptionInput.dart';
 import 'package:gobz_app/data/formInputs/projects/ProjectNameInput.dart';
-import 'package:gobz_app/data/models/BlocState.dart';
 import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/models/requests/ProjectCreationRequest.dart';
 import 'package:gobz_app/data/models/requests/ProjectUpdateRequest.dart';
@@ -12,8 +12,15 @@ import 'package:gobz_app/data/repositories/ProjectRepository.dart';
 class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> {
   final ProjectRepository _projectRepository;
 
-  ProjectEditionBloc(this._projectRepository, {Project? project})
-      : super(project != null ? ProjectEditionState.fromProject(project) : ProjectEditionState.pure());
+  ProjectEditionBloc._(this._projectRepository, ProjectEditionState state) : super(state);
+
+  factory ProjectEditionBloc.creation(ProjectRepository projectRepository) {
+    return ProjectEditionBloc._(projectRepository, ProjectEditionState.pure());
+  }
+
+  factory ProjectEditionBloc.edition(ProjectRepository projectRepository, Project project) {
+    return ProjectEditionBloc._(projectRepository, ProjectEditionState.fromProject(project));
+  }
 
   @override
   Stream<ProjectEditionState> mapEventToState(ProjectEditionEvent event) async* {
@@ -81,9 +88,9 @@ abstract class ProjectEditionEvents {
 
   static _ProjectIsSharedChanged isSharedChanged(bool isShared) => _ProjectIsSharedChanged(isShared);
 
-  static _CreateProjectFormSubmitted creationFormSubmitted() => _CreateProjectFormSubmitted();
+  static _CreateProjectFormSubmitted create() => _CreateProjectFormSubmitted();
 
-  static _UpdateProjectFormSubmitted updateFormSubmitted() => _UpdateProjectFormSubmitted();
+  static _UpdateProjectFormSubmitted update() => _UpdateProjectFormSubmitted();
 }
 
 class _ProjectNameChanged extends ProjectEditionEvent {
@@ -109,30 +116,29 @@ class _CreateProjectFormSubmitted extends ProjectEditionEvent {}
 class _UpdateProjectFormSubmitted extends ProjectEditionEvent {}
 
 // State
-class ProjectEditionState extends BlocState with FormzMixin {
+class ProjectEditionState extends EditionBlocState {
   final Project? project;
-  final bool hasBeenUpdated;
   final ProjectNameInput name;
   final ProjectDescriptionInput description;
   final bool isShared;
 
   const ProjectEditionState._({
-    bool? isLoading,
+    FormzStatus formStatus = FormzStatus.pure,
     Exception? error,
     this.project,
-    this.hasBeenUpdated = false,
     this.name = const ProjectNameInput.pure(),
     this.description = const ProjectDescriptionInput.pure(),
     this.isShared = true,
-  }) : super(isLoading: isLoading, error: error);
+  }) : super(formStatus: formStatus, error: error);
 
   factory ProjectEditionState.pure() => ProjectEditionState._();
 
   factory ProjectEditionState.fromProject(Project project) => ProjectEditionState._(
-      project: project,
-      name: ProjectNameInput.pure(projectName: project.name),
-      description: ProjectDescriptionInput.pure(projectDescription: project.description),
-      isShared: project.isShared);
+        project: project,
+        name: ProjectNameInput.pure(projectName: project.name),
+        description: ProjectDescriptionInput.pure(projectDescription: project.description),
+        isShared: project.isShared,
+      );
 
   @override
   List<FormzInput> get inputs => [name, description];
@@ -141,14 +147,14 @@ class ProjectEditionState extends BlocState with FormzMixin {
           {bool? isLoading,
           Exception? error,
           Project? project,
+          FormzStatus? formStatus,
           ProjectNameInput? name,
           ProjectDescriptionInput? description,
           bool? isShared}) =>
       ProjectEditionState._(
-        isLoading: isLoading ?? false,
         error: error,
+        formStatus: formStatus ?? this.formStatus,
         project: project ?? this.project,
-        hasBeenUpdated: project != null,
         name: name ?? this.name,
         description: description ?? this.description,
         isShared: isShared ?? this.isShared,

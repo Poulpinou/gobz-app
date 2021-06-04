@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:gobz_app/data/blocs/EditionBlocState.dart';
 import 'package:gobz_app/data/configurations/StorageKeysConfig.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/formInputs/auth/EmailInput.dart';
 import 'package:gobz_app/data/formInputs/auth/PasswordInput.dart';
-import 'package:gobz_app/data/models/BlocState.dart';
 import 'package:gobz_app/data/models/requests/LoginRequest.dart';
 import 'package:gobz_app/data/repositories/AuthRepository.dart';
 import 'package:gobz_app/data/utils/LocalStorageUtils.dart';
@@ -45,14 +45,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _onFormSubmitted(LoginState state) async* {
     if (state.status.isValidated) {
-      yield state.copyWith(formStatus: FormzStatus.submissionInProgress, isLoading: true);
+      yield state.formSubmitting();
       try {
         await _authRepository.login(LoginRequest(state.email.value, state.password.value));
 
         // Store current user infos
         await LocalStorageUtils.setBool(StorageKeysConfig.instance.stayConnectedKey, state.stayConnected);
-        await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserEmailKey, state.email.value);
-        await LocalStorageUtils.setString(StorageKeysConfig.instance.currentUserPasswordKey, state.password.value);
 
         yield state.copyWith(formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
@@ -108,23 +106,21 @@ class _StayConnectedChanged extends LoginEvent {
 
 class _LoginSubmitted extends LoginEvent {}
 
-// States
-class LoginState extends BlocState with FormzMixin {
-  final FormzStatus formStatus;
+// State
+class LoginState extends EditionBlocState {
   final EmailInput email;
   final PasswordInput password;
   final bool stayConnected;
   final bool localValuesLoaded;
 
   const LoginState(
-      {bool? isLoading,
-      Exception? error,
-      this.formStatus = FormzStatus.pure,
+      {Exception? error,
+      FormzStatus formStatus = FormzStatus.pure,
       this.email = const EmailInput.pure(),
       this.password = const PasswordInput.pure(),
       this.stayConnected = false,
       this.localValuesLoaded = false})
-      : super(isLoading: isLoading, error: error);
+      : super(formStatus: formStatus, error: error);
 
   @override
   List<FormzInput> get inputs => [email, password];
@@ -138,7 +134,6 @@ class LoginState extends BlocState with FormzMixin {
           bool? stayConnected,
           bool? localValuesLoaded}) =>
       LoginState(
-          isLoading: isLoading ?? false,
           error: error,
           formStatus: formStatus ?? this.status,
           email: email ?? this.email,

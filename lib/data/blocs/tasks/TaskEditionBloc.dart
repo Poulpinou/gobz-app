@@ -1,37 +1,42 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:gobz_app/data/blocs/EditionBlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/formInputs/tasks/TaskTextInput.dart';
-import 'package:gobz_app/data/models/BlocState.dart';
 import 'package:gobz_app/data/models/Task.dart';
 import 'package:gobz_app/data/models/requests/TaskCreationRequest.dart';
 import 'package:gobz_app/data/models/requests/TaskUpdateRequest.dart';
 import 'package:gobz_app/data/repositories/TaskRepository.dart';
 
 class TaskEditionBloc extends Bloc<TaskEditionEvent, TaskEditionState> {
-  final int? _stepId;
   final TaskRepository _taskRepository;
 
-  TaskEditionBloc(this._taskRepository, {int? stepId, Task? task})
-      : _stepId = stepId,
-        super(task != null ? TaskEditionState.fromTask(task) : TaskEditionState.pure());
+  TaskEditionBloc._(this._taskRepository, TaskEditionState state) : super(state);
+
+  factory TaskEditionBloc.creation(TaskRepository taskRepository) {
+    return TaskEditionBloc._(taskRepository, TaskEditionState.pure());
+  }
+
+  factory TaskEditionBloc.edition(TaskRepository taskRepository, Task task) {
+    return TaskEditionBloc._(taskRepository, TaskEditionState.fromTask(task));
+  }
 
   @override
   Stream<TaskEditionState> mapEventToState(TaskEditionEvent event) async* {
     if (event is _TaskTextChanged) {
       yield state.copyWith(text: TaskTextInput.dirty(event.text));
     } else if (event is _CreateTaskFormSubmitted) {
-      yield* _onCreateTaskSubmitted(state);
+      yield* _onCreateTaskSubmitted(state, event);
     } else if (event is _UpdateTaskFormSubmitted) {
       yield* _onUpdateTaskSubmitted(state);
     }
   }
 
-  Stream<TaskEditionState> _onCreateTaskSubmitted(TaskEditionState state) async* {
+  Stream<TaskEditionState> _onCreateTaskSubmitted(TaskEditionState state, _CreateTaskFormSubmitted event) async* {
     if (state.status.isValidated) {
       yield state.loading();
       try {
-        final Task? task = await _taskRepository.createTask(_stepId!, TaskCreationRequest(text: state.text.value));
+        final Task? task = await _taskRepository.createTask(event.stepId, TaskCreationRequest(text: state.text.value));
 
         yield state.copyWith(task: task);
       } catch (e) {
@@ -72,9 +77,9 @@ abstract class TaskEditionEvent {}
 abstract class TaskEditionEvents {
   static _TaskTextChanged textChanged(String text) => _TaskTextChanged(text);
 
-  static _CreateTaskFormSubmitted createFormSubmitted() => _CreateTaskFormSubmitted();
+  static _CreateTaskFormSubmitted create(int stepId) => _CreateTaskFormSubmitted(stepId);
 
-  static _UpdateTaskFormSubmitted updateFormSubmitted() => _UpdateTaskFormSubmitted();
+  static _UpdateTaskFormSubmitted update() => _UpdateTaskFormSubmitted();
 }
 
 class _TaskTextChanged extends TaskEditionEvent {
@@ -83,23 +88,25 @@ class _TaskTextChanged extends TaskEditionEvent {
   _TaskTextChanged(this.text);
 }
 
-class _CreateTaskFormSubmitted extends TaskEditionEvent {}
+class _CreateTaskFormSubmitted extends TaskEditionEvent {
+  final int stepId;
+
+  _CreateTaskFormSubmitted(this.stepId);
+}
 
 class _UpdateTaskFormSubmitted extends TaskEditionEvent {}
 
 // State
-class TaskEditionState extends BlocState with FormzMixin {
+class TaskEditionState extends EditionBlocState {
   final Task? task;
-  final bool hasBeenUpdated;
   final TaskTextInput text;
 
   const TaskEditionState._({
-    bool? isLoading,
+    FormzStatus formStatus = FormzStatus.pure,
     Exception? error,
-    this.hasBeenUpdated = false,
     this.task,
     this.text = const TaskTextInput.pure(),
-  }) : super(isLoading: isLoading, error: error);
+  }) : super(formStatus: formStatus, error: error);
 
   factory TaskEditionState.pure() => TaskEditionState._();
 
@@ -112,14 +119,14 @@ class TaskEditionState extends BlocState with FormzMixin {
   TaskEditionState copyWith({
     bool? isLoading,
     Exception? error,
+    FormzStatus? formStatus,
     Task? task,
     TaskTextInput? text,
   }) =>
       TaskEditionState._(
-        isLoading: isLoading ?? false,
         error: error,
+        formStatus: formStatus ?? this.formStatus,
         task: task ?? this.task,
-        hasBeenUpdated: task != null,
         text: text ?? this.text,
       );
 

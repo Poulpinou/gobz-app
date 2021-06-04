@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Step;
 import 'package:gobz_app/data/models/Step.dart';
-import 'package:gobz_app/view/components/TaskListComponent.dart';
+import 'package:gobz_app/view/components/specific/TaskListComponent.dart';
 import 'package:gobz_app/view/widgets/generic/Accordion.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
