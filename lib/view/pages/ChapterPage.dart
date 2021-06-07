@@ -138,9 +138,11 @@ class ChapterPage extends StatelessWidget {
               lineHeight: 20.0,
               animation: true,
               animationDuration: 600,
-              percent: state.chapter.completion!,
-              center: Text(
-                  state.chapter.completion! < 1 ? "${(state.chapter.completion! * 100).toStringAsFixed(1)}%" : "OK"),
+              percent: state.chapter.completion ?? 0,
+              center: state.chapter.completion != null
+                  ? Text(
+                      state.chapter.completion! < 1 ? "${(state.chapter.completion! * 100).toStringAsFixed(1)}%" : "OK")
+                  : Text("..."),
               progressColor: Theme.of(context).colorScheme.secondary,
               linearStrokeCap: LinearStrokeCap.butt,
             ),

@@ -22,10 +22,6 @@ class StepListComponent extends StatelessWidget {
     context.read<StepsBloc>().add(StepsEvents.fetch());
   }
 
-  void _refreshStep(BuildContext context) {
-    context.read<StepBloc>().add(StepEvents.fetch());
-  }
-
   void _createStep(BuildContext context) async {
     await Navigator.push(
       context,
@@ -38,7 +34,7 @@ class StepListComponent extends StatelessWidget {
       ),
     );
 
-    _refreshStep(context);
+    _refreshSteps(context);
   }
 
   void _editStep(BuildContext context, Step step) async {
@@ -54,7 +50,7 @@ class StepListComponent extends StatelessWidget {
     );
 
     if (result != null) {
-      _refreshStep(context);
+      _refreshSteps(context);
     }
   }
 
@@ -145,7 +141,7 @@ class StepListComponent extends StatelessWidget {
                           onSelected: (action) => action?.call(step),
                           items: <PopupMenuEntry<Function(Step)>>[
                             PopupMenuItem<Function(Step)>(
-                              value: (step) => _refreshStep(context),
+                              value: (step) => _refreshSteps(context),
                               child: Row(
                                 children: <Widget>[
                                   const Icon(Icons.refresh),

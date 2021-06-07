@@ -38,9 +38,11 @@ class FormPage<T> extends StatelessWidget {
           AppBar(
             title: Text(title ?? ""),
           ),
-      body: Padding(
-        padding: padding,
-        child: form,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: padding,
+          child: form,
+        ),
       ),
     );
   }

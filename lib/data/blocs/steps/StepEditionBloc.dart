@@ -46,7 +46,7 @@ class StepEditionBloc extends Bloc<StepEditionEvent, StepEditionState> {
               description: state.description.value,
             ));
 
-        yield state.copyWith(step: step);
+        yield state.copyWith(step: step, formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         yield state.errored(
           DisplayableException(
@@ -70,7 +70,7 @@ class StepEditionBloc extends Bloc<StepEditionEvent, StepEditionState> {
               description: state.description.value,
             ));
 
-        yield state.copyWith(step: step);
+        yield state.copyWith(step: step, formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         yield state.errored(
           DisplayableException(

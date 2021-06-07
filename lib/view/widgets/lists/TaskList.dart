@@ -43,11 +43,13 @@ class _TaskListState extends State<TaskList> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: widget.tasks
-          .map((task) => TaskListItem(
-                task: task,
-                selected: _selectedId == null ? false : task.id == _selectedId,
-                onClick: () => _selectTask(task),
-              ))
+          .map(
+            (task) => TaskListItem(
+              task: task,
+              selected: _selectedId == null ? false : task.id == _selectedId,
+              onClick: () => _selectTask(task),
+            ),
+          )
           .toList(),
     );
   }

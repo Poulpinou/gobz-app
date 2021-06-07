@@ -38,7 +38,7 @@ class TaskEditionBloc extends Bloc<TaskEditionEvent, TaskEditionState> {
       try {
         final Task? task = await _taskRepository.createTask(event.stepId, TaskCreationRequest(text: state.text.value));
 
-        yield state.copyWith(task: task);
+        yield state.copyWith(task: task, formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         yield state.errored(
           DisplayableException(
@@ -57,7 +57,7 @@ class TaskEditionBloc extends Bloc<TaskEditionEvent, TaskEditionState> {
       try {
         final Task? task = await _taskRepository.updateTask(state.task!.id, TaskUpdateRequest(text: state.text.value));
 
-        yield state.copyWith(task: task);
+        yield state.copyWith(task: task, formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         yield state.errored(
           DisplayableException(

@@ -114,7 +114,7 @@ class ChaptersPage extends StatelessWidget {
                       data: state.chapters,
                       itemBuilder: (context, chapter) => ChapterListItem(
                         chapter: chapter,
-                        onClick: (chapter) => _clickChapter(context, chapter),
+                        onClick: () => _clickChapter(context, chapter),
                       ),
                       separatorBuilder: (context, index) => Divider(
                         color: Theme.of(context).colorScheme.secondary,

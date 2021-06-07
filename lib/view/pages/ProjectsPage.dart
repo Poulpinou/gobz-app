@@ -14,6 +14,7 @@ import 'FormPage.dart';
 import 'ProjectPage.dart';
 
 class ProjectsPage extends StatelessWidget {
+  // Actions
   void _createProject(BuildContext context) async {
     final Project? project = await Navigator.push(
       context,
@@ -38,74 +39,78 @@ class ProjectsPage extends StatelessWidget {
     context.read<ProjectsBloc>().add(ProjectsEvents.fetch());
   }
 
+  // Build
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    return BlocProvider<ProjectsBloc>(
       create: (context) => ProjectsBloc(
         projectRepository: RepositoryProvider.of<ProjectRepository>(context),
         fetchOnStart: true,
       ),
       child: Scaffold(
         body: BlocHandler<ProjectsBloc, ProjectsState>.simple(
-          child: Column(children: [
-            SearchBar(
-              onChanged: (value) => context.read<ProjectsBloc>().add(ProjectsEvents.searchTextChanged(value)),
-            ),
-            BlocBuilder<ProjectsBloc, ProjectsState>(
-              buildWhen: (previous, current) =>
-                  previous.searchText.value != current.searchText.value || previous.isLoading != current.isLoading,
-              builder: (context, state) {
-                if (state.isLoading) {
-                  return Expanded(child: CircularLoader("Récupération des projets..."));
-                }
+          child: BlocBuilder<ProjectsBloc, ProjectsState>(
+            buildWhen: (previous, current) => previous.isLoading != current.isLoading,
+            builder: (context, state) => Column(children: [
+              SearchBar(
+                onChanged: (value) => context.read<ProjectsBloc>().add(ProjectsEvents.searchTextChanged(value)),
+              ),
+              BlocBuilder<ProjectsBloc, ProjectsState>(
+                buildWhen: (previous, current) =>
+                    previous.searchText.value != current.searchText.value || previous.isLoading != current.isLoading,
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return Expanded(child: CircularLoader("Récupération des projets..."));
+                  }
 
-                if (state.isErrored) {
+                  if (state.isErrored) {
+                    return Expanded(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text("Impossible de récupérer les projets"),
+                            ElevatedButton(
+                                onPressed: () => context.read<ProjectsBloc>().add(ProjectsEvents.fetch()),
+                                child: const Text("Réessayer"))
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  if (state.projects.length == 0) {
+                    return Expanded(
+                      child: Center(
+                        child: const Text("Vous n'avez encore aucun projet."),
+                      ),
+                    );
+                  }
+
+                  if (state.filteredProjects.length == 0) {
+                    return Padding(
+                      padding: EdgeInsets.all(10),
+                      child: const Text("Aucun projet ne correspond à cette recherche"),
+                    );
+                  }
+
                   return Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text("Impossible de récupérer les projets"),
-                          ElevatedButton(
-                              onPressed: () => context.read<ProjectsBloc>().add(ProjectsEvents.fetch()),
-                              child: const Text("Réessayer"))
-                        ],
+                    child: GenericList<Project>(
+                      data: state.filteredProjects,
+                      itemBuilder: (context, project) => ProjectListItem(
+                        project: project,
+                        onClick: () => _clickProject(context, project),
+                      ),
+                      separatorBuilder: (context, index) => Divider(
+                        color: Theme.of(context).colorScheme.secondary,
                       ),
                     ),
                   );
-                }
-
-                if (state.projects.length == 0) {
-                  return Expanded(
-                    child: Center(
-                      child: const Text("Vous n'avez encore aucun projet."),
-                    ),
-                  );
-                }
-
-                if (state.filteredProjects.length == 0) {
-                  return Padding(
-                    padding: EdgeInsets.all(10),
-                    child: const Text("Aucun projet ne correspond à cette recherche"),
-                  );
-                }
-
-                return Expanded(
-                  child: GenericList<Project>(
-                    data: state.filteredProjects,
-                    itemBuilder: (context, project) => ProjectListItem(
-                      project: project,
-                      onClick: () => _clickProject(context, project),
-                    ),
-                    separatorBuilder: (context, index) => Divider(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ]),
+                },
+              ),
+            ]),
+          ),
         ),
         floatingActionButton: BlocBuilder<ProjectsBloc, ProjectsState>(
           builder: (context, state) => FloatingActionButton(

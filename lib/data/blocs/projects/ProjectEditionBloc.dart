@@ -44,7 +44,7 @@ class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> 
         final Project project = (await _projectRepository
             .createProject(ProjectCreationRequest(state.name.value, state.description.value, state.isShared)));
 
-        yield state.copyWith(project: project);
+        yield state.copyWith(project: project, formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         yield state.errored(
           DisplayableException(
@@ -64,7 +64,7 @@ class ProjectEditionBloc extends Bloc<ProjectEditionEvent, ProjectEditionState> 
         final Project project = (await _projectRepository.updateProject(
             state.project!.id, ProjectUpdateRequest(state.name.value, state.description.value, state.isShared)));
 
-        yield state.copyWith(project: project);
+        yield state.copyWith(project: project, formStatus: FormzStatus.submissionSuccess);
       } catch (e) {
         yield state.errored(
           DisplayableException(
