@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/data/blocs/chapters/ChaptersBloc.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
-import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/repositories/ChapterRepository.dart';
 import 'package:gobz_app/view/components/forms/chapters/ChapterForm.dart';
 import 'package:gobz_app/view/pages/FormPage.dart';
@@ -14,12 +13,12 @@ import 'package:gobz_app/view/widgets/lists/items/ChapterListItem.dart';
 import 'ChapterPage.dart';
 
 class ChaptersPage extends StatelessWidget {
-  final Project project;
+  final int projectId;
 
-  const ChaptersPage({Key? key, required this.project}) : super(key: key);
+  const ChaptersPage({Key? key, required this.projectId}) : super(key: key);
 
-  static Route route(Project project) {
-    return MaterialPageRoute(builder: (_) => ChaptersPage(project: project));
+  static Route route(int projectId) {
+    return MaterialPageRoute(builder: (_) => ChaptersPage(projectId: projectId));
   }
 
   void _createChapter(BuildContext context) async {
@@ -27,7 +26,7 @@ class ChaptersPage extends StatelessWidget {
       context,
       FormPage.route<Chapter>(
         NewChapterForm(
-          projectId: project.id,
+          projectId: projectId,
           onValidate: (result) => Navigator.pop(context, result),
         ),
         title: "Nouveau Chapitre",
@@ -37,12 +36,12 @@ class ChaptersPage extends StatelessWidget {
     if (chapter != null) {
       context.read<ChaptersBloc>().add(ChaptersEvents.fetch());
 
-      Navigator.push(context, ChapterPage.route(chapter));
+      Navigator.push(context, ChapterPage.route(chapter.id));
     }
   }
 
   void _clickChapter(BuildContext context, Chapter chapter) async {
-    await Navigator.push(context, ChapterPage.route(chapter));
+    await Navigator.push(context, ChapterPage.route(chapter.id));
 
     context.read<ChaptersBloc>().add(ChaptersEvents.fetch());
   }
@@ -51,7 +50,7 @@ class ChaptersPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ChaptersBloc(
-        project: project,
+        projectId: projectId,
         chapterRepository: RepositoryProvider.of<ChapterRepository>(context),
         fetchOnStart: true,
       ),

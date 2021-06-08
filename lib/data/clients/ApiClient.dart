@@ -11,15 +11,19 @@ import 'package:http/http.dart';
 
 abstract class ApiClient {
   final String baseUrl;
-
   final bool logRequests;
+  final Duration? fakeWait;
 
   static const Map<String, String> defaultHeaders = {
     HttpHeaders.contentTypeHeader: 'application/json',
     HttpHeaders.acceptHeader: 'application/json',
   };
 
-  ApiClient(this.baseUrl, {this.logRequests = false});
+  ApiClient({
+    required this.baseUrl,
+    this.logRequests = false,
+    this.fakeWait,
+  });
 
   /// Override this method to provide custom Uri
   Uri buildUri(String? path) => Uri.http(baseUrl, path ?? "");
@@ -51,74 +55,51 @@ abstract class ApiClient {
     }
   }
 
+  Future<dynamic> sendRequest(Future<Response> request) async {
+    if (fakeWait != null) {
+      await Future.delayed(fakeWait!);
+    }
+
+    try {
+      final Response response = await request;
+      return buildResponse(response);
+    } on SocketException {
+      throw UnreachableServerException();
+    }
+  }
+
   Future<dynamic> get(String? path) async {
     final Uri uri = buildUri(path);
     if (logRequests) Log.info("GET ${uri.path}");
 
-    var responseJson;
-    try {
-      final Response response = await http.get(uri, headers: await buildHeaders());
-      responseJson = buildResponse(response);
-    } on SocketException {
-      throw UnreachableServerException();
-    }
-
-    return responseJson;
+    return sendRequest(http.get(uri, headers: await buildHeaders()));
   }
 
   Future<dynamic> post(String path, {dynamic? body}) async {
     final Uri uri = buildUri(path);
-    if (logRequests) Log.info("POST ${uri.path} with body: $body");
+    if (logRequests) Log.info("POST ${uri.path} ${body != null ? "with body: $body" : ""}");
 
-    var responseJson;
-    try {
-      final Response response = await http.post(uri, headers: await buildHeaders(), body: json.encode(body));
-      responseJson = buildResponse(response);
-    } on SocketException {
-      throw UnreachableServerException();
-    }
-    return responseJson;
+    return sendRequest(http.post(uri, headers: await buildHeaders(), body: json.encode(body)));
   }
 
   Future<dynamic> put(String path, {dynamic? body}) async {
     final Uri uri = buildUri(path);
-    if (logRequests) Log.info("PUT ${uri.path}");
+    if (logRequests) Log.info("PUT ${uri.path} ${body != null ? "with body: $body" : ""}");
 
-    var responseJson;
-    try {
-      final Response response = await http.put(uri, headers: await buildHeaders(), body: json.encode(body));
-      responseJson = buildResponse(response);
-    } on SocketException {
-      throw UnreachableServerException();
-    }
-    return responseJson;
+    return sendRequest(http.put(uri, headers: await buildHeaders(), body: json.encode(body)));
   }
 
   Future<dynamic> patch(String path, {dynamic? body}) async {
     final Uri uri = buildUri(path);
-    if (logRequests) Log.info("PATCH ${uri.path}");
+    if (logRequests) Log.info("PATCH ${uri.path} ${body != null ? "with body: $body" : ""}");
 
-    var responseJson;
-    try {
-      final Response response = await http.patch(uri, headers: await buildHeaders(), body: json.encode(body));
-      responseJson = buildResponse(response);
-    } on SocketException {
-      throw UnreachableServerException();
-    }
-    return responseJson;
+    return sendRequest(http.patch(uri, headers: await buildHeaders(), body: json.encode(body)));
   }
 
   Future<dynamic> delete(String path) async {
     final Uri uri = buildUri(path);
     if (logRequests) Log.info("DELETE ${uri.path}");
 
-    var responseJson;
-    try {
-      final Response response = await http.delete(uri, headers: await buildHeaders());
-      responseJson = buildResponse(response);
-    } on SocketException {
-      throw UnreachableServerException();
-    }
-    return responseJson;
+    return sendRequest(http.delete(uri, headers: await buildHeaders()));
   }
 }

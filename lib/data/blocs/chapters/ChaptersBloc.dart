@@ -2,14 +2,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/data/blocs/BlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
-import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/repositories/ChapterRepository.dart';
 
 class ChaptersBloc extends Bloc<ChaptersEvent, ChaptersState> {
-  final Project project;
+  final int projectId;
   final ChapterRepository chapterRepository;
 
-  ChaptersBloc({required this.project, required this.chapterRepository, bool fetchOnStart = false})
+  ChaptersBloc({required this.projectId, required this.chapterRepository, bool fetchOnStart = false})
       : super(ChaptersState()) {
     if (fetchOnStart) {
       add(_FetchChapters());
@@ -26,7 +25,7 @@ class ChaptersBloc extends Bloc<ChaptersEvent, ChaptersState> {
   Stream<ChaptersState> _onFetchChapters(_FetchChapters event, ChaptersState state) async* {
     yield state.loading();
     try {
-      final List<Chapter> chapters = await chapterRepository.getChapters(project.id);
+      final List<Chapter> chapters = await chapterRepository.getChapters(projectId);
       yield state.copyWith(chapters: chapters);
     } catch (e) {
       yield state.errored(

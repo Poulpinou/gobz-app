@@ -17,6 +17,7 @@ class GenericList<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      shrinkWrap: true,
       itemBuilder: (context, index) => itemBuilder(context, data[index]),
       itemCount: data.length,
       padding: EdgeInsets.only(bottom: bottomSpace),

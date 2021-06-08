@@ -8,6 +8,7 @@ void main() {
     gobzClientConfig: GobzClientConfig(
       host: "10.0.2.2:8080",
       logRequests: true,
+      //fakeWait: Duration(milliseconds: 500),
     ),
   ));
 

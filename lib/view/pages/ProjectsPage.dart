@@ -29,12 +29,12 @@ class ProjectsPage extends StatelessWidget {
     if (project != null) {
       context.read<ProjectsBloc>().add(ProjectsEvents.fetch());
 
-      Navigator.push(context, ProjectPage.route(project));
+      Navigator.push(context, ProjectPage.route(project.id));
     }
   }
 
   void _clickProject(BuildContext context, Project project) async {
-    await Navigator.push(context, ProjectPage.route(project));
+    await Navigator.push(context, ProjectPage.route(project.id));
 
     context.read<ProjectsBloc>().add(ProjectsEvents.fetch());
   }

@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/data/blocs/BlocState.dart';
+import 'package:gobz_app/data/blocs/FetchBlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/models/Project.dart';
-import 'package:gobz_app/data/models/ProjectInfos.dart';
 import 'package:gobz_app/data/repositories/ProjectRepository.dart';
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
-  final ProjectRepository _projectRepository;
+  final int projectId;
+  final ProjectRepository projectRepository;
 
-  ProjectBloc(this._projectRepository, Project project, {bool fetchOnStart = false})
-      : super(ProjectState(project: project)) {
+  ProjectBloc({required this.projectRepository, required this.projectId, bool fetchOnStart = false})
+      : super(ProjectState()) {
     if (fetchOnStart) {
       add(_FetchProject());
     }
@@ -29,8 +29,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Stream<ProjectState> _fetchProject() async* {
     yield state.loading();
     try {
-      final ProjectInfos projectInfos = await _projectRepository.getProjectInfos(state.project.id);
-      yield state.copyWith(project: projectInfos.project, projectInfos: projectInfos);
+      final Project project = await projectRepository.getProject(projectId);
+      yield state.fetched(project);
     } catch (e) {
       yield state.errored(
         DisplayableException(
@@ -45,8 +45,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Stream<ProjectState> _deleteProject() async* {
     yield state.loading();
     try {
-      await _projectRepository.deleteProject(state.project.id);
-      yield state.copyWith(projectDeleted: true);
+      await projectRepository.deleteProject(projectId);
+      yield state.deleted();
     } catch (e) {
       yield state.errored(
         DisplayableException(
@@ -73,29 +73,31 @@ class _FetchProject extends ProjectEvent {}
 class _DeleteProject extends ProjectEvent {}
 
 // State
-class ProjectState extends BlocState {
-  final Project project;
-  final ProjectInfos? projectInfos;
-  final bool projectDeleted;
+class ProjectState extends FetchBlocState<Project> {
+  const ProjectState({
+    bool? isLoading,
+    Exception? error,
+    FetchStatus fetchStatus = FetchStatus.UNFECTHED,
+    Project? project,
+  }) : super(
+          isLoading: isLoading,
+          error: error,
+          fetchStatus: fetchStatus,
+          data: project,
+        );
 
-  const ProjectState(
-      {bool? isLoading, Exception? error, required this.project, this.projectInfos, this.projectDeleted = false})
-      : super(isLoading: isLoading, error: error);
-
-  bool get shouldBeFetched => projectInfos == null;
+  Project? get project => data;
 
   ProjectState copyWith({
     bool? isLoading,
     Exception? error,
-    Project? project,
-    ProjectInfos? projectInfos,
+    FetchStatus? fetchStatus,
+    Project? data,
     bool? projectDeleted,
   }) =>
       ProjectState(
-        project: project ?? this.project,
-        isLoading: isLoading ?? false,
-        error: error,
-        projectInfos: projectInfos ?? this.projectInfos,
-        projectDeleted: projectDeleted ?? this.projectDeleted,
-      );
+          project: data ?? this.data,
+          isLoading: isLoading ?? false,
+          error: error,
+          fetchStatus: fetchStatus ?? this.fetchStatus);
 }
