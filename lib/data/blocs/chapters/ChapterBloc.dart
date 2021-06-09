@@ -1,14 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/data/blocs/BlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
 import 'package:gobz_app/data/repositories/ChapterRepository.dart';
 
-class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
-  final ChapterRepository _chapterRepository;
+import '../FetchBlocState.dart';
 
-  ChapterBloc(this._chapterRepository, Chapter chapter, {bool fetchOnStart = false})
-      : super(ChapterState(chapter: chapter)) {
+class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
+  final ChapterRepository chapterRepository;
+  final int chapterId;
+
+  ChapterBloc({required this.chapterRepository, required this.chapterId, bool fetchOnStart = false})
+      : super(ChapterState()) {
     if (fetchOnStart) {
       add(_FetchChapter());
     }
@@ -26,8 +28,7 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
   Stream<ChapterState> _fetchChapter() async* {
     yield state.loading();
     try {
-      final Chapter chapter = await _chapterRepository.getChapter(state.chapter.id);
-      yield state.copyWith(chapter: chapter);
+      yield state.fetched(await chapterRepository.getChapter(chapterId));
     } catch (e) {
       yield state.errored(
         DisplayableException(
@@ -42,8 +43,8 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
   Stream<ChapterState> _deleteChapter() async* {
     yield state.loading();
     try {
-      await _chapterRepository.deleteChapter(state.chapter.id);
-      yield state.copyWith(chapterDeleted: true);
+      await chapterRepository.deleteChapter(chapterId);
+      yield state.deleted();
     } catch (e) {
       yield state.errored(
         DisplayableException(
@@ -70,27 +71,31 @@ class _FetchChapter extends ChapterEvent {}
 class _DeleteChapter extends ChapterEvent {}
 
 // State
-class ChapterState extends BlocState {
-  final Chapter chapter;
-  final bool chapterDeleted;
-
-  ChapterState({
+class ChapterState extends FetchBlocState<Chapter> {
+  const ChapterState({
     bool? isLoading,
     Exception? error,
-    required this.chapter,
-    this.chapterDeleted = false,
-  }) : super(isLoading: isLoading, error: error);
+    FetchStatus fetchStatus = FetchStatus.UNFECTHED,
+    Chapter? chapter,
+  }) : super(
+          isLoading: isLoading,
+          error: error,
+          fetchStatus: fetchStatus,
+          data: chapter,
+        );
 
-  @override
+  Chapter? get chapter => data;
+
   ChapterState copyWith({
     bool? isLoading,
     Exception? error,
-    Chapter? chapter,
+    FetchStatus? fetchStatus,
+    Chapter? data,
     bool? chapterDeleted,
   }) =>
       ChapterState(
+          chapter: data ?? this.data,
           isLoading: isLoading ?? false,
           error: error,
-          chapter: chapter ?? this.chapter,
-          chapterDeleted: chapterDeleted ?? this.chapterDeleted);
+          fetchStatus: fetchStatus ?? this.fetchStatus);
 }

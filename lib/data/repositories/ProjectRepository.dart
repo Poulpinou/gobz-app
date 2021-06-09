@@ -2,6 +2,8 @@ import 'package:gobz_app/data/clients/ApiClient.dart';
 import 'package:gobz_app/data/clients/GobzApiClient.dart';
 import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/models/ProjectInfos.dart';
+import 'package:gobz_app/data/models/ProjectMember.dart';
+import 'package:gobz_app/data/models/ProjectProgress.dart';
 import 'package:gobz_app/data/models/requests/ProjectCreationRequest.dart';
 import 'package:gobz_app/data/models/requests/ProjectUpdateRequest.dart';
 import 'package:gobz_app/data/utils/LoggingUtils.dart';
@@ -38,6 +40,28 @@ class ProjectRepository {
       return ProjectInfos.fromJson(responseData);
     } catch (e) {
       Log.error("Failed to create project infos from response", e);
+      rethrow;
+    }
+  }
+
+  Future<ProjectProgress> getProjectProgress(int projectId) async {
+    final Map<String, dynamic> responseData = await _client.get("/$projectId/progress");
+
+    try {
+      return ProjectProgress.fromJson(responseData);
+    } catch (e) {
+      Log.error("Failed to create project infos from response", e);
+      rethrow;
+    }
+  }
+
+  Future<List<ProjectMember>> getProjectMembers(int projectId) async {
+    final List<dynamic> responseData = await _client.get("/$projectId/members");
+
+    try {
+      return responseData.map((memberData) => ProjectMember.fromJson(memberData)).toList();
+    } catch (e) {
+      Log.error("Failed to create project members from response", e);
       rethrow;
     }
   }

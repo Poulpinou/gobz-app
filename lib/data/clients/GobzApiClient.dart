@@ -11,7 +11,11 @@ class GobzApiClient extends ApiClient {
   final bool withBearerToken;
 
   GobzApiClient({this.basePath, this.withBearerToken = true})
-      : super(GobzClientConfig.instance.host, logRequests: GobzClientConfig.instance.logRequests);
+      : super(
+          baseUrl: GobzClientConfig.instance.host,
+          logRequests: GobzClientConfig.instance.logRequests,
+          fakeWait: GobzClientConfig.instance.fakeWait,
+        );
 
   @override
   Uri buildUri(String? path) => Uri.http(baseUrl, "${basePath ?? ""}$path");

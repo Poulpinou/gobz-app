@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gobz_app/data/blocs/auth/AuthBloc.dart';
 import 'package:gobz_app/data/models/User.dart';
+import 'package:gobz_app/view/pages/HomePage.dart';
 import 'package:gobz_app/view/widgets/generic/Avatar.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,7 @@ class _MainPageState extends State<MainPage> {
   final List<_MainPageScreenInfo> _screenInfos = [
     _MainPageScreenInfo(
         title: 'Accueil',
-        screen: const Text('Accueil'),
+        screen: HomePage(),
         navigationBarItem: BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil")),
     _MainPageScreenInfo(
         title: 'Runs',

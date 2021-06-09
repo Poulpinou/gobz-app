@@ -23,7 +23,6 @@ abstract class EditionBlocState extends BlocState with FormzMixin {
 
   T formSubmitting<T extends BlocState>() => copyWith(formStatus: FormzStatus.submissionInProgress) as T;
 
-  T formSubmissionFailed<T extends EditionBlocState>(Exception error) {
-    return copyWith(formStatus: FormzStatus.submissionFailure, error: error) as T;
-  }
+  T formSubmissionFailed<T extends EditionBlocState>(Exception error) =>
+      copyWith(formStatus: FormzStatus.submissionFailure, error: error) as T;
 }
