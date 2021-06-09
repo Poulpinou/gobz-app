@@ -28,21 +28,22 @@ class ChapterPage extends StatelessWidget {
 
   void _deleteChapter(BuildContext context, Chapter chapter) async {
     final bool? isConfirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text('Supprimer ${chapter.name}?'),
-              content: Text('Attention, cette action est définitive!'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: Text('Oui'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text('Non'),
-                ),
-              ],
-            ));
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Supprimer ${chapter.name}?'),
+        content: Text('Attention, cette action est définitive!'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('Oui'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Non'),
+          ),
+        ],
+      ),
+    );
 
     if (isConfirmed != null && isConfirmed == true) {
       context.read<ChapterBloc>().add(ChapterEvents.delete());
