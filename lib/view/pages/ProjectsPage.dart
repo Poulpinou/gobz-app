@@ -10,7 +10,7 @@ import 'package:gobz_app/view/widgets/inputs/SearchBar.dart';
 import 'package:gobz_app/view/widgets/lists/GenericList.dart';
 import 'package:gobz_app/view/widgets/lists/items/ProjectListItem.dart';
 
-import 'FormPage.dart';
+import 'generic/FormPage.dart';
 import 'ProjectPage.dart';
 
 class ProjectsPage extends StatelessWidget {

@@ -13,7 +13,7 @@ import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/generic/FetchFailure.dart';
 
-import 'FormPage.dart';
+import 'generic/FormPage.dart';
 
 class ProjectPage extends StatelessWidget {
   static const double SPACE_BETWEEN_MODULES = 10;

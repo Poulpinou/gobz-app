@@ -3,7 +3,7 @@ import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/models/Chapter.dart';
 import 'package:gobz_app/data/repositories/ChapterRepository.dart';
 
-import '../FetchBlocState.dart';
+import '../generic/states/FetchBlocState.dart';
 
 class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
   final ChapterRepository chapterRepository;

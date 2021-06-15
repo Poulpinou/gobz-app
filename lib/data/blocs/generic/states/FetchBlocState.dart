@@ -1,4 +1,4 @@
-import 'package:gobz_app/data/blocs/BlocState.dart';
+import 'package:gobz_app/data/blocs/generic/states/BlocState.dart';
 
 enum FetchStatus { UNFECTHED, FETCHED, DELETED }
 

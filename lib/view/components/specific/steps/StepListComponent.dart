@@ -6,7 +6,7 @@ import 'package:gobz_app/data/models/Chapter.dart';
 import 'package:gobz_app/data/models/Step.dart';
 import 'package:gobz_app/data/repositories/StepRepository.dart';
 import 'package:gobz_app/view/components/forms/steps/StepForm.dart';
-import 'package:gobz_app/view/pages/FormPage.dart';
+import 'package:gobz_app/view/pages/generic/FormPage.dart';
 import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import 'package:gobz_app/view/widgets/generic/CircularLoader.dart';
 import 'package:gobz_app/view/widgets/generic/HoldMenu.dart';

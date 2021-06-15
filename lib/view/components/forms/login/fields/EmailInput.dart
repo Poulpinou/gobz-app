@@ -20,8 +20,10 @@ class _EmailInputState extends State<_EmailInput> {
           controller: _controller,
           key: const Key('loginForm_emailInput'),
           onChanged: (email) => context.read<LoginBloc>().add(LoginEvents.emailChanged(email)),
-          decoration:
-              InputDecoration(labelText: 'Email', errorText: state.email.invalid ? state.email.error?.message : null),
+          decoration: InputDecoration(
+            labelText: 'Email',
+            errorText: state.email.invalid ? state.email.error?.message : null,
+          ),
         );
       },
     );

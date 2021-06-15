@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/data/blocs/FetchBlocState.dart';
+import 'package:gobz_app/data/blocs/generic/states/FetchBlocState.dart';
 
 class FetchBloc<T> extends Bloc<FetchEvent, FetchBlocState<T>> {
   final Future<T> fetchFunction;
