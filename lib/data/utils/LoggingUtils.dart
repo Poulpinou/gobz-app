@@ -23,7 +23,7 @@ class Log {
       {required String message, LogLevel level = LogLevel.INFO, Object? error, StackTrace? stackTrace}) {
     final DateTime time = DateTime.now();
 
-    logger.log("[${DateFormat('yyyy/MM/dd-hh:mm:ss').format(time)}][${level.stringValue}] $message",
+    logger.log("[${DateFormat('yyyy/MM/dd-HH:mm:ss').format(time)}][${level.stringValue}] $message",
         level: level.index, error: error, time: time, stackTrace: stackTrace);
   }
 }

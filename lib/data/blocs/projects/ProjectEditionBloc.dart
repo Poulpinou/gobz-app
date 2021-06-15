@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:gobz_app/data/blocs/EditionBlocState.dart';
+import 'package:gobz_app/data/blocs/generic/states/EditionBlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/formInputs/projects/ProjectDescriptionInput.dart';
 import 'package:gobz_app/data/formInputs/projects/ProjectNameInput.dart';

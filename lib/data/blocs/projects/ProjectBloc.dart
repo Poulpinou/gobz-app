@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/data/blocs/FetchBlocState.dart';
+import 'package:gobz_app/data/blocs/generic/states/FetchBlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/models/Project.dart';
 import 'package:gobz_app/data/repositories/ProjectRepository.dart';

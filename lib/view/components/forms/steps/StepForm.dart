@@ -10,6 +10,7 @@ import 'package:gobz_app/view/widgets/generic/BlocHandler.dart';
 import '../FormComponent.dart';
 
 part 'fields/DescriptionField.dart';
+
 part 'fields/NameField.dart';
 
 class NewStepForm extends _StepFormBase {
@@ -71,9 +72,7 @@ abstract class _StepFormBase extends StatelessWidget implements FormComponent<St
       mapEventToNotification: (state) {
         if (state.isSubmissionSuccess && state.step != null) {
           return BlocNotification.success("${isCreation ? 'Création' : 'Sauvegarde'} de ${state.step!.name} réussie!")
-              .copyWith(
-            postAction: (context) => onValidate?.call(state.step!),
-          );
+              .withPostAction((context) => onValidate?.call(state.step!));
         }
       },
       child: BlocBuilder<StepEditionBloc, StepEditionState>(

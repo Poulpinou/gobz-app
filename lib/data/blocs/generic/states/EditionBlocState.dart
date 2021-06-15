@@ -1,5 +1,5 @@
 import 'package:formz/formz.dart';
-import 'package:gobz_app/data/blocs/BlocState.dart';
+import 'package:gobz_app/data/blocs/generic/states/BlocState.dart';
 
 abstract class EditionBlocState extends BlocState with FormzMixin {
   final FormzStatus formStatus;

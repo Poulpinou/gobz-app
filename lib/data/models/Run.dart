@@ -16,8 +16,7 @@ class Run {
   final ProjectMember owner;
   final List<RunTask> tasks;
   final RunStatus status;
-  final bool hasLimitDate;
-  final DateTime limitDate;
+  final DateTime? limitDate;
   final double? completion;
 
   Run(
@@ -27,10 +26,11 @@ class Run {
     this.owner,
     this.tasks,
     this.status,
-    this.hasLimitDate,
     this.limitDate,
     this.completion,
   );
+
+  bool get hasLimitDate => limitDate != null;
 
   factory Run.fromJson(Map<String, dynamic> json) => _$RunFromJson(json);
 }

@@ -41,11 +41,15 @@ class RunListItem extends StatelessWidget {
   }
 
   Widget _buildTimeProgressBar(BuildContext context) {
+    if (!run.hasLimitDate) {
+      return Container();
+    }
+
     if (run.status == RunStatus.DONE || run.status == RunStatus.ABANDONED) {
       return Container();
     }
 
-    final Duration remainingDuration = run.limitDate.difference(DateTime.now());
+    final Duration remainingDuration = run.limitDate!.difference(DateTime.now());
     final String message;
     if (run.status == RunStatus.LATE) {
       message =

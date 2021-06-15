@@ -10,7 +10,7 @@ import 'package:gobz_app/view/widgets/generic/FetchFailure.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import '../components/specific/steps/StepListComponent.dart';
-import 'FormPage.dart';
+import 'generic/FormPage.dart';
 
 class ChapterPage extends StatelessWidget {
   final int chapterId;

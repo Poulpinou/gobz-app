@@ -8,7 +8,7 @@ import 'package:gobz_app/data/formInputs/auth/UsernameInput.dart';
 import 'package:gobz_app/data/models/requests/SignInRequest.dart';
 import 'package:gobz_app/data/repositories/AuthRepository.dart';
 
-import '../EditionBlocState.dart';
+import '../generic/states/EditionBlocState.dart';
 
 class SignInBloc extends Bloc<SignInEvent, SignInState> {
   final AuthRepository _authRepository;

@@ -49,7 +49,7 @@ class ProjectInfosModule extends StatelessWidget {
                                   style: Theme.of(context).textTheme.subtitle1?.copyWith(fontWeight: FontWeight.bold),
                                 ),
                                 Text(snapshot.data?.createdAt != null
-                                    ? "Créé le ${DateFormat("dd/MM/yyyy à hh:mm").format(snapshot.data!.createdAt!)}"
+                                    ? "Créé le ${DateFormat("dd/MM/yyyy à HH:mm").format(snapshot.data!.createdAt!)}"
                                     : "Chargement..."),
                                 Text("Public: ${snapshot.data?.isShared ?? false ? 'oui' : 'non'}"),
                               ],

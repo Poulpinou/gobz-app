@@ -5,13 +5,18 @@ class _NameField extends StatefulWidget {
 
   const _NameField({Key? key, this.initialValue}) : super(key: key);
 
-  _NameFieldState createState() => _NameFieldState(initialValue);
+  _NameFieldState createState() => _NameFieldState();
 }
 
 class _NameFieldState extends State<_NameField> {
-  final TextEditingController _controller;
+  late TextEditingController _controller;
 
-  _NameFieldState(String? initialValue) : _controller = TextEditingController(text: initialValue ?? "");
+  @override
+  void initState() {
+    _controller = TextEditingController(text: widget.initialValue ?? "");
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

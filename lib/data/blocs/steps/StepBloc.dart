@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gobz_app/data/blocs/BlocState.dart';
+import 'package:gobz_app/data/blocs/generic/states/BlocState.dart';
 import 'package:gobz_app/data/exceptions/DisplayableException.dart';
 import 'package:gobz_app/data/models/Step.dart';
 import 'package:gobz_app/data/repositories/StepRepository.dart';

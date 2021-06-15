@@ -8,7 +8,11 @@ class RunCreationRequest {
   final List<int> taskIds;
   final DateTime? limitDate;
 
-  RunCreationRequest(this.stepId, this.taskIds, this.limitDate);
+  RunCreationRequest({
+    required this.stepId,
+    required this.taskIds,
+    this.limitDate,
+  });
 
   Map<String, dynamic> toJson() => _$RunCreationRequestToJson(this);
 }

@@ -14,4 +14,10 @@ class Task {
   Task(this.id, this.text, this.isDone, this.workers, this.isWorkingOnIt);
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
+
+  @override
+  int get hashCode => id;
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is Task && id == other.id;
 }
